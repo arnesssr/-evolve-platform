@@ -2,9 +2,9 @@ name: Deploy Documentation
 
 on:
   push:
-    branches: [ version-0.1.1 ]
+    branches: [ main ]
   pull_request:
-    branches: [ version-0.1.1 ]
+    branches: [ main ]
   # Allow manual triggering
   workflow_dispatch:
 
