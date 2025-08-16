@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Module - Evolve Platform Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="folder-structure.html">Project Structure</a></li>
+                <li><a href="admin-module.html">Admin Module</a></li>
+                <li><a href="business-module.html" class="active">Business Module</a></li>
+                <li><a href="reseller-module.html">Reseller Module</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>Business Module</span>
+            </div>
+
+            <h1>Business Module Documentation</h1>
+            <p>The Business module manages end customers who purchase and use the platform's software products (ERP, SACCO, Payroll systems). This module handles customer onboarding, subscription management, and product access.</p>
+
+            <!-- Module Overview -->
+            <h2>Module Overview</h2>
+            <div class="card">
+                <h3>Purpose</h3>
+                <p>The Business module serves as the customer-facing component of the Evolve Platform, handling:</p>
+                <ul>
+                    <li>Customer registration and profile management</li>
+                    <li>Software product subscriptions and billing</li>
+                    <li>Product access and usage tracking</li>
+                    <li>Customer support and communication</li>
+                    <li>Integration with payment systems</li>
+                </ul>
+            </div>
+
+            <!-- Directory Structure -->
+            <h2>Directory Structure</h2>
+            <div class="card">
+                <h3>App/business/</h3>
+                <pre><code>App/business/
+├── __init__.py
+├── admin.py                    # Django admin configuration
+├── apps.py                     # App configuration
+├── models.py                   # Business data models
+├── views.py                    # Business view controllers
+├── urls.py                     # URL routing
+├── serializers.py              # API serializers
+├── forms.py                    # Django forms
+├── managers.py                 # Custom model managers
+├── utils.py                    # Business utility functions
+├── signals.py                  # Django signals
+├── tasks.py                    # Background tasks
+├── tests/
+│   ├── test_models.py          # Model tests
+│   ├── test_views.py           # View tests
+│   ├── test_api.py             # API tests
+│   └── test_utils.py           # Utility tests
+├── management/
+│   └── commands/               # Management commands
+├── migrations/                 # Database migrations
+└── templates/business/         # Business templates</code></pre>
+            </div>
+
+            <!-- Key Responsibilities -->
+            <h2>Key Responsibilities</h2>
+            <div class="card">
+                <h3>Customer Management</h3>
+                <ul>
+                    <li><strong>Registration:</strong> Handle new business customer sign-ups</li>
+                    <li><strong>Profile Management:</strong> Manage company information and user profiles</li>
+                    <li><strong>Verification:</strong> Verify business credentials and documentation</li>
+                    <li><strong>KYC Compliance:</strong> Ensure know-your-customer compliance</li>
+                </ul>
+
+                <h3>Subscription Management</h3>
+                <ul>
+                    <li><strong>Plan Selection:</strong> Allow customers to choose subscription plans</li>
+                    <li><strong>Billing Cycles:</strong> Manage monthly/yearly billing cycles</li>
+                    <li><strong>Payment Processing:</strong> Handle subscription payments</li>
+                    <li><strong>Plan Changes:</strong> Support upgrades and downgrades</li>
+                </ul>
+
+                <h3>Product Access</h3>
+                <ul>
+                    <li><strong>Feature Access:</strong> Control access to product features based on plan</li>
+                    <li><strong>Usage Tracking:</strong> Monitor product usage and limits</li>
+                    <li><strong>Multi-tenant Support:</strong> Ensure data isolation between customers</li>
+                </ul>
+            </div>
+
+            <!-- Core Models -->
+            <h2>Core Models</h2>
+            <div class="card">
+                <h3>Business Model</h3>
+                <p>Main model representing business customers:</p>
+                <pre><code>class Business(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    business_name = models.CharField(max_length=200)
+    business_email = models.EmailField()
+    industry = models.CharField(max_length=100)
+    company_size = models.CharField(max_length=20)
+    country = models.CharField(max_length=50)
+    postal_code = models.CharField(max_length=20)
+    subscription_status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)</code></pre>
+
+                <h3>Subscription Model</h3>
+                <p>Manages customer subscriptions:</p>
+                <pre><code>class Subscription(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    auto_renewal = models.BooleanField(default=True)</code></pre>
+
+                <h3>Plan Model</h3>
+                <p>Defines available subscription plans:</p>
+                <pre><code>class Plan(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    yearly_price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
+    features = models.JSONField()
+    max_users = models.IntegerField()
+    storage_limit = models.BigIntegerField()</code></pre>
+            </div>
+
+            <!-- API Endpoints -->
+            <h2>API Endpoints</h2>
+            <div class="card">
+                <h3>Business Profile APIs</h3>
+                <table>
+                    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                    <tr><td>GET</td><td>/api/business/v1/profile/</td><td>Get business profile</td></tr>
+                    <tr><td>PUT</td><td>/api/business/v1/profile/</td><td>Update business profile</td></tr>
+                    <tr><td>POST</td><td>/api/business/v1/verify/</td><td>Submit verification documents</td></tr>
+                </table>
+
+                <h3>Subscription APIs</h3>
+                <table>
+                    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                    <tr><td>GET</td><td>/api/business/v1/subscription/</td><td>Get current subscription</td></tr>
+                    <tr><td>GET</td><td>/api/business/v1/plans/</td><td>List available plans</td></tr>
+                    <tr><td>POST</td><td>/api/business/v1/subscribe/</td><td>Subscribe to a plan</td></tr>
+                    <tr><td>PUT</td><td>/api/business/v1/subscription/change/</td><td>Change subscription plan</td></tr>
+                    <tr><td>POST</td><td>/api/business/v1/subscription/cancel/</td><td>Cancel subscription</td></tr>
+                </table>
+
+                <h3>Usage & Billing APIs</h3>
+                <table>
+                    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+                    <tr><td>GET</td><td>/api/business/v1/usage/</td><td>Get usage statistics</td></tr>
+                    <tr><td>GET</td><td>/api/business/v1/invoices/</td><td>List invoices</td></tr>
+                    <tr><td>GET</td><td>/api/business/v1/payments/</td><td>List payment history</td></tr>
+                </table>
+            </div>
+
+            <!-- Services -->
+            <h2>Service Layer</h2>
+            <div class="card">
+                <h3>Business Services</h3>
+                <ul>
+                    <li><strong>CustomerService:</strong> Handles customer registration and verification</li>
+                    <li><strong>SubscriptionService:</strong> Manages subscription lifecycle</li>
+                    <li><strong>BillingService:</strong> Handles billing and payment processing</li>
+                    <li><strong>UsageTrackingService:</strong> Monitors product usage and limits</li>
+                    <li><strong>NotificationService:</strong> Sends customer notifications</li>
+                </ul>
+            </div>
+
+            <!-- Development Guidelines -->
+            <h2>Development Guidelines</h2>
+            <div class="card">
+                <h3>Adding New Features</h3>
+                <ul>
+                    <li>Always consider multi-tenancy when adding new features</li>
+                    <li>Implement proper access controls and permissions</li>
+                    <li>Add usage tracking for billable features</li>
+                    <li>Ensure backward compatibility with existing subscriptions</li>
+                </ul>
+
+                <h3>Billing and Payments</h3>
+                <ul>
+                    <li>Always use transactions for billing operations</li>
+                    <li>Implement idempotency for payment operations</li>
+                    <li>Log all financial transactions for audit purposes</li>
+                    <li>Handle payment failures gracefully</li>
+                </ul>
+
+                <h3>Data Security</h3>
+                <ul>
+                    <li>Encrypt sensitive business data at rest</li>
+                    <li>Implement proper data isolation between customers</li>
+                    <li>Regular security audits and penetration testing</li>
+                    <li>GDPR compliance for data protection</li>
+                </ul>
+
+                <h3>Testing</h3>
+                <ul>
+                    <li>Write comprehensive tests for billing logic</li>
+                    <li>Test multi-tenant data isolation</li>
+                    <li>Mock external payment services in tests</li>
+                    <li>Load test subscription management endpoints</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> The Business module handles critical customer data and billing operations. All changes should be thoroughly tested and reviewed before deployment. Consider the financial and operational impact of any modifications.
+            </div>
+        </main>
+    </div>
+</body>
+</html>
