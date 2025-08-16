@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: arnesssr/my-evolve-platform
+  IMAGE_NAME: arnesssr/evolve-platform
 
 jobs:
   build-and-push:
