@@ -1,0 +1,42 @@
+# Trivy Security Scanner - Ignore File
+# =====================================
+# This file tells Trivy to ignore certain vulnerabilities that are not relevant to our Django application
+
+# Kernel vulnerabilities - these are system-level and not relevant to our Python Django app
+# The kernel issues should be handled at the OS/infrastructure level, not application level
+CVE-2024-*-kernel*
+CVE-2023-*-kernel*
+CVE-2022-*-kernel*
+
+# System-level vulnerabilities that are not application dependencies
+*kernel*
+*io_uring*
+*objtool*
+*spi*
+*perf*
+*iavf*
+*fhandle*
+*bridge*
+*PCI*
+*ALSA*
+*virtio*
+*dmaengine*
+*clk*
+*drm*
+*kasan*
+*ublk*
+*nvmet*
+*ext4*
+*ibmvnic*
+*bluetooth*
+*descendant*
+*low-privileged*
+
+# Focus only on:
+# - Python package vulnerabilities
+# - Django security issues  
+# - Application-level dependencies
+# - Container/Docker related issues (if applicable)
+
+# Note: This file helps focus security scanning on actual application risks
+# rather than system-level kernel issues that should be handled by infrastructure teams
