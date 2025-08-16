@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - Evolve Platform Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="folder-structure.html">Project Structure</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="admin-module.html">Admin Module</a></li>
+                <li><a href="business-module.html">Business Module</a></li>
+                <li><a href="reseller-module.html">Reseller Module</a></li>
+                <li><a href="integrations.html">Integrations</a></li>
+                <li><a href="api-reference.html" class="active">API Reference</a></li>
+                <li><a href="deployment.html">Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>API Reference</span>
+            </div>
+
+            <h1>API Reference</h1>
+            <p>Complete reference for the Evolve Platform REST API endpoints. All APIs follow RESTful conventions and use JSON for request/response payloads.</p>
+
+            <!-- API Overview -->
+            <h2>API Overview</h2>
+            <div class="card">
+                <h3>Base Information</h3>
+                <ul>
+                    <li><strong>Base URL:</strong> <code>https://your-domain.com/api/</code></li>
+                    <li><strong>Current Version:</strong> v1</li>
+                    <li><strong>Authentication:</strong> JWT Token-based</li>
+                    <li><strong>Content Type:</strong> application/json</li>
+                    <li><strong>Response Format:</strong> JSON</li>
+                </ul>
+
+                <h3>API Structure</h3>
+                <pre><code>/api/
+├── auth/                       # Authentication endpoints
+├── admin/v1/                   # Admin management APIs
+├── business/v1/                # Business customer APIs
+├── reseller/v1/                # Reseller management APIs
+└── reseller/earnings/          # Reseller earnings APIs</code></pre>
+            </div>
+
+            <!-- Authentication -->
+            <h2>Authentication</h2>
+            <div class="card">
+                <h3>Authentication Flow</h3>
+                <p>The API uses JWT (JSON Web Tokens) for authentication. Users must obtain a token via login and include it in the Authorization header for protected endpoints.</p>
+
+                <h4>Login Endpoint</h4>
+                <table>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td><code>/api/auth/login/</code></td>
+                        <td>Authenticate user and get JWT token</td>
+                    </tr>
+                </table>
+
+                <h4>Request Example</h4>
+                <pre><code>POST /api/auth/login/
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "your_password"
+}</code></pre>
+
+                <h4>Response Example</h4>
+                <pre><code>{
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "user": {
+        "id": 1,
+        "email": "user@example.com",
+        "role": "reseller"
+    }
+}</code></pre>
+
+                <h4>Using the Token</h4>
+                <pre><code>Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...</code></pre>
+            </div>
+
+            <!-- Admin APIs -->
+            <h2>Admin APIs</h2>
+            <div class="card">
+                <h3>User Management</h3>
+                
+                <h4>List Users</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/admin/v1/users/</code></td></tr>
+                    <tr><th>Description</th><td>Get paginated list of all platform users</td></tr>
+                    <tr><th>Authentication</th><td>Required (Admin only)</td></tr>
+                </table>
+
+                <h5>Query Parameters</h5>
+                <ul>
+                    <li><code>role</code> - Filter by user role (admin, business_owner, reseller)</li>
+                    <li><code>status</code> - Filter by status (active, pending, suspended)</li>
+                    <li><code>search</code> - Search by email or name</li>
+                    <li><code>page</code> - Page number for pagination</li>
+                    <li><code>page_size</code> - Number of results per page</li>
+                </ul>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "count": 150,
+    "next": "/api/admin/v1/users/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "email": "user@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "profile": {
+                "role": "reseller",
+                "phone": "+1234567890",
+                "industry": "Technology"
+            },
+            "is_active": true,
+            "date_joined": "2024-01-15T10:30:00Z"
+        }
+    ]
+}</code></pre>
+
+                <h4>Approve User</h4>
+                <table>
+                    <tr><th>Method</th><td>POST</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/admin/v1/users/{id}/approve/</code></td></tr>
+                    <tr><th>Description</th><td>Approve a pending user registration</td></tr>
+                    <tr><th>Authentication</th><td>Required (Admin only)</td></tr>
+                </table>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "message": "User approved successfully",
+    "user_id": 1,
+    "status": "active"
+}</code></pre>
+
+                <h4>Business Management</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/admin/v1/businesses/</code></td></tr>
+                    <tr><th>Description</th><td>Get list of all business customers</td></tr>
+                    <tr><th>Authentication</th><td>Required (Admin only)</td></tr>
+                </table>
+
+                <h5>Query Parameters</h5>
+                <ul>
+                    <li><code>industry</code> - Filter by industry</li>
+                    <li><code>country</code> - Filter by country</li>
+                    <li><code>company_size</code> - Filter by company size</li>
+                </ul>
+            </div>
+
+            <!-- Reseller APIs -->
+            <h2>Reseller APIs</h2>
+            <div class="card">
+                <h3>Profile Management</h3>
+
+                <h4>Get Profile</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/v1/profile/</code></td></tr>
+                    <tr><th>Description</th><td>Get current reseller's profile information</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "id": 1,
+    "user": {
+        "id": 5,
+        "email": "reseller@example.com",
+        "first_name": "Jane",
+        "last_name": "Smith"
+    },
+    "reseller_type": "individual",
+    "company_name": null,
+    "phone_number": "+1234567890",
+    "address": "123 Main St",
+    "city": "New York",
+    "country": "United States",
+    "referral_code": "LXN-U00005-A7B",
+    "tier": "silver",
+    "commission_rate": "15.00",
+    "is_verified": true,
+    "total_sales": "12500.00",
+    "total_commission_earned": "1875.00",
+    "pending_commission": "250.00"
+}</code></pre>
+
+                <h4>Update Profile</h4>
+                <table>
+                    <tr><th>Method</th><td>PUT/PATCH</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/v1/profile/</code></td></tr>
+                    <tr><th>Description</th><td>Update reseller profile information</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Request Example</h5>
+                <pre><code>PATCH /api/reseller/v1/profile/
+Content-Type: application/json
+
+{
+    "phone_number": "+1987654321",
+    "address": "456 Oak Avenue",
+    "city": "Los Angeles"
+}</code></pre>
+
+                <h4>Get Referral Link</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/v1/referral-link/</code></td></tr>
+                    <tr><th>Description</th><td>Get personalized referral links</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Query Parameters</h5>
+                <ul>
+                    <li><code>product_id</code> - Optional specific product to create link for</li>
+                </ul>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "referral_code": "LXN-U00005-A7B",
+    "links": {
+        "general": "https://platform.com/?ref=LXN-U00005-A7B",
+        "erp_product": "https://platform.com/erp/?ref=LXN-U00005-A7B",
+        "sacco_product": "https://platform.com/sacco/?ref=LXN-U00005-A7B"
+    }
+}</code></pre>
+            </div>
+
+            <!-- Earnings APIs -->
+            <h2>Earnings APIs</h2>
+            <div class="card">
+                <h3>Commission Management</h3>
+
+                <h4>List Commissions</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/earnings/commissions/</code></td></tr>
+                    <tr><th>Description</th><td>Get list of reseller's commissions</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Query Parameters</h5>
+                <ul>
+                    <li><code>status</code> - Filter by status (pending, approved, paid)</li>
+                    <li><code>start_date</code> - Start date for date range filter</li>
+                    <li><code>end_date</code> - End date for date range filter</li>
+                    <li><code>page</code> - Page number</li>
+                </ul>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "count": 25,
+    "next": "/api/reseller/earnings/commissions/?page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "transaction_reference": "TXN-001-2024",
+            "client_name": "ABC Corp",
+            "client_email": "contact@abccorp.com",
+            "product_name": "ERP Professional",
+            "sale_amount": "2500.00",
+            "amount": "375.00",
+            "commission_rate": "15.00",
+            "tier_bonus": "0.00",
+            "status": "approved",
+            "calculation_date": "2024-01-20T14:30:00Z",
+            "approval_date": "2024-01-22T10:15:00Z",
+            "paid_date": null
+        }
+    ]
+}</code></pre>
+
+                <h4>Earnings Dashboard</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/earnings/dashboard/</code></td></tr>
+                    <tr><th>Description</th><td>Get earnings dashboard summary</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "summary": {
+        "total_earnings": "1875.00",
+        "pending_commission": "250.00",
+        "this_month_earnings": "450.00",
+        "last_month_earnings": "380.00"
+    },
+    "tier_info": {
+        "current_tier": "silver",
+        "commission_rate": "15.00",
+        "next_tier": "gold",
+        "sales_to_next_tier": "2500.00"
+    },
+    "recent_commissions": [...],
+    "performance_chart": {
+        "labels": ["Jan", "Feb", "Mar", "Apr"],
+        "data": [300, 450, 380, 450]
+    }
+}</code></pre>
+
+                <h4>Request Payout</h4>
+                <table>
+                    <tr><th>Method</th><td>POST</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/reseller/earnings/payout-request/</code></td></tr>
+                    <tr><th>Description</th><td>Request payout of pending commissions</td></tr>
+                    <tr><th>Authentication</th><td>Required (Reseller)</td></tr>
+                </table>
+
+                <h5>Request Example</h5>
+                <pre><code>POST /api/reseller/earnings/payout-request/
+Content-Type: application/json
+
+{
+    "amount": "250.00",
+    "payment_method": "bank_transfer",
+    "notes": "Monthly payout request"
+}</code></pre>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "id": 15,
+    "amount": "250.00",
+    "payment_method": "bank_transfer",
+    "status": "pending",
+    "request_date": "2024-01-25T09:00:00Z",
+    "estimated_processing": "2024-01-27T09:00:00Z",
+    "message": "Payout request submitted successfully"
+}</code></pre>
+            </div>
+
+            <!-- Business APIs -->
+            <h2>Business APIs</h2>
+            <div class="card">
+                <h3>Business Profile</h3>
+
+                <h4>Get Business Profile</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/business/v1/profile/</code></td></tr>
+                    <tr><th>Description</th><td>Get current business profile</td></tr>
+                    <tr><th>Authentication</th><td>Required (Business)</td></tr>
+                </table>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "id": 1,
+    "business_name": "TechCorp Solutions",
+    "business_email": "info@techcorp.com",
+    "industry": "Information Technology",
+    "company_size": "51-200",
+    "country": "Kenya",
+    "postal_code": "00100",
+    "subscription_status": "active",
+    "current_plan": {
+        "name": "Professional",
+        "price": "299.99",
+        "features": ["Advanced Reporting", "API Access", "Priority Support"]
+    }
+}</code></pre>
+
+                <h4>Subscription Management</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/business/v1/subscription/</code></td></tr>
+                    <tr><th>Description</th><td>Get current subscription details</td></tr>
+                    <tr><th>Authentication</th><td>Required (Business)</td></tr>
+                </table>
+
+                <h4>Available Plans</h4>
+                <table>
+                    <tr><th>Method</th><td>GET</td></tr>
+                    <tr><th>Endpoint</th><td><code>/api/business/v1/plans/</code></td></tr>
+                    <tr><th>Description</th><td>Get list of available subscription plans</td></tr>
+                    <tr><th>Authentication</th><td>Required (Business)</td></tr>
+                </table>
+
+                <h5>Response Example</h5>
+                <pre><code>{
+    "plans": [
+        {
+            "id": 1,
+            "name": "Basic",
+            "price": "99.99",
+            "yearly_price": "999.99",
+            "description": "Perfect for small businesses",
+            "features": [
+                {"name": "Users", "value": "Up to 10"},
+                {"name": "Storage", "value": "100GB"},
+                {"name": "Support", "value": "Email"}
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Professional",
+            "price": "299.99",
+            "yearly_price": "2999.99",
+            "description": "Advanced features for growing businesses",
+            "features": [
+                {"name": "Users", "value": "Up to 50"},
+                {"name": "Storage", "value": "500GB"},
+                {"name": "Support", "value": "Priority"}
+            ]
+        }
+    ]
+}</code></pre>
+            </div>
+
+            <!-- Error Handling -->
+            <h2>Error Handling</h2>
+            <div class="card">
+                <h3>HTTP Status Codes</h3>
+                <table>
+                    <tr>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Usage</th>
+                    </tr>
+                    <tr>
+                        <td>200</td>
+                        <td>OK</td>
+                        <td>Successful GET, PUT, PATCH requests</td>
+                    </tr>
+                    <tr>
+                        <td>201</td>
+                        <td>Created</td>
+                        <td>Successful POST requests that create resources</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Invalid request parameters or malformed JSON</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Missing or invalid authentication token</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                        <td>User doesn't have permission for the requested action</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Requested resource doesn't exist</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Unexpected server error</td>
+                    </tr>
+                </table>
+
+                <h3>Error Response Format</h3>
+                <pre><code>{
+    "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "The provided data is invalid",
+        "details": {
+            "email": ["This field is required"],
+            "password": ["Password must be at least 8 characters"]
+        }
+    }
+}</code></pre>
+
+                <h3>Common Error Codes</h3>
+                <ul>
+                    <li><code>VALIDATION_ERROR</code> - Invalid input data</li>
+                    <li><code>AUTHENTICATION_FAILED</code> - Invalid credentials</li>
+                    <li><code>PERMISSION_DENIED</code> - Insufficient permissions</li>
+                    <li><code>RESOURCE_NOT_FOUND</code> - Requested resource doesn't exist</li>
+                    <li><code>RATE_LIMIT_EXCEEDED</code> - Too many requests</li>
+                </ul>
+            </div>
+
+            <!-- Rate Limiting -->
+            <h2>Rate Limiting</h2>
+            <div class="card">
+                <h3>Rate Limit Rules</h3>
+                <table>
+                    <tr>
+                        <th>User Type</th>
+                        <th>Requests per Hour</th>
+                        <th>Burst Limit</th>
+                    </tr>
+                    <tr>
+                        <td>Unauthenticated</td>
+                        <td>100</td>
+                        <td>10 per minute</td>
+                    </tr>
+                    <tr>
+                        <td>Authenticated User</td>
+                        <td>1000</td>
+                        <td>50 per minute</td>
+                    </tr>
+                    <tr>
+                        <td>Admin</td>
+                        <td>5000</td>
+                        <td>200 per minute</td>
+                    </tr>
+                </table>
+
+                <h3>Rate Limit Headers</h3>
+                <pre><code>X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 950
+X-RateLimit-Reset: 1643723400</code></pre>
+
+                <h3>Rate Limit Exceeded Response</h3>
+                <pre><code>HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+{
+    "error": {
+        "code": "RATE_LIMIT_EXCEEDED",
+        "message": "Rate limit exceeded. Try again in 3600 seconds.",
+        "retry_after": 3600
+    }
+}</code></pre>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>API Versioning:</strong> The API uses URL versioning (v1, v2, etc.). When breaking changes are introduced, a new version will be created while maintaining backward compatibility for existing versions.
+            </div>
+        </main>
+    </div>
+</body>
+</html>

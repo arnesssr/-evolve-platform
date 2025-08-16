@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseller Module - Evolve Platform Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="folder-structure.html">Project Structure</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="admin-module.html">Admin Module</a></li>
+                <li><a href="business-module.html">Business Module</a></li>
+                <li><a href="reseller-module.html" class="active">Reseller Module</a></li>
+                <li><a href="integrations.html">Integrations</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
+                <li><a href="deployment.html">Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>Reseller Module</span>
+            </div>
+
+            <h1>Reseller Module Documentation</h1>
+            <p>The Reseller module is the most complex module in the Evolve Platform, handling sales agent management, commission tracking, earnings calculations, and payout processing. This module includes a sophisticated earnings sub-system for managing complex commission structures.</p>
+
+            <!-- Module Overview -->
+            <h2>Module Overview</h2>
+            <div class="card">
+                <h3>Purpose</h3>
+                <p>The Reseller module serves as a comprehensive sales management system that provides:</p>
+                <ul>
+                    <li><strong>Reseller Management:</strong> Registration, verification, and tier-based management</li>
+                    <li><strong>Commission Tracking:</strong> Sophisticated commission calculation and tracking</li>
+                    <li><strong>Earnings Management:</strong> Payout processing, invoice generation, and tax handling</li>
+                    <li><strong>Performance Analytics:</strong> Sales metrics, conversion tracking, and leaderboards</li>
+                    <li><strong>Marketing Tools:</strong> Referral links, campaign tracking, and promotional materials</li>
+                </ul>
+
+                <div style="margin-top: 20px;">
+                    <h4>Location:</h4>
+                    <code>App/reseller/</code>
+                </div>
+            </div>
+
+            <!-- Directory Structure -->
+            <h2>Directory Structure</h2>
+            <div class="card">
+                <pre><code>App/reseller/
+├── earnings/                   # Earnings sub-module (commission system)
+│   ├── models/                 # Earnings-specific models
+│   │   ├── base.py             # Base models and choices
+│   │   ├── reseller.py         # Reseller profile model
+│   │   ├── commission.py       # Commission tracking model
+│   │   ├── invoice.py          # Invoice generation model
+│   │   └── payout.py           # Payout management model
+│   ├── services/               # Earnings business logic
+│   │   ├── base.py             # Base service class
+│   │   ├── reseller_service.py # Reseller management service
+│   │   ├── commission_service.py # Commission calculation service
+│   │   ├── invoice_service.py   # Invoice generation service
+│   │   └── payout_service.py    # Payout processing service
+│   ├── repositories/           # Earnings data access layer
+│   │   ├── base.py             # Base repository class
+│   │   ├── reseller_repository.py
+│   │   ├── commission_repository.py
+│   │   ├── invoice_repository.py
+│   │   └── payout_repository.py
+│   ├── forms/                  # Earnings-related forms
+│   │   ├── profile_forms.py    # Reseller profile forms
+│   │   ├── invoice_forms.py    # Invoice generation forms
+│   │   └── payout_forms.py     # Payout request forms
+│   └── api/                    # Earnings API endpoints
+│       ├── urls.py             # Earnings API routing
+│       └── views.py            # Earnings API views
+├── api/                        # Main reseller API endpoints
+│   └── v1/                     # API version 1
+│       ├── serializers/        # API serializers
+│       │   └── reseller_serializers.py
+│       ├── views/              # API view controllers
+│       │   └── reseller_views.py
+│       └── urls.py             # API URL routing
+├── views/                      # Web interface views
+│   └── profile_views.py        # Reseller profile management views
+├── management/                 # Django management commands
+│   └── commands/               # Reseller-specific commands
+│       ├── regenerate_partner_codes.py
+│       └── update_partner_codes.py
+├── migrations/                 # Database migrations
+├── tests/                      # Unit and integration tests
+├── utils.py                    # Utility functions
+├── base_views.py               # Base view classes
+├── context_processors.py      # Template context processors
+├── permissions.py              # Custom permissions
+├── urls.py                     # Main reseller URL routing
+└── views.py                    # Legacy view functions</code></pre>
+            </div>
+
+            <!-- Key Components -->
+            <h2>Key Components</h2>
+
+            <div class="card">
+                <h3>Reseller Profile System</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Key Features</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Reseller Model</strong></td>
+                        <td>Core reseller profile with personal and business information</td>
+                        <td>KYC verification, tier management, referral codes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tier System</strong></td>
+                        <td>Bronze, Silver, Gold, Platinum tiers based on sales performance</td>
+                        <td>Automatic tier upgrades, commission rate adjustments</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Referral Codes</strong></td>
+                        <td>Unique partner codes for tracking referrals</td>
+                        <td>Automatic generation, collision detection, tracking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Verification System</strong></td>
+                        <td>KYC and business verification workflow</td>
+                        <td>Document upload, admin approval, status tracking</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Commission System</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Commission Calculation</strong></td>
+                        <td>Automatic commission calculation based on sales</td>
+                        <td>Tier-based rates, bonus structures, real-time calculation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transaction Tracking</strong></td>
+                        <td>Track all sales transactions and their commission status</td>
+                        <td>Pesapal integration, status updates, audit trails</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Approval Workflow</strong></td>
+                        <td>Admin approval process for commission payments</td>
+                        <td>Pending → Approved → Paid status flow</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Commission Types</strong></td>
+                        <td>Different commission structures for different products</td>
+                        <td>Percentage-based, flat-rate, tiered bonuses</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Payout System</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Features</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Payout Requests</strong></td>
+                        <td>Reseller-initiated payout requests</td>
+                        <td>Minimum thresholds, request validation, status tracking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Methods</strong></td>
+                        <td>Multiple payment method support</td>
+                        <td>Bank transfers, PayPal, mobile money</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Invoice Generation</strong></td>
+                        <td>Automatic invoice generation for payouts</td>
+                        <td>PDF generation, tax calculations, record keeping</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Processing Workflow</strong></td>
+                        <td>Automated payout processing pipeline</td>
+                        <td>Validation, approval, processing, confirmation</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Models and Data Structures -->
+            <h2>Models and Data Structures</h2>
+            
+            <div class="card">
+                <h3>Core Models</h3>
+                
+                <h4>Reseller Model</h4>
+                <pre><code>class Reseller(TimeStampedModel):
+    # User relationship
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='reseller_profile')
+    
+    # Reseller type (Individual/Business)
+    reseller_type = models.CharField(max_length=20, choices=ResellerType.choices)
+    
+    # Company information
+    company_name = models.CharField(max_length=255, blank=True, null=True)
+    company_website = models.URLField(blank=True, null=True)
+    company_description = models.TextField(blank=True)
+    
+    # Contact information
+    phone_number = models.CharField(max_length=20)
+    address = models.TextField()
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+    
+    # Reseller details
+    referral_code = models.CharField(max_length=50, unique=True, db_index=True)
+    tier = models.CharField(max_length=20, choices=TierChoices.choices)
+    commission_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Financial information
+    payment_method = models.CharField(max_length=50)
+    bank_account_name = models.CharField(max_length=255)
+    bank_account_number = models.CharField(max_length=100)
+    paypal_email = models.EmailField()
+    
+    # Status and metrics
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    total_sales = models.DecimalField(max_digits=12, decimal_places=2)
+    total_commission_earned = models.DecimalField(max_digits=12, decimal_places=2)
+    pending_commission = models.DecimalField(max_digits=12, decimal_places=2)</code></pre>
+
+                <h4>Commission Model</h4>
+                <pre><code>class Commission(TimeStampedModel):
+    reseller = models.ForeignKey(Reseller, on_delete=models.CASCADE, related_name='commissions')
+    
+    # Transaction details
+    transaction_reference = models.CharField(max_length=100, unique=True)
+    client_name = models.CharField(max_length=255)
+    client_email = models.EmailField()
+    product_name = models.CharField(max_length=255)
+    
+    # Financial details
+    sale_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    commission_rate = models.DecimalField(max_digits=5, decimal_places=2)
+    tier_bonus = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    # Status and dates
+    status = models.CharField(max_length=10, choices=CommissionStatusChoices.choices)
+    calculation_date = models.DateTimeField(auto_now_add=True)
+    approval_date = models.DateTimeField(null=True, blank=True)
+    paid_date = models.DateTimeField(null=True, blank=True)
+    
+    # Relationships
+    invoice = models.ForeignKey('Invoice', on_delete=models.SET_NULL, null=True)
+    payout = models.ForeignKey('Payout', on_delete=models.SET_NULL, null=True)</code></pre>
+
+                <h4>Tier System</h4>
+                <pre><code>class TierChoices(models.TextChoices):
+    BRONZE = 'bronze', 'Bronze (10% commission)'
+    SILVER = 'silver', 'Silver (15% commission)'  
+    GOLD = 'gold', 'Gold (20% commission)'
+    PLATINUM = 'platinum', 'Platinum (25% commission)'
+
+# Tier upgrade thresholds
+TIER_THRESHOLDS = {
+    'BRONZE': 0,          # Entry level
+    'SILVER': 5000,       # $5,000 in sales
+    'GOLD': 15000,        # $15,000 in sales  
+    'PLATINUM': 50000,    # $50,000 in sales
+}</code></pre>
+            </div>
+
+            <!-- API Endpoints -->
+            <h2>API Endpoints</h2>
+            <div class="card">
+                <h3>Reseller API Endpoints</h3>
+                
+                <h4>Profile Management</h4>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/profile/</code></td>
+                        <td>GET, PUT, PATCH</td>
+                        <td>Get/update reseller profile</td>
+                        <td>profile data</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/profile/verify/</code></td>
+                        <td>POST</td>
+                        <td>Submit verification documents</td>
+                        <td>documents, verification_type</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/referral-link/</code></td>
+                        <td>GET</td>
+                        <td>Get personalized referral link</td>
+                        <td>product_id (optional)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/regenerate-code/</code></td>
+                        <td>POST</td>
+                        <td>Regenerate referral code</td>
+                        <td>reason</td>
+                    </tr>
+                </table>
+
+                <h4>Commission and Earnings</h4>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/earnings/commissions/</code></td>
+                        <td>GET</td>
+                        <td>List all commissions</td>
+                        <td>status, date_range, pagination</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/earnings/dashboard/</code></td>
+                        <td>GET</td>
+                        <td>Get earnings dashboard data</td>
+                        <td>period (monthly/yearly)</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/earnings/payout-request/</code></td>
+                        <td>POST</td>
+                        <td>Request payout of pending commissions</td>
+                        <td>amount, payment_method</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/earnings/payouts/</code></td>
+                        <td>GET</td>
+                        <td>List payout history</td>
+                        <td>status, date_range</td>
+                    </tr>
+                </table>
+
+                <h4>Analytics and Reporting</h4>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/analytics/performance/</code></td>
+                        <td>GET</td>
+                        <td>Get performance analytics</td>
+                        <td>date_range, metrics</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/analytics/conversions/</code></td>
+                        <td>GET</td>
+                        <td>Get conversion rate data</td>
+                        <td>product_id, time_period</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/leaderboard/</code></td>
+                        <td>GET</td>
+                        <td>Get reseller leaderboard</td>
+                        <td>period, metric_type</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/reseller/v1/reports/sales/</code></td>
+                        <td>GET</td>
+                        <td>Generate sales report</td>
+                        <td>format (PDF/CSV), date_range</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Services and Business Logic -->
+            <h2>Services and Business Logic</h2>
+            <div class="card">
+                <h3>Core Services</h3>
+                
+                <h4>Reseller Management Service</h4>
+                <ul>
+                    <li><strong>create_reseller_profile(user, profile_data):</strong> Create new reseller profile</li>
+                    <li><strong>update_tier(reseller_id):</strong> Automatically update reseller tier based on sales</li>
+                    <li><strong>verify_reseller(reseller_id, verification_data):</strong> Process KYC verification</li>
+                    <li><strong>generate_referral_code(user_id):</strong> Generate unique referral code</li>
+                    <li><strong>deactivate_reseller(reseller_id, reason):</strong> Deactivate reseller account</li>
+                </ul>
+
+                <h4>Commission Calculation Service</h4>
+                <ul>
+                    <li><strong>calculate_commission(sale_amount, reseller_id, product_id):</strong> Calculate commission for a sale</li>
+                    <li><strong>apply_tier_bonus(commission, reseller_tier):</strong> Apply tier-based bonus</li>
+                    <li><strong>process_sale_commission(transaction_data):</strong> Process commission for completed sale</li>
+                    <li><strong>approve_commission(commission_id):</strong> Approve pending commission</li>
+                    <li><strong>bulk_approve_commissions(commission_ids):</strong> Batch approve commissions</li>
+                </ul>
+
+                <h4>Payout Processing Service</h4>
+                <ul>
+                    <li><strong>create_payout_request(reseller_id, amount, payment_method):</strong> Create payout request</li>
+                    <li><strong>validate_payout_request(payout_request):</strong> Validate payout eligibility</li>
+                    <li><strong>process_payout(payout_id):</strong> Process approved payout</li>
+                    <li><strong>generate_payout_invoice(payout_id):</strong> Generate invoice for payout</li>
+                    <li><strong>update_payout_status(payout_id, status):</strong> Update payout status</li>
+                </ul>
+
+                <h4>Analytics Service</h4>
+                <ul>
+                    <li><strong>get_reseller_performance(reseller_id, period):</strong> Get performance metrics</li>
+                    <li><strong>calculate_conversion_rates(reseller_id):</strong> Calculate conversion rates</li>
+                    <li><strong>generate_leaderboard(period, metric):</strong> Generate reseller leaderboard</li>
+                    <li><strong>get_earnings_summary(reseller_id):</strong> Get earnings summary</li>
+                </ul>
+            </div>
+
+            <!-- Partner Code System -->
+            <h2>Partner Code System</h2>
+            <div class="card">
+                <h3>Referral Code Generation</h3>
+                <p>The platform uses a sophisticated partner code system for tracking referrals:</p>
+                
+                <h4>Code Structure</h4>
+                <pre><code># Partner code format: PREFIX-USERPART-CHECKSUM
+# Example: LXN-U12345-A7B
+
+def generate_partner_code(user_id):
+    prefix = "LXN"  # Lixnet prefix
+    user_part = f"U{user_id:05d}"  # User ID with padding
+    checksum = calculate_checksum(user_part)  # Collision prevention
+    return f"{prefix}-{user_part}-{checksum}"</code></pre>
+
+                <h4>Management Commands</h4>
+                <ul>
+                    <li><strong>regenerate_partner_codes:</strong> Regenerate all partner codes (admin use)</li>
+                    <li><strong>update_partner_codes:</strong> Update partner codes with new format</li>
+                </ul>
+
+                <h4>Tracking and Attribution</h4>
+                <ul>
+                    <li><strong>URL Parameters:</strong> <code>?ref=LXN-U12345-A7B</code></li>
+                    <li><strong>Cookie Tracking:</strong> 30-day attribution window</li>
+                    <li><strong>Database Logging:</strong> All referral clicks and conversions logged</li>
+                    <li><strong>Multi-touch Attribution:</strong> First-click and last-click tracking</li>
+                </ul>
+            </div>
+
+            <!-- Development Guidelines -->
+            <h2>Development Guidelines</h2>
+            <div class="card">
+                <h3>Adding New Reseller Features</h3>
+                <ol>
+                    <li><strong>Earnings Sub-module:</strong> If feature involves commissions/payouts, add to <code>earnings/</code></li>
+                    <li><strong>Service Layer:</strong> Implement business logic in appropriate service class</li>
+                    <li><strong>Repository Pattern:</strong> Use repository pattern for data access</li>
+                    <li><strong>API Endpoints:</strong> Follow RESTful conventions for new endpoints</li>
+                    <li><strong>Permissions:</strong> Implement proper access controls using custom permissions</li>
+                    <li><strong>Testing:</strong> Write comprehensive tests for commission calculations</li>
+                </ol>
+
+                <h3>Commission Calculation Guidelines</h3>
+                <ul>
+                    <li><strong>Precision:</strong> Use Decimal type for all financial calculations</li>
+                    <li><strong>Atomic Operations:</strong> Wrap commission calculations in database transactions</li>
+                    <li><strong>Audit Trail:</strong> Log all commission calculations and changes</li>
+                    <li><strong>Tier Updates:</strong> Automatically trigger tier updates after sales</li>
+                    <li><strong>Validation:</strong> Validate all commission calculations before saving</li>
+                </ul>
+
+                <h3>Security Considerations</h3>
+                <ul>
+                    <li><strong>Financial Data:</strong> Encrypt sensitive financial information</li>
+                    <li><strong>Access Control:</strong> Resellers can only access their own data</li>
+                    <li><strong>Payout Validation:</strong> Multiple validation layers for payout requests</li>
+                    <li><strong>Fraud Detection:</strong> Monitor for suspicious patterns in referrals</li>
+                    <li><strong>Rate Limiting:</strong> Implement rate limiting for API endpoints</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>Important:</strong> The Reseller module handles financial transactions and commissions. All code changes must be thoroughly tested, especially commission calculation logic. Consider the financial impact of any modifications and ensure proper audit trails are maintained.
+            </div>
+        </main>
+    </div>
+</body>
+</html>

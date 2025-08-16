@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Module - Evolve Platform Documentation</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="folder-structure.html">Project Structure</a></li>
+                <li><a href="getting-started.html">Getting Started</a></li>
+                <li><a href="admin-module.html" class="active">Admin Module</a></li>
+                <li><a href="business-module.html">Business Module</a></li>
+                <li><a href="reseller-module.html">Reseller Module</a></li>
+                <li><a href="integrations.html">Integrations</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
+                <li><a href="deployment.html">Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>Admin Module</span>
+            </div>
+
+            <h1>Admin Module Documentation</h1>
+            <p>The Admin module handles platform administration and management functions for Lixnet (platform owner). This module provides comprehensive tools for managing users, vendors, transactions, and overall platform operations.</p>
+
+            <!-- Module Overview -->
+            <h2>Module Overview</h2>
+            <div class="card">
+                <h3>Purpose</h3>
+                <p>The Admin module serves as the central command center for platform administrators, providing:</p>
+                <ul>
+                    <li><strong>User Management:</strong> Approve, manage, and monitor all platform users</li>
+                    <li><strong>Vendor Oversight:</strong> Review and approve vendor applications and products</li>
+                    <li><strong>Transaction Monitoring:</strong> Track all financial transactions and commissions</li>
+                    <li><strong>Platform Analytics:</strong> Generate reports and insights on platform performance</li>
+                </ul>
+
+                <div style="margin-top: 20px;">
+                    <h4>Location:</h4>
+                    <code>App/admin/</code>
+                </div>
+            </div>
+
+            <!-- Directory Structure -->
+            <h2>Directory Structure</h2>
+            <div class="card">
+                <pre><code>App/admin/
+├── api/                        # REST API endpoints for admin operations
+│   └── v1/                     # API version 1
+│       ├── serializers/        # Data serialization for API responses
+│       └── views/              # API view controllers
+├── models/                     # Admin-specific database models
+├── views/                      # Web interface view controllers
+├── forms/                      # Django forms for admin interfaces
+├── services/                   # Business logic for admin operations
+├── repositories/               # Data access layer for admin data
+├── tests/                      # Unit and integration tests
+├── utils/                      # Utility functions and helpers
+├── exceptions/                 # Custom exception classes
+├── migrations/                 # Database migrations for admin models
+└── management/                 # Custom Django management commands
+    └── commands/               # Admin-specific Django commands</code></pre>
+            </div>
+
+            <!-- Key Responsibilities -->
+            <h2>Key Responsibilities</h2>
+
+            <div class="card">
+                <h3>User Management</h3>
+                <table>
+                    <tr>
+                        <th>Function</th>
+                        <th>Description</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>User Approval</strong></td>
+                        <td>Review and approve new user registrations</td>
+                        <td>Admin views and API endpoints for user status management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Role Assignment</strong></td>
+                        <td>Assign and modify user roles (Business, Reseller, Admin)</td>
+                        <td>UserProfile model management through admin interface</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Profile Management</strong></td>
+                        <td>Edit and update user profiles and information</td>
+                        <td>CRUD operations on User and UserProfile models</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Account Status</strong></td>
+                        <td>Enable, disable, or suspend user accounts</td>
+                        <td>User model status field management</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Vendor Management</h3>
+                <table>
+                    <tr>
+                        <th>Function</th>
+                        <th>Description</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Vendor Verification</strong></td>
+                        <td>Review vendor applications and documentation</td>
+                        <td>Business model verification workflow</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Product Approval</strong></td>
+                        <td>Approve new products and pricing plans</td>
+                        <td>Plan and Feature model management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status Management</strong></td>
+                        <td>Activate, deactivate, or suspend vendor accounts</td>
+                        <td>Business model status field updates</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compliance Monitoring</strong></td>
+                        <td>Ensure vendors comply with platform policies</td>
+                        <td>Automated checks and manual review processes</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Transaction Oversight</h3>
+                <table>
+                    <tr>
+                        <th>Function</th>
+                        <th>Description</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Tracking</strong></td>
+                        <td>Monitor all payment transactions through Pesapal</td>
+                        <td>Integration with Pesapal API for transaction status</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Commission Oversight</strong></td>
+                        <td>Review and approve commission payments to resellers</td>
+                        <td>Commission model management and approval workflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Financial Reporting</strong></td>
+                        <td>Generate financial reports and analytics</td>
+                        <td>Aggregation queries on transaction and commission data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dispute Resolution</strong></td>
+                        <td>Handle payment disputes and chargebacks</td>
+                        <td>Manual review interface and dispute tracking</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Models and Data Structures -->
+            <h2>Models and Data Structures</h2>
+            
+            <div class="card">
+                <h3>Core Models Used</h3>
+                <p>The Admin module primarily works with existing shared models:</p>
+                
+                <h4>UserProfile Model</h4>
+                <pre><code>class UserProfile(models.Model):
+    ROLE_CHOICES = [
+        ("business_owner", "Business Owner"),
+        ("reseller", "Reseller"), 
+        ("admin", "Admin"),
+        ("pending", "Pending Role")
+    ]
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="pending")
+    industry = models.CharField(max_length=100, null=True, blank=True)</code></pre>
+
+                <h4>Business Model</h4>
+                <pre><code>class Business(models.Model):
+    business_name = models.CharField(max_length=100)
+    business_email = models.EmailField()
+    industry = models.CharField(max_length=50, choices=INDUSTRY_CHOICES)
+    company_size = models.CharField(max_length=20, choices=COMPANY_SIZE_CHOICES)
+    country = models.CharField(max_length=50, choices=COUNTRY_CHOICES)
+    postal_code = models.CharField(max_length=20)</code></pre>
+
+                <h4>Plan and Feature Models</h4>
+                <pre><code>class Plan(models.Model):
+    name = models.CharField(max_length=100)
+    badge = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    yearly_price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+class Feature(models.Model):
+    plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name='features')
+    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=100)</code></pre>
+            </div>
+
+            <!-- API Endpoints -->
+            <h2>API Endpoints</h2>
+            <div class="card">
+                <h3>Admin API Endpoints</h3>
+                <p>Location: <code>App/admin/api/v1/</code></p>
+                
+                <h4>User Management APIs</h4>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/users/</code></td>
+                        <td>GET</td>
+                        <td>List all users with filtering</td>
+                        <td>role, status, search</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/users/{id}/</code></td>
+                        <td>GET, PUT, PATCH</td>
+                        <td>Get/update specific user</td>
+                        <td>user_id</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/users/{id}/approve/</code></td>
+                        <td>POST</td>
+                        <td>Approve pending user</td>
+                        <td>user_id</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/users/{id}/suspend/</code></td>
+                        <td>POST</td>
+                        <td>Suspend user account</td>
+                        <td>user_id, reason</td>
+                    </tr>
+                </table>
+
+                <h4>Business/Vendor Management APIs</h4>
+                <table>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/businesses/</code></td>
+                        <td>GET</td>
+                        <td>List all businesses</td>
+                        <td>industry, country, status</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/businesses/{id}/verify/</code></td>
+                        <td>POST</td>
+                        <td>Verify business registration</td>
+                        <td>business_id</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/plans/</code></td>
+                        <td>GET, POST</td>
+                        <td>Manage pricing plans</td>
+                        <td>is_active, price_range</td>
+                    </tr>
+                    <tr>
+                        <td><code>/api/admin/v1/plans/{id}/activate/</code></td>
+                        <td>POST</td>
+                        <td>Activate/deactivate plan</td>
+                        <td>plan_id</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Services and Business Logic -->
+            <h2>Services and Business Logic</h2>
+            <div class="card">
+                <h3>Core Services</h3>
+                <p>Location: <code>App/admin/services/</code></p>
+                
+                <h4>User Management Service</h4>
+                <ul>
+                    <li><strong>approve_user(user_id):</strong> Approve pending user registration</li>
+                    <li><strong>assign_role(user_id, role):</strong> Assign or change user role</li>
+                    <li><strong>suspend_user(user_id, reason):</strong> Suspend user account with reason</li>
+                    <li><strong>bulk_approve_users(user_ids):</strong> Batch approve multiple users</li>
+                </ul>
+
+                <h4>Business Management Service</h4>
+                <ul>
+                    <li><strong>verify_business(business_id):</strong> Verify business registration documents</li>
+                    <li><strong>approve_product_plan(plan_id):</strong> Approve new pricing plan</li>
+                    <li><strong>generate_business_report(business_id):</strong> Generate comprehensive business report</li>
+                    <li><strong>monitor_compliance(business_id):</strong> Check business compliance status</li>
+                </ul>
+
+                <h4>Analytics Service</h4>
+                <ul>
+                    <li><strong>get_platform_metrics():</strong> Get overall platform performance metrics</li>
+                    <li><strong>generate_financial_report(date_range):</strong> Generate financial performance report</li>
+                    <li><strong>get_user_activity_stats():</strong> Get user activity and engagement statistics</li>
+                    <li><strong>get_commission_analytics():</strong> Get commission payment analytics</li>
+                </ul>
+            </div>
+
+            <!-- Development Guidelines -->
+            <h2>Development Guidelines</h2>
+            <div class="card">
+                <h3>Adding New Admin Features</h3>
+                <ol>
+                    <li><strong>Define the Model:</strong> If new data structures are needed, add them to <code>models/</code></li>
+                    <li><strong>Create Service:</strong> Implement business logic in <code>services/admin_service.py</code></li>
+                    <li><strong>Build Repository:</strong> Add data access methods in <code>repositories/</code></li>
+                    <li><strong>Create API:</strong> Add REST endpoints in <code>api/v1/views/</code></li>
+                    <li><strong>Add Web Interface:</strong> Create admin interface views in <code>views/</code></li>
+                    <li><strong>Write Tests:</strong> Add comprehensive tests in <code>tests/</code></li>
+                </ol>
+
+                <h3>Security Considerations</h3>
+                <ul>
+                    <li><strong>Authentication:</strong> All admin endpoints require admin role verification</li>
+                    <li><strong>Authorization:</strong> Implement permission checks for sensitive operations</li>
+                    <li><strong>Audit Logging:</strong> Log all admin actions for compliance and security</li>
+                    <li><strong>Data Validation:</strong> Validate all input data through serializers and forms</li>
+                </ul>
+
+                <h3>Testing Strategy</h3>
+                <ul>
+                    <li><strong>Unit Tests:</strong> Test individual services and utilities</li>
+                    <li><strong>Integration Tests:</strong> Test API endpoints and database interactions</li>
+                    <li><strong>Permission Tests:</strong> Verify access controls and role-based permissions</li>
+                    <li><strong>Performance Tests:</strong> Test admin dashboard performance with large datasets</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Note:</strong> The Admin module is critical for platform operations. All changes should be thoroughly tested and reviewed before deployment. Consider the impact on other modules when making modifications.
+            </div>
+        </main>
+    </div>
+</body>
+</html>
