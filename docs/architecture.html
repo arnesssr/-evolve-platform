@@ -11,17 +11,17 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h1>🚀 Evolve Platform</h1>
+                <h1>Evolve Platform</h1>
                 <p>Developer Documentation</p>
             </div>
             <ul class="nav-menu">
-                <li><a href="index.html">🏠 Home</a></li>
-                <li><a href="architecture.html" class="active">🏗️ Architecture</a></li>
-                <li><a href="folder-structure.html">📁 Folder Structure</a></li>
-                <li><a href="getting-started.html">🚀 Getting Started</a></li>
-                <li><a href="#modules">📦 Modules</a></li>
-                <li><a href="#apis">🔌 API Reference</a></li>
-                <li><a href="#deployment">🚢 Deployment</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="architecture.html" class="active">Architecture</a></li>
+                <li><a href="folder-structure.html">Project Structure</a></li>
+                <li><a href="admin-module.html">Admin Module</a></li>
+                <li><a href="business-module.html">Business Module</a></li>
+                <li><a href="reseller-module.html">Reseller Module</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
             </ul>
         </nav>
 
@@ -31,44 +31,54 @@
                 <a href="index.html">Home</a> > <span>Architecture</span>
             </div>
 
-            <h1>🏗️ System Architecture</h1>
+            <h1>System Architecture</h1>
             <p>Understanding the high-level architecture of the Evolve Payments Platform - how components interact, data flows, and the overall system design.</p>
 
-            <!-- High-Level Overview -->
-            <h2>🌐 High-Level System Overview</h2>
             <div class="card">
                 <h3>System Type: Multi-Tenant B2B Marketplace</h3>
                 <p>The Evolve Payments Platform is a Django-based multi-tenant system that facilitates commission-based sales between software vendors and resellers in African markets.</p>
                 
-                <div class="folder-tree">
-┌─────────────────────────────────────────────────────┐
-│                   🌍 CLIENT LAYER                   │
-├─────────────────────────────────────────────────────┤
-│  👥 Admin Portal  │  🏢 Business Portal  │  🤝 Reseller Portal │
-├─────────────────────────────────────────────────────┤
-│                   🔗 API GATEWAY                    │
-├─────────────────────────────────────────────────────┤
-│              📦 Django Application                  │
-│  ┌─────────────┬─────────────┬─────────────────────┐ │
-│  │ Admin       │ Business    │ Reseller            │ │
-│  │ Module      │ Module      │ Module              │ │
-│  └─────────────┴─────────────┴─────────────────────┘ │
-├─────────────────────────────────────────────────────┤
-│                🔌 INTEGRATIONS                      │
-│  📧 Email      │  📱 SMS      │  💳 Pesapal        │
-├─────────────────────────────────────────────────────┤
-│                   🗄️ DATA LAYER                     │
-│              SQLite (Dev) / PostgreSQL (Prod)      │
-└─────────────────────────────────────────────────────┘
-                </div>
+                <h4>System Layers</h4>
+                <table>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Components</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Client Layer</strong></td>
+                        <td>Admin Portal, Business Portal, Reseller Portal</td>
+                        <td>User interfaces for different user types</td>
+                    </tr>
+                    <tr>
+                        <td><strong>API Gateway</strong></td>
+                        <td>REST API Endpoints</td>
+                        <td>Centralized API access point</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Application Layer</strong></td>
+                        <td>Admin Module, Business Module, Reseller Module</td>
+                        <td>Core business logic and processing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Integration Layer</strong></td>
+                        <td>Email, SMS, Payment Gateway (Pesapal)</td>
+                        <td>External service integrations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Layer</strong></td>
+                        <td>SQLite (Development), PostgreSQL (Production)</td>
+                        <td>Data persistence and storage</td>
+                    </tr>
+                </table>
             </div>
 
             <!-- Core Modules -->
-            <h2>📦 Core Modules Architecture</h2>
+            <h2>Core Modules Architecture</h2>
 
             <!-- Admin Module -->
             <div class="card">
-                <h3>🔧 Admin Module</h3>
+                <h3>Admin Module</h3>
                 <p><strong>Purpose:</strong> Platform management and oversight for Lixnet (platform owner)</p>
                 
                 <table>
@@ -102,7 +112,7 @@
 
             <!-- Business Module -->
             <div class="card">
-                <h3>🏢 Business Module</h3>
+                <h3>Business Module</h3>
                 <p><strong>Purpose:</strong> End customer management and software access</p>
                 
                 <table>
@@ -136,64 +146,78 @@
 
             <!-- Reseller Module -->
             <div class="card">
-                <h3>🤝 Reseller Module</h3>
+                <h3>Reseller Module</h3>
                 <p><strong>Purpose:</strong> Sales agent management and commission tracking</p>
                 
-                <div class="folder-tree">
-🤝 Reseller Module
-├── 👤 Profile Management
-│   ├── Registration & KYC
-│   ├── Profile Verification
-│   └── Tier Management
-├── 💰 Earnings Submodule
-│   ├── Commission Calculation
-│   ├── Payout Management
-│   ├── Invoice Generation
-│   └── Tax Handling
-├── 📊 Performance Tracking
-│   ├── Sales Metrics
-│   ├── Conversion Rates
-│   └── Leaderboards
-└── 🎯 Marketing Tools
-    ├── Referral Links
-    ├── Marketing Materials
-    └── Campaign Tracking
-                </div>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Sub-components</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Profile Management</strong></td>
+                        <td>Reseller registration and verification</td>
+                        <td>Registration & KYC, Profile Verification, Tier Management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Earnings Submodule</strong></td>
+                        <td>Commission calculation and payout processing</td>
+                        <td>Commission Calculation, Payout Management, Invoice Generation, Tax Handling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance Tracking</strong></td>
+                        <td>Sales metrics and analytics</td>
+                        <td>Sales Metrics, Conversion Rates, Leaderboards</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Marketing Tools</strong></td>
+                        <td>Referral and campaign management</td>
+                        <td>Referral Links, Marketing Materials, Campaign Tracking</td>
+                    </tr>
+                </table>
 
                 <div class="alert alert-info">
-                    <strong>🏗️ Special Architecture:</strong> The Reseller module includes a dedicated <code>earnings/</code> submodule with its own models, services, and API structure due to the complexity of commission calculations.
+                    <strong>Special Architecture:</strong> The Reseller module includes a dedicated <code>earnings/</code> submodule with its own models, services, and API structure due to the complexity of commission calculations.
                 </div>
             </div>
 
             <!-- Data Architecture -->
-            <h2>🗄️ Data Architecture</h2>
+            <h2>Data Architecture</h2>
 
             <div class="card">
                 <h3>Database Design Patterns</h3>
                 
-                <div class="folder-tree">
-📊 Data Models Hierarchy
-├── 👥 User Models (Django Auth Extension)
-│   ├── Admin Users
-│   ├── Business Users
-│   └── Reseller Users
-├── 💰 Financial Models
-│   ├── Commissions
-│   ├── Payouts
-│   ├── Invoices
-│   └── Transactions
-├── 📦 Product Models
-│   ├── Software Products
-│   ├── Pricing Plans
-│   └── Subscriptions
-└── 🔗 Relationship Models
-    ├── Referrals
-    ├── Sales Tracking
-    └── User Associations
-                </div>
+                <table>
+                    <tr>
+                        <th>Model Category</th>
+                        <th>Models</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>User Models</strong></td>
+                        <td>Admin Users, Business Users, Reseller Users</td>
+                        <td>Django Auth Extension for different user types</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Financial Models</strong></td>
+                        <td>Commissions, Payouts, Invoices, Transactions</td>
+                        <td>Financial data and commission tracking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Product Models</strong></td>
+                        <td>Software Products, Pricing Plans, Subscriptions</td>
+                        <td>Product catalog and subscription management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Relationship Models</strong></td>
+                        <td>Referrals, Sales Tracking, User Associations</td>
+                        <td>Linking users, sales, and referrals</td>
+                    </tr>
+                </table>
 
                 <h4>Key Design Principles:</h4>
-                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                <ul>
                     <li><strong>Multi-tenancy:</strong> Data isolation between different user types</li>
                     <li><strong>Audit Trail:</strong> All financial transactions are fully logged</li>
                     <li><strong>Soft Deletes:</strong> Critical data is never permanently deleted</li>
@@ -202,30 +226,38 @@
             </div>
 
             <!-- API Architecture -->
-            <h2>🔌 API Architecture</h2>
+            <h2>API Architecture</h2>
 
             <div class="card">
                 <h3>RESTful API Design</h3>
                 <p>Each module exposes a versioned REST API following consistent patterns.</p>
                 
-                <div class="folder-tree">
-🔌 API Structure
-├── /api/v1/admin/
-│   ├── users/          # User management
-│   ├── vendors/        # Vendor approval
-│   ├── transactions/   # Financial oversight
-│   └── analytics/      # Platform metrics
-├── /api/v1/business/
-│   ├── profile/        # Business profiles
-│   ├── subscriptions/  # Subscription management
-│   ├── software/       # Software access
-│   └── support/        # Support tickets
-└── /api/v1/reseller/
-    ├── profile/        # Reseller profiles
-    ├── earnings/       # Commission data
-    ├── referrals/      # Referral tracking
-    └── performance/    # Sales metrics
-                </div>
+                <table>
+                    <tr>
+                        <th>API Module</th>
+                        <th>Base Path</th>
+                        <th>Endpoints</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Admin API</strong></td>
+                        <td>/api/v1/admin/</td>
+                        <td>users/, vendors/, transactions/, analytics/</td>
+                        <td>User management, vendor approval, financial oversight, platform metrics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business API</strong></td>
+                        <td>/api/v1/business/</td>
+                        <td>profile/, subscriptions/, software/, support/</td>
+                        <td>Business profiles, subscription management, software access, support tickets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reseller API</strong></td>
+                        <td>/api/v1/reseller/</td>
+                        <td>profile/, earnings/, referrals/, performance/</td>
+                        <td>Reseller profiles, commission data, referral tracking, sales metrics</td>
+                    </tr>
+                </table>
 
                 <h4>API Standards:</h4>
                 <table>
@@ -258,7 +290,7 @@
             </div>
 
             <!-- Integration Architecture -->
-            <h2>🔗 Integration Architecture</h2>
+            <h2>Integration Architecture</h2>
 
             <div class="card">
                 <h3>External Service Integrations</h3>
@@ -291,38 +323,46 @@
                 </table>
 
                 <div class="alert alert-warning">
-                    <strong>🔄 Integration Pattern:</strong> All external integrations are wrapped in service classes with proper error handling and fallback mechanisms.
+                    <strong>Integration Pattern:</strong> All external integrations are wrapped in service classes with proper error handling and fallback mechanisms.
                 </div>
             </div>
 
             <!-- Security Architecture -->
-            <h2>🔒 Security Architecture</h2>
+            <h2>Security Architecture</h2>
 
             <div class="card">
                 <h3>Security Layers</h3>
                 
-                <div class="folder-tree">
-🔒 Security Implementation
-├── 🛡️ Authentication Layer
-│   ├── Django Authentication
-│   ├── Token-based API Auth
-│   └── Two-Factor Authentication
-├── 🎯 Authorization Layer
-│   ├── Role-based Permissions
-│   ├── Module-level Access Control
-│   └── API Endpoint Protection
-├── 🔐 Data Protection
-│   ├── Environment Variables
-│   ├── Database Encryption
-│   └── PII Data Handling
-└── 🌐 Transport Security
-    ├── HTTPS Enforcement
-    ├── CSRF Protection
-    └── XSS Prevention
-                </div>
+                <table>
+                    <tr>
+                        <th>Security Layer</th>
+                        <th>Components</th>
+                        <th>Implementation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Authentication Layer</strong></td>
+                        <td>Django Authentication, Token-based API Auth, Two-Factor Authentication</td>
+                        <td>User identity verification and session management</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Authorization Layer</strong></td>
+                        <td>Role-based Permissions, Module-level Access Control, API Endpoint Protection</td>
+                        <td>Access control based on user roles and permissions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Protection</strong></td>
+                        <td>Environment Variables, Database Encryption, PII Data Handling</td>
+                        <td>Sensitive data encryption and secure storage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transport Security</strong></td>
+                        <td>HTTPS Enforcement, CSRF Protection, XSS Prevention</td>
+                        <td>Secure data transmission and web security</td>
+                    </tr>
+                </table>
 
                 <h4>Key Security Features:</h4>
-                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                <ul>
                     <li><strong>Environment-based Configuration:</strong> Sensitive data in .env files</li>
                     <li><strong>Role-based Access:</strong> Admin, Business, Reseller role separation</li>
                     <li><strong>API Rate Limiting:</strong> Prevent abuse and ensure fair usage</li>
@@ -331,7 +371,7 @@
             </div>
 
             <!-- Deployment Architecture -->
-            <h2>🚢 Deployment Architecture</h2>
+            <h2>Deployment Architecture</h2>
 
             <div class="card">
                 <h3>Environment Strategy</h3>
@@ -365,38 +405,42 @@
             </div>
 
             <!-- Clean Architecture Pattern -->
-            <h2>🏗️ Clean Architecture Implementation</h2>
+            <h2>Clean Architecture Implementation</h2>
 
             <div class="card">
                 <h3>Layer Separation</h3>
                 <p>Each module follows clean architecture principles with clear separation of concerns:</p>
                 
-                <div class="folder-tree">
-📐 Clean Architecture Layers
-├── 🌐 Presentation Layer (api/ & views/)
-│   ├── API Controllers
-│   ├── Web Controllers
-│   ├── Serializers
-│   └── Form Handlers
-├── 💼 Application Layer (services/)
-│   ├── Business Logic
-│   ├── Use Cases
-│   ├── Workflows
-│   └── Orchestration
-├── 🏢 Domain Layer (models/)
-│   ├── Business Entities
-│   ├── Value Objects
-│   ├── Business Rules
-│   └── Domain Events
-└── 🗄️ Infrastructure Layer (repositories/)
-    ├── Data Access
-    ├── External APIs
-    ├── File System
-    └── Third-party Services
-                </div>
+                <table>
+                    <tr>
+                        <th>Architecture Layer</th>
+                        <th>Components</th>
+                        <th>Responsibility</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Presentation Layer</strong></td>
+                        <td>API Controllers, Web Controllers, Serializers, Form Handlers</td>
+                        <td>User interface and API endpoint handling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Application Layer</strong></td>
+                        <td>Business Logic, Use Cases, Workflows, Orchestration</td>
+                        <td>Application-specific business rules and workflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain Layer</strong></td>
+                        <td>Business Entities, Value Objects, Business Rules, Domain Events</td>
+                        <td>Core business logic and domain models</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Infrastructure Layer</strong></td>
+                        <td>Data Access, External APIs, File System, Third-party Services</td>
+                        <td>External system integration and data persistence</td>
+                    </tr>
+                </table>
 
                 <h4>Benefits of This Architecture:</h4>
-                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                <ul>
                     <li><strong>Testability:</strong> Each layer can be tested independently</li>
                     <li><strong>Maintainability:</strong> Clear separation makes changes easier</li>
                     <li><strong>Scalability:</strong> Components can be scaled independently</li>
@@ -405,7 +449,7 @@
             </div>
 
             <!-- Performance Considerations -->
-            <h2>⚡ Performance Architecture</h2>
+            <h2>Performance Architecture</h2>
 
             <div class="card">
                 <h3>Performance Strategies</h3>
@@ -440,16 +484,16 @@
             </div>
 
             <!-- Future Architecture Plans -->
-            <h2>🔮 Future Architecture Evolution</h2>
+            <h2>Future Architecture Evolution</h2>
 
             <div class="card">
                 <h3>Planned Enhancements</h3>
                 
                 <div class="alert alert-info">
-                    <strong>📋 Roadmap Items:</strong> These are planned improvements to the current architecture.
+                    <strong>Roadmap Items:</strong> These are planned improvements to the current architecture.
                 </div>
 
-                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                <ul>
                     <li><strong>Microservices Migration:</strong> Break down monolith into independent services</li>
                     <li><strong>Event-Driven Architecture:</strong> Implement domain events for better decoupling</li>
                     <li><strong>Caching Layer:</strong> Redis for session management and API caching</li>
@@ -460,7 +504,7 @@
             </div>
 
             <div class="alert alert-success">
-                <strong>✅ Architecture Benefits:</strong> This clean, modular architecture provides a solid foundation that can scale with business growth while maintaining code quality and developer productivity.
+                <strong>Architecture Benefits:</strong> This clean, modular architecture provides a solid foundation that can scale with business growth while maintaining code quality and developer productivity.
             </div>
         </main>
     </div>
