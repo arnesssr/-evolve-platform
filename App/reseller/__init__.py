@@ -1,0 +1,1 @@
+# Reseller app initialization

@@ -1,0 +1,69 @@
+<header class="reseller-header">
+    <div class="header-left">
+        <button class="sidebar-toggle" id="headerToggleBtn" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="welcome-text">
+            <h2>Welcome back, {{ user.first_name }}!</h2>
+            {% if partner_code %}
+            <p>Partner Code: {{ partner_code }}</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="header-right">
+        <div class="header-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search leads, referrals...">
+        </div>
+        
+        <div class="header-actions">
+            <button class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </button>
+            
+            <div class="user-dropdown dropdown">
+                <button class="user-dropdown-trigger dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{ user.email }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li class="dropdown-header">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-circle fs-3 me-2"></i>
+                            <div>
+                                <strong>{{ user.get_full_name|default:user.username }}</strong><br>
+                                <small class="text-muted">{{ user.email }}</small>
+                            </div>
+                        </div>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'reseller:profile_view' %}">
+                        <i class="fas fa-user me-2"></i>My Profile
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'reseller:profile_edit' %}">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'reseller:payment_method_update' %}">
+                        <i class="fas fa-credit-card me-2"></i>Payment Methods
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'reseller:settings' %}">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a></li>
+                </ul>
+            </div>
+            
+            <a href="#" class="help-link">
+                <i class="fas fa-question-circle"></i>
+                <span>Help</span>
+            </a>
+        </div>
+    </div>
+</header>

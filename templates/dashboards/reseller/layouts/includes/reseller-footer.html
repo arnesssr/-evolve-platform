@@ -1,0 +1,214 @@
+<!-- Reseller Dashboard Footer -->
+<footer class="reseller-footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+                <li><a href="{% url 'reseller_dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'reseller_commissions' %}">Commissions</a></li>
+                <li><a href="{% url 'reseller_referrals' %}">Referrals</a></li>
+                <li><a href="{% url 'reseller_resources' %}">Resources</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Support</h4>
+            <ul class="footer-links">
+                <li><a href="{% url 'reseller_support' %}">Help Center</a></li>
+                <li><a href="{% url 'reseller_documentation' %}">Documentation</a></li>
+                <li><a href="{% url 'reseller_contact' %}">Contact Support</a></li>
+                <li><a href="{% url 'reseller_faq' %}">FAQs</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Partner Resources</h4>
+            <ul class="footer-links">
+                <li><a href="{% url 'reseller_training' %}">Training Materials</a></li>
+                <li><a href="{% url 'reseller_marketing_tools' %}">Marketing Tools</a></li>
+                <li><a href="{% url 'reseller_api_docs' %}">API Documentation</a></li>
+                <li><a href="{% url 'reseller_terms' %}">Partner Terms</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Stay Connected</h4>
+            <p class="footer-info">Join our partner community</p>
+            <div class="social-links">
+                <a href="#" class="social-link" title="LinkedIn">
+                    <i class="fas fa-linkedin"></i>
+                </a>
+                <a href="#" class="social-link" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-link" title="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+            <div class="partner-tier-badge">
+                <span class="tier-label">Your Tier:</span>
+                <span class="tier-name">{{ user.reseller_profile.tier|default:"Bronze" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <div class="footer-bottom-content">
+            <p>&copy; {% now "Y" %} Evolve Payments. All rights reserved.</p>
+            <div class="footer-bottom-links">
+                <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+                <span class="separator">|</span>
+                <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+                <span class="separator">|</span>
+                <a href="{% url 'reseller_agreement' %}">Partner Agreement</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.reseller-footer {
+    background-color: var(--reseller-dark);
+    color: var(--reseller-light);
+    padding: 3rem 0 1rem;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section h4 {
+    color: var(--reseller-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: var(--reseller-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--reseller-primary);
+}
+
+.footer-info {
+    color: var(--reseller-text-light);
+    margin-bottom: 1rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--reseller-primary);
+    color: white;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background-color: var(--reseller-accent);
+    transform: translateY(-2px);
+}
+
+.partner-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+.tier-label {
+    font-size: 0.875rem;
+    color: var(--reseller-text-light);
+}
+
+.tier-name {
+    font-weight: 600;
+    color: var(--reseller-primary);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+}
+
+.footer-bottom-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-bottom-content p {
+    margin: 0;
+    color: var(--reseller-text-light);
+}
+
+.footer-bottom-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-bottom-links a {
+    color: var(--reseller-text-light);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-bottom-links a:hover {
+    color: var(--reseller-primary);
+}
+
+.separator {
+    color: var(--reseller-text-light);
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>

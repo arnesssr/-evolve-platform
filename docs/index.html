@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolve Payments Platform - Developer Docs</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>🚀 Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">🏠 Home</a></li>
+                <li><a href="architecture.html">🏗️ Architecture</a></li>
+                <li><a href="folder-structure.html">📁 Folder Structure</a></li>
+                <li><a href="getting-started.html">🚀 Getting Started</a></li>
+                <li><a href="#modules">📦 Modules</a></li>
+                <li><a href="#apis">🔌 API Reference</a></li>
+                <li><a href="#deployment">🚢 Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a>
+            </div>
+
+            <h1>Evolve Payments Platform</h1>
+            <p>Welcome to the <strong>internal developer documentation</strong> for the Evolve Payments Platform. This documentation is designed exclusively for our development team to understand the codebase structure, architecture, and development workflows.</p>
+
+            <div class="alert alert-info">
+                <strong>🔒 Internal Only:</strong> This documentation is for team developers only and contains technical implementation details not meant for external users.
+            </div>
+
+            <!-- Project Overview -->
+            <h2>📋 Project Overview</h2>
+            <div class="card">
+                <h3>What is Evolve Payments Platform?</h3>
+                <p>A B2B software marketplace and referral platform that connects software vendors with resellers, enabling commission-based sales of business software solutions across African markets.</p>
+                
+                <div style="margin-top: 16px;">
+                    <span class="tag django">Django 5.2.4</span>
+                    <span class="tag python">Python 3.8+</span>
+                    <span class="tag database">SQLite</span>
+                    <span class="tag api">REST API</span>
+                </div>
+            </div>
+
+            <!-- System Roles -->
+            <h2>👥 System Roles</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Description</th>
+                        <th>Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Admin</strong></td>
+                        <td>Platform owner (Lixnet) - manages platform, approves vendors, monitors transactions</td>
+                        <td><code>App.admin</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Business</strong></td>
+                        <td>End customers who purchase and use software products (ERP, SACCO, Payroll)</td>
+                        <td><code>App.business</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reseller</strong></td>
+                        <td>Sales agents who promote products and earn commissions on referrals</td>
+                        <td><code>App.reseller</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Quick Links -->
+            <h2>🔗 Quick Navigation</h2>
+            <div class="quick-links">
+                <a href="architecture.html" class="quick-link">
+                    <h3>🏗️ System Architecture</h3>
+                    <p>High-level system design, modules, and how components interact with each other.</p>
+                </a>
+
+                <a href="folder-structure.html" class="quick-link">
+                    <h3>📁 Folder Structure</h3>
+                    <p>Detailed breakdown of the codebase directory structure and file organization.</p>
+                </a>
+
+                <a href="getting-started.html" class="quick-link">
+                    <h3>🚀 Getting Started</h3>
+                    <p>Environment setup, local development, and common development tasks.</p>
+                </a>
+
+                <a href="#modules" class="quick-link">
+                    <h3>📦 Module Docs</h3>
+                    <p>Deep dive into each module: Admin, Business, Reseller, and Integrations.</p>
+                </a>
+            </div>
+
+            <!-- Current Status -->
+            <h2>📊 Current Implementation Status</h2>
+            <div class="card">
+                <h3>✅ Implemented Features</h3>
+                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li>Multi-tenant system architecture</li>
+                    <li>User authentication and role-based access</li>
+                    <li>Reseller commission tracking system</li>
+                    <li>Basic payment integration structure</li>
+                    <li>Admin dashboard foundation</li>
+                    <li>API structure for all modules</li>
+                </ul>
+
+                <h3>🚧 In Development</h3>
+                <ul style="margin: 16px 0; padding-left: 20px; color: #ffb84d;">
+                    <li>Full Pesapal payment integration</li>
+                    <li>Advanced reporting features</li>
+                    <li>Email notification system</li>
+                    <li>SMS integration completion</li>
+                </ul>
+            </div>
+
+            <!-- Tech Stack -->
+            <h2>🛠️ Technology Stack</h2>
+            <div class="card">
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Technology</th>
+                        <th>Version</th>
+                    </tr>
+                    <tr>
+                        <td>Backend Framework</td>
+                        <td>Django</td>
+                        <td>5.2.4</td>
+                    </tr>
+                    <tr>
+                        <td>Database</td>
+                        <td>SQLite (dev) / PostgreSQL (prod)</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>API</td>
+                        <td>Django REST Framework</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Gateway</td>
+                        <td>Pesapal</td>
+                        <td>v3</td>
+                    </tr>
+                    <tr>
+                        <td>SMS Service</td>
+                        <td>SMSLeopard</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Environment Config</td>
+                        <td>python-decouple</td>
+                        <td>3.8</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Quick Commands -->
+            <h2>⚡ Quick Commands</h2>
+            <div class="card">
+                <h3>Development Commands</h3>
+                <pre><code># Run development server
+python manage.py runserver
+
+# Apply migrations
+python manage.py migrate
+
+# Create superuser
+python manage.py createsuperuser
+
+# Run tests
+python manage.py test
+
+# Collect static files
+python manage.py collectstatic</code></pre>
+            </div>
+
+            <div class="alert alert-warning">
+                <strong>📝 Note:</strong> This documentation is automatically updated. If you notice any outdated information, please update the source files and the changes will be reflected after the next deployment.
+            </div>
+        </main>
+    </div>
+</body>
+</html>

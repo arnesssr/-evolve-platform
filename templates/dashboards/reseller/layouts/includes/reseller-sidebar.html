@@ -1,0 +1,63 @@
+{% load static %}
+<!-- Reseller Dashboard Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-rocket"></i> <span class="logo-text">Evolve Reseller</span>
+        </div>
+        <button class="toggle-btn" id="toggleBtn" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <!-- Menu icon for collapsed state -->
+        <button class="collapsed-menu-btn" id="collapsedMenuBtn" title="Expand Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="{% url 'reseller:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-tooltip="Dashboard">
+            <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+        </a>
+        <div class="sidebar-group">
+            <span>Sales</span>
+            <a href="{% url 'reseller:leads' %}" class="{% if request.resolver_match.url_name == 'leads' %}active{% endif %}" data-tooltip="Leads">
+                <i class="fas fa-users"></i> <span>Leads</span>
+            </a>
+            <a href="{% url 'reseller:referrals' %}" class="{% if request.resolver_match.url_name == 'referrals' %}active{% endif %}" data-tooltip="Referrals">
+                <i class="fas fa-user-friends"></i> <span>Referrals</span>
+            </a>
+            <a href="{% url 'reseller:reports' %}" class="{% if request.resolver_match.url_name == 'reports' %}active{% endif %}" data-tooltip="Reports">
+                <i class="fas fa-chart-line"></i> <span>Reports</span>
+            </a>
+        </div>
+        <div class="sidebar-group">
+            <span>Earnings</span>
+            <a href="{% url 'reseller:earnings_commissions' %}" class="{% if request.resolver_match.url_name == 'earnings_commissions' %}active{% endif %}" data-tooltip="Commissions">
+                <i class="fas fa-coins"></i> <span>Commissions</span>
+            </a>
+            <a href="{% url 'reseller:earnings_invoices' %}" class="{% if request.resolver_match.url_name == 'earnings_invoices' %}active{% endif %}" data-tooltip="Invoices">
+                <i class="fas fa-file-invoice"></i> <span>Invoices</span>
+            </a>
+            <a href="{% url 'reseller:earnings_payouts' %}" class="{% if request.resolver_match.url_name == 'earnings_payouts' %}active{% endif %}" data-tooltip="Payouts">
+                <i class="fas fa-hand-holding-usd"></i> <span>Payouts</span>
+            </a>
+        </div>
+        <div class="sidebar-group">
+            <span>Marketing</span>
+            <a href="{% url 'reseller:links' %}" class="{% if request.resolver_match.url_name == 'links' %}active{% endif %}" data-tooltip="Links">
+                <i class="fas fa-link"></i> <span>Links</span>
+            </a>
+            <a href="{% url 'reseller:tools' %}" class="{% if request.resolver_match.url_name == 'tools' %}active{% endif %}" data-tooltip="Tools">
+                <i class="fas fa-toolbox"></i> <span>Tools</span>
+            </a>
+            <a href="{% url 'reseller:resources' %}" class="{% if request.resolver_match.url_name == 'resources' %}active{% endif %}" data-tooltip="Resources">
+                <i class="fas fa-book"></i> <span>Resources</span>
+            </a>
+        </div>
+        <a href="{% url 'reseller:settings' %}" class="{% if 'settings' in request.resolver_match.url_name %}active{% endif %}" data-tooltip="Settings">
+            <i class="fas fa-cog"></i> <span>Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" data-tooltip="Logout">
+            <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+        </a>
+    </nav>
+</aside>

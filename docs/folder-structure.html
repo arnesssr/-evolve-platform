@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Structure - Evolve Payments Platform</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>🚀 Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">🏠 Home</a></li>
+                <li><a href="architecture.html">🏗️ Architecture</a></li>
+                <li><a href="folder-structure.html" class="active">📁 Folder Structure</a></li>
+                <li><a href="getting-started.html">🚀 Getting Started</a></li>
+                <li><a href="#modules">📦 Modules</a></li>
+                <li><a href="#apis">🔌 API Reference</a></li>
+                <li><a href="#deployment">🚢 Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>Folder Structure</span>
+            </div>
+
+            <h1>📁 Project Folder Structure</h1>
+            <p>This guide explains the organization and purpose of every directory and major file in the Evolve Payments Platform codebase.</p>
+
+            <!-- Root Level Overview -->
+            <h2>🌳 Root Level Overview</h2>
+            <div class="folder-tree">
+<span class="folder">evolve-payments-platform/</span>
+├── <span class="folder">App/</span>                      <span class="comment"># Main Django application modules</span>
+├── <span class="folder">config/</span>                   <span class="comment"># Django project configuration</span>
+├── <span class="folder">templates/</span>                <span class="comment"># Global HTML templates</span>
+├── <span class="folder">static/</span>                   <span class="comment"># Static files (CSS, JS, images)</span>
+├── <span class="folder">staticfiles/</span>              <span class="comment"># Collected static files (auto-generated)</span>
+├── <span class="folder">evolve_env/</span>               <span class="comment"># Virtual environment (local)</span>
+├── <span class="folder">docs/</span>                     <span class="comment"># Project documentation</span>
+├── <span class="folder">dev-docs/</span>                 <span class="comment"># Developer documentation (this site)</span>
+├── <span class="folder">plans/</span>                    <span class="comment"># Project planning documents</span>
+├── <span class="folder">.github/</span>                  <span class="comment"># GitHub workflows and configuration</span>
+├── <span class="folder">.git/</span>                     <span class="comment"># Git repository data</span>
+├── <span class="folder">.idea/</span>                    <span class="comment"># PyCharm IDE configuration</span>
+├── <span class="file">manage.py</span>                   <span class="comment"># Django management script</span>
+├── <span class="file">requirements.txt</span>            <span class="comment"># Python dependencies</span>
+├── <span class="file">db.sqlite3</span>                  <span class="comment"># SQLite database file</span>
+├── <span class="file">Dockerfile</span>                  <span class="comment"># Docker container configuration</span>
+├── <span class="file">docker-compose.yml</span>          <span class="comment"># Docker compose configuration</span>
+├── <span class="file">.env</span>                        <span class="comment"># Environment variables (not in git)</span>
+├── <span class="file">.gitignore</span>                  <span class="comment"># Git ignore rules</span>
+├── <span class="file">readme.md</span>                   <span class="comment"># Project README</span>
+└── <span class="file">run_server.ps1</span>              <span class="comment"># PowerShell server startup script</span>
+            </div>
+
+            <!-- Core Directories Breakdown -->
+            <h2>📂 Core Directories Breakdown</h2>
+
+            <!-- App Directory -->
+            <div class="card">
+                <h3>🔥 App/ - Main Application Code</h3>
+                <p>Contains all the Django application modules organized by business domain. This is where the core business logic lives.</p>
+                
+                <div class="folder-tree">
+<span class="folder">App/</span>
+├── <span class="folder">admin/</span>                    <span class="comment"># Platform administration module</span>
+│   ├── <span class="folder">api/</span>                  <span class="comment"># Admin API endpoints</span>
+│   │   └── <span class="folder">v1/</span>               <span class="comment"># API version 1</span>
+│   │       ├── <span class="folder">serializers/</span>  <span class="comment"># API data serializers</span>
+│   │       └── <span class="folder">views/</span>        <span class="comment"># API view controllers</span>
+│   ├── <span class="folder">models/</span>               <span class="comment"># Database models for admin</span>
+│   ├── <span class="folder">views/</span>                <span class="comment"># Web view controllers</span>
+│   ├── <span class="folder">forms/</span>                <span class="comment"># Django forms</span>
+│   ├── <span class="folder">services/</span>             <span class="comment"># Business logic layer</span>
+│   ├── <span class="folder">repositories/</span>         <span class="comment"># Data access layer</span>
+│   ├── <span class="folder">tests/</span>                <span class="comment"># Unit tests</span>
+│   ├── <span class="folder">utils/</span>                <span class="comment"># Utility functions</span>
+│   ├── <span class="folder">exceptions/</span>           <span class="comment"># Custom exceptions</span>
+│   ├── <span class="folder">migrations/</span>           <span class="comment"># Database migrations</span>
+│   └── <span class="folder">management/commands/</span>   <span class="comment"># Custom Django commands</span>
+├── <span class="folder">business/</span>                 <span class="comment"># Business customer module</span>
+│   └── <span class="comment">(same structure as admin/)</span>
+├── <span class="folder">reseller/</span>                 <span class="comment"># Reseller module</span>
+│   ├── <span class="folder">earnings/</span>             <span class="comment"># Commission & earnings sub-module</span>
+│   │   ├── <span class="folder">models/</span>           <span class="comment"># Earnings-related models</span>
+│   │   ├── <span class="folder">services/</span>         <span class="comment"># Earnings business logic</span>
+│   │   ├── <span class="folder">repositories/</span>     <span class="comment"># Earnings data access</span>
+│   │   └── <span class="folder">api/</span>              <span class="comment"># Earnings API endpoints</span>
+│   └── <span class="comment">(same structure as admin/)</span>
+├── <span class="folder">integrations/</span>             <span class="comment"># External service integrations</span>
+└── <span class="folder">migrations/</span>               <span class="comment"># Main app migrations</span>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>🏗️ Architecture Pattern:</strong> Each module follows a clean architecture pattern with separate layers for API, views, services, repositories, and models.
+                </div>
+            </div>
+
+            <!-- Config Directory -->
+            <div class="card">
+                <h3>⚙️ config/ - Django Configuration</h3>
+                <p>Contains Django project settings and configuration files.</p>
+                
+                <table>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                        <th>Key Contents</th>
+                    </tr>
+                    <tr>
+                        <td><code>settings.py</code></td>
+                        <td>Main Django settings</td>
+                        <td>Database config, installed apps, middleware, environment variables</td>
+                    </tr>
+                    <tr>
+                        <td><code>urls.py</code></td>
+                        <td>Main URL routing</td>
+                        <td>Root URL patterns that include app-specific URLs</td>
+                    </tr>
+                    <tr>
+                        <td><code>wsgi.py</code></td>
+                        <td>Web server interface</td>
+                        <td>WSGI configuration for deployment</td>
+                    </tr>
+                    <tr>
+                        <td><code>asgi.py</code></td>
+                        <td>Async server interface</td>
+                        <td>ASGI configuration for async features</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Templates Directory -->
+            <div class="card">
+                <h3>🎨 templates/ - HTML Templates</h3>
+                <p>Global HTML templates organized by feature area.</p>
+                
+                <div class="folder-tree">
+<span class="folder">templates/</span>
+├── <span class="folder">auth/</span>                     <span class="comment"># Authentication templates (login, register)</span>
+├── <span class="folder">dashboards/</span>               <span class="comment"># User dashboard templates</span>
+├── <span class="folder">emails/</span>                   <span class="comment"># Email notification templates</span>
+├── <span class="folder">landing/</span>                  <span class="comment"># Landing page templates</span>
+├── <span class="folder">onboarding/</span>               <span class="comment"># User onboarding flow templates</span>
+├── <span class="folder">payments/</span>                 <span class="comment"># Payment-related templates</span>
+└── <span class="file">README.md</span>                   <span class="comment"># Template organization guide</span>
+                </div>
+            </div>
+
+            <!-- Module Architecture -->
+            <h2>🏗️ Module Architecture Pattern</h2>
+            <p>Each main module (admin, business, reseller) follows a consistent architecture pattern:</p>
+
+            <div class="card">
+                <h3>📊 Layer Responsibilities</h3>
+                <table>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Directory</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>API Layer</strong></td>
+                        <td><code>api/v1/</code></td>
+                        <td>REST API endpoints, serialization</td>
+                        <td>User registration API, data validation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Web Layer</strong></td>
+                        <td><code>views/</code></td>
+                        <td>Web interface controllers</td>
+                        <td>Dashboard views, form handling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Service Layer</strong></td>
+                        <td><code>services/</code></td>
+                        <td>Business logic, complex operations</td>
+                        <td>Commission calculations, user workflows</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repository Layer</strong></td>
+                        <td><code>repositories/</code></td>
+                        <td>Data access, database queries</td>
+                        <td>User data retrieval, complex queries</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Model Layer</strong></td>
+                        <td><code>models/</code></td>
+                        <td>Database schema, data validation</td>
+                        <td>User model, relationship definitions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Form Layer</strong></td>
+                        <td><code>forms/</code></td>
+                        <td>Web form definitions</td>
+                        <td>Registration forms, validation rules</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- File Naming Conventions -->
+            <h2>📝 File Naming Conventions</h2>
+            <div class="card">
+                <h3>Naming Standards</h3>
+                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li><strong>Models:</strong> <code>user_model.py</code>, <code>commission_model.py</code></li>
+                    <li><strong>Views:</strong> <code>dashboard_views.py</code>, <code>user_views.py</code></li>
+                    <li><strong>Services:</strong> <code>user_service.py</code>, <code>payment_service.py</code></li>
+                    <li><strong>APIs:</strong> <code>user_api.py</code>, <code>commission_api.py</code></li>
+                    <li><strong>Tests:</strong> <code>test_user_service.py</code>, <code>test_api_endpoints.py</code></li>
+                </ul>
+            </div>
+
+            <!-- Environment and Config Files -->
+            <h2>🌍 Environment & Configuration Files</h2>
+            <div class="card">
+                <table>
+                    <tr>
+                        <th>File</th>
+                        <th>Purpose</th>
+                        <th>Contains</th>
+                    </tr>
+                    <tr>
+                        <td><code>.env</code></td>
+                        <td>Environment variables</td>
+                        <td>API keys, database URLs, secret configurations</td>
+                    </tr>
+                    <tr>
+                        <td><code>requirements.txt</code></td>
+                        <td>Python dependencies</td>
+                        <td>Django, python-decouple, requests, etc.</td>
+                    </tr>
+                    <tr>
+                        <td><code>Dockerfile</code></td>
+                        <td>Container configuration</td>
+                        <td>Docker image build instructions</td>
+                    </tr>
+                    <tr>
+                        <td><code>docker-compose.yml</code></td>
+                        <td>Multi-container setup</td>
+                        <td>Service definitions, networking, volumes</td>
+                    </tr>
+                    <tr>
+                        <td><code>.gitignore</code></td>
+                        <td>Git ignore rules</td>
+                        <td>Files/folders to exclude from version control</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Working with the Structure -->
+            <h2>🛠️ Working with the Structure</h2>
+            
+            <div class="card">
+                <h3>Adding New Features</h3>
+                <p>When adding new functionality, follow this pattern:</p>
+                <ol style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li>Create models in the appropriate <code>models/</code> directory</li>
+                    <li>Add business logic in <code>services/</code></li>
+                    <li>Create data access methods in <code>repositories/</code></li>
+                    <li>Build API endpoints in <code>api/v1/</code></li>
+                    <li>Create web views in <code>views/</code> if needed</li>
+                    <li>Add templates in the appropriate <code>templates/</code> subdirectory</li>
+                    <li>Write tests in <code>tests/</code></li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h3>Quick Navigation Tips</h3>
+                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li><strong>Looking for business logic?</strong> Check <code>App/[module]/services/</code></li>
+                    <li><strong>Need to modify database queries?</strong> Look in <code>repositories/</code></li>
+                    <li><strong>Working on APIs?</strong> Navigate to <code>api/v1/</code></li>
+                    <li><strong>Updating UI?</strong> Templates are in global <code>templates/</code></li>
+                    <li><strong>Configuring the app?</strong> Check <code>config/settings.py</code></li>
+                    <li><strong>Adding dependencies?</strong> Update <code>requirements.txt</code></li>
+                </ul>
+            </div>
+
+            <div class="alert alert-success">
+                <strong>✅ Best Practice:</strong> Always follow the established folder structure when adding new features. This keeps the codebase organized and makes it easier for team members to find and understand code.
+            </div>
+        </main>
+    </div>
+</body>
+</html>

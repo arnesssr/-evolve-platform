@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Plans Management</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/edit-plans.css' %}">
+</head>
+<body>
+  <div class="admin-container">
+    <div class="header">
+      <div class="breadcrumb">Admin Dashboard › Settings › Payment Plans</div>
+      <h1 class="page-title">Payment Plans Management</h1>
+      <p class="page-subtitle">Configure and manage your subscription plans and pricing</p>
+    </div>
+
+    <div class="main-layout">
+      <div class="sidebar">
+        <h3 class="sidebar-title">Available Plans</h3>
+        <ul class="plans-list">
+          {% for plan in plans %}
+          <li class="plan-card {% if forloop.first %}active{% endif %}" data-id="{{ plan.id }}">
+            <div class="plan-header">
+              <div class="plan-name">{{ plan.name }}</div>
+              {% if plan.badge %}
+              <div class="plan-badge">{{ plan.badge }}</div>
+              {% endif %}
+            </div>
+            <div class="plan-price">KSh.{{ plan.price }} <span class="plan-period">/ month</span></div>
+          </li>
+          {% endfor %}
+        </ul>
+        <button id="add-new-plan-btn" class="add-plan-btn">+ Add New Plan</button>
+      </div>
+
+      <div class="edit-panel">
+        <div class="panel-header">
+          <h2 class="panel-title" id="edit-title">Edit Plan</h2>
+          <div class="action-buttons">
+            <button class="btn-save">Save Changes</button>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Basic Information</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Plan Name</label>
+              <input type="text" id="plan-name" class="form-input" placeholder="Enter plan name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Badge</label>
+              <input type="text" id="plan-badge" class="form-input" placeholder="e.g., Most Popular">
+            </div>
+            <div class="form-group full-width">
+              <label class="form-label">Description</label>
+              <textarea id="plan-description" class="form-textarea" placeholder="Enter plan description"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Monthly Price</label>
+              <div class="input-group">
+                <span class="currency-prefix">KSh.</span>
+                <input type="number" id="plan-monthly" class="form-input currency-input" placeholder="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Annual Price</label>
+              <div class="input-group">
+                <span class="currency-prefix">KSh.</span>
+                <input type="number" id="plan-yearly" class="form-input currency-input" placeholder="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Plan Status</label>
+              <div class="toggle-container">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="plan-status" class="toggle-input">
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="status-badge">
+                  <span class="status-dot"></span>
+                  <span id="status-text">Active</span>
+                </span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Order</label>
+              <input type="number" id="plan-order" class="form-input" placeholder="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Plan Features</h3>
+          <div class="features-section" id="feature-list">
+            <!-- JS will dynamically insert feature items here -->
+          </div>
+          <button id="add-feature-btn" class="btn btn-secondary mt-3">+ Add New Feature</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="{% static 'js/edit-plans.js' %}"></script>
+</body>
+</html>

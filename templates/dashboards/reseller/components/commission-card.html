@@ -1,0 +1,21 @@
+<!-- Commission metric card component -->
+<div class="card commission-card">
+    <div class="card-body">
+        <h6 class="card-title">{{ title }}</h6>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="h4 mb-0">${{ amount }}</span>
+            <span class="badge bg-secondary">{{ trend }}</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.commission-card {
+    background-color: #f7f7f9;
+    border-color: #ddd;
+}
+.commission-card .card-title {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+</style>

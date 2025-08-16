@@ -1,0 +1,150 @@
+<!-- Modal for adding/editing leads -->
+<div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLeadModalLabel">Add New Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="leadForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadName" class="form-label">Lead Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="leadName" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadEmail" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="leadEmail" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="leadPhone" name="phone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadCompany" class="form-label">Company <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="leadCompany" name="company" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadProduct" class="form-label">Product Interest</label>
+                                <select class="form-select" id="leadProduct" name="product">
+                                    <option value="">Select Product</option>
+                                    <option value="payment_gateway">Payment Gateway</option>
+                                    <option value="pos_system">POS System</option>
+                                    <option value="ecommerce">E-Commerce Solution</option>
+                                    <option value="mobile_payments">Mobile Payments</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadValue" class="form-label">Estimated Deal Value</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="leadValue" name="value" min="0" step="100">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadStatus" class="form-label">Status</label>
+                                <select class="form-select" id="leadStatus" name="status">
+                                    <option value="new" selected>New</option>
+                                    <option value="contacted">Contacted</option>
+                                    <option value="qualified">Qualified</option>
+                                    <option value="proposal">Proposal</option>
+                                    <option value="negotiation">Negotiation</option>
+                                    <option value="converted">Converted</option>
+                                    <option value="lost">Lost</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="leadSource" class="form-label">Lead Source</label>
+                                <select class="form-select" id="leadSource" name="source">
+                                    <option value="">Select Source</option>
+                                    <option value="referral">Referral</option>
+                                    <option value="website">Website</option>
+                                    <option value="social_media">Social Media</option>
+                                    <option value="email_campaign">Email Campaign</option>
+                                    <option value="cold_call">Cold Call</option>
+                                    <option value="event">Event/Trade Show</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="leadNotes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="leadNotes" name="notes" rows="3" placeholder="Add any additional notes about this lead..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="leadTags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="leadTags" name="tags" placeholder="Enter tags separated by commas">
+                        <small class="form-text text-muted">e.g., high-priority, enterprise, retail</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveLead()">Save Lead</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveLead() {
+    // Validate form
+    const form = document.getElementById('leadForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    // Get form data
+    const formData = new FormData(form);
+    const leadData = Object.fromEntries(formData);
+    
+    // Save lead (implement API call here)
+    console.log('Saving lead:', leadData);
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addLeadModal'));
+    modal.hide();
+    
+    // Reset form
+    form.reset();
+    
+    // Show success message
+    // showNotification('Lead added successfully!', 'success');
+}
+
+function editLead(leadId) {
+    // Load lead data and populate form
+    // Implement edit functionality
+    const modal = new bootstrap.Modal(document.getElementById('addLeadModal'));
+    document.getElementById('addLeadModalLabel').textContent = 'Edit Lead';
+    modal.show();
+}
+</script>

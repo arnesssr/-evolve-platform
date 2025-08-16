@@ -1,0 +1,100 @@
+/* Header User Dropdown Styles */
+.user-dropdown {
+    position: relative;
+}
+
+.user-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-dropdown-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.user-dropdown-trigger i.fa-user-circle {
+    font-size: 1.25rem;
+}
+
+.user-dropdown-trigger i.fa-chevron-down {
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.user-dropdown-trigger[aria-expanded="true"] i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Dropdown Menu Styles */
+.user-dropdown .dropdown-menu {
+    min-width: 280px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-dropdown .dropdown-header {
+    padding: 1rem;
+    background-color: var(--bs-gray-100);
+    border-bottom: 1px solid var(--bs-gray-200);
+}
+
+.user-dropdown .dropdown-item {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+    padding-left: 1.25rem;
+}
+
+.user-dropdown .dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.user-dropdown .dropdown-item:hover i {
+    color: var(--primary-color);
+}
+
+.user-dropdown .dropdown-item.text-danger:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.user-dropdown .dropdown-item.text-danger i {
+    color: #dc3545;
+}
+
+/* Profile Badge in Header */
+.dropdown-header .fa-user-circle {
+    color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .user-dropdown-trigger span {
+        display: none;
+    }
+    
+    .user-dropdown .dropdown-menu {
+        min-width: 200px;
+    }
+}

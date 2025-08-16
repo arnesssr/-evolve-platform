@@ -1,0 +1,172 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Lead Management - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="leads-management">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Lead Management</h1>
+            <p class="text-muted mb-0">Track and manage your sales leads</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+            <i class="fas fa-plus-circle me-2"></i>Add New Lead
+        </button>
+    </div>
+
+    <!-- Lead Statistics -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_leads|default:0 }}</div>
+                <div class="stat-label">Total Leads</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ qualified_leads|default:0 }}</div>
+                <div class="stat-label">Qualified</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ converted_leads|default:0 }}</div>
+                <div class="stat-label">Converted</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ conversion_rate|default:"0%" }}</div>
+                <div class="stat-label">Conversion Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3" method="get">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="qualified">Qualified</option>
+                        <option value="proposal">Proposal</option>
+                        <option value="negotiation">Negotiation</option>
+                        <option value="converted">Converted</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Date Range</label>
+                    <select name="date_range" class="form-select">
+                        <option value="">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Search by name, email, or company">
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leads Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Lead Info</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Value</th>
+                            <th>Last Contact</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td>
+                                <div class="lead-info">
+                                    <div class="fw-medium">{{ lead.name }}</div>
+                                    <div class="text-muted small">{{ lead.email }}</div>
+                                </div>
+                            </td>
+                            <td>{{ lead.company }}</td>
+                            <td>
+                                <span class="badge bg-{{ lead.status_color }}">{{ lead.status }}</span>
+                            </td>
+                            <td>${{ lead.potential_value|floatformat:0 }}</td>
+                            <td>{{ lead.last_contact|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="viewLead({{ lead.id }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="editLead({{ lead.id }})">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="deleteLead({{ lead.id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <p class="mb-0">No leads found. Start by adding your first lead!</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if leads %}
+            <nav aria-label="Lead pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not has_previous %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ previous_page }}" tabindex="-1">Previous</a>
+                    </li>
+                    {% for page in page_range %}
+                    <li class="page-item {% if page == current_page %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if not has_next %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ next_page }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Lead Modal -->
+{% include 'dashboards/reseller/components/lead-modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'reseller/js/lead-manager.js' %}"></script>
+{% endblock %}

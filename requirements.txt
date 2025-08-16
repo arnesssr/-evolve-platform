@@ -1,0 +1,19 @@
+# Evolve Payments Platform - Python Dependencies
+# =============================================
+# IMPORTANT: Update this file whenever you add a new dependency!
+# To install: pip install -r requirements.txt
+
+# Core Framework
+Django==5.2.4
+
+# Environment Configuration
+python-decouple==3.8
+
+# HTTP Requests (for API integrations)
+requests==2.32.4
+
+# Note: When adding new dependencies:
+# 1. Install the package: pip install package_name
+# 2. Add it to this file with its version: package_name==x.x.x
+# 3. To get the version: pip show package_name
+# 4. Commit both this file and your code changes together

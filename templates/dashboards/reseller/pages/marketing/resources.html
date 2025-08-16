@@ -1,0 +1,115 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Training Resources - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="training-resources">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="h3 mb-0">Training Resources</h1>
+        <p class="text-muted mb-0">Enhance your skills and knowledge with our training materials</p>
+    </div>
+
+    <!-- Training Modules -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-book-half me-2"></i>On-Demand Webinars
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Effective Payment Solutions</h6>
+                            <p class="text-muted small mb-0">Learn the latest trends in payment solutions</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Boosting Your Sales</h6>
+                            <p class="text-muted small mb-0">Sales strategies to increase your revenue</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Customer Retention Techniques</h6>
+                            <p class="text-muted small mb-0">Maintain strong relationships with your clients</p>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-primary btn-sm">View All Webinars</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-laptop me-2"></i>Online Courses
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Intro to E-commerce Solutions</h6>
+                            <p class="text-muted small mb-0">Understand the fundamentals of e-commerce</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Advanced Payment Technologies</h6>
+                            <p class="text-muted small mb-0">Dive deep into the tech that powers payments</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Building a Resilient Team</h6>
+                            <p class="text-muted small mb-0">Leadership skills to strengthen your team</p>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-primary btn-sm">Browse All Courses</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-person-video3 me-2"></i>Consultation Services
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Sales Strategy Session</h6>
+                            <p class="text-muted small mb-0">Personalized advice to meet your sales goals</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Technical Integration Guidance</h6>
+                            <p class="text-muted small mb-0">Tailored support for seamless integrations</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Market Analysis Consultation</h6>
+                            <p class="text-muted small mb-0">Get insights into current and future market trends</p>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="#" class="btn btn-primary btn-sm">Explore All Services</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Training resources interaction logic can be added here
+</script>
+{% endblock %}
+

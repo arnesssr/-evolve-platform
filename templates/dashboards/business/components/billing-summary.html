@@ -1,0 +1,17 @@
+<div class="card h-100">
+    <div class="card-body text-center">
+        <div class="text-{{ status|default:'info' }} mb-3">
+            <i class="fas fa-{{ icon|default:'money-bill' }} fa-3x"></i>
+        </div>
+        <h3 class="mb-1">{{ value|default:'KES 0' }}</h3>
+        <p class="text-muted mb-0">{{ title|default:'Billing Summary' }}</p>
+        {% if description %}
+            <small class="text-muted">{{ description }}</small>
+        {% endif %}
+        {% if due_date %}
+            <div class="mt-2">
+                <small class="badge bg-warning">Due: {{ due_date }}</small>
+            </div>
+        {% endif %}
+    </div>
+</div>

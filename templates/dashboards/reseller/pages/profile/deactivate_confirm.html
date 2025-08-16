@@ -1,0 +1,29 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Deactivate Profile - Reseller Dashboard{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'reseller:profile_view' %}">Profile</a></li>
+    <li class="breadcrumb-item active">Deactivate</li>
+{% endblock %}
+
+{% block content %}
+<div class="profile-deactivate">
+    <h2>Deactivate Your Reseller Profile</h2>
+    <div class="alert alert-danger">
+        <p><strong>Warning:</strong> Deactivating your profile will:</p>
+        <ul>
+            <li>Disable all your referral links</li>
+            <li>Stop commission calculations</li>
+            <li>Prevent access to reseller features</li>
+        </ul>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to deactivate your reseller profile?</p>
+        <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+        <a href="{% url 'reseller:profile_view' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

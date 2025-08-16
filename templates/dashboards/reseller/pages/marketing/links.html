@@ -1,0 +1,215 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Referral Links - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="referral-links">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="h3 mb-0">Referral Link Generator</h1>
+        <p class="text-muted mb-0">Create and manage your unique referral links</p>
+    </div>
+
+    <!-- Link Generator -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Generate New Link</h5>
+        </div>
+        <div class="card-body">
+            <form id="linkGeneratorForm">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Campaign Name</label>
+                        <input type="text" class="form-control" name="campaign_name" placeholder="e.g., Summer Promo 2024" required>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Product</label>
+                        <select class="form-select" name="product" required>
+                            <option value="">Select Product</option>
+                            <option value="payment_gateway">Payment Gateway</option>
+                            <option value="pos_system">POS System</option>
+                            <option value="ecommerce">E-Commerce Solution</option>
+                            <option value="all">All Products</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">UTM Source</label>
+                        <input type="text" class="form-control" name="utm_source" placeholder="e.g., facebook, email">
+                    </div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Landing Page</label>
+                        <select class="form-select" name="landing_page">
+                            <option value="home">Homepage</option>
+                            <option value="pricing">Pricing Page</option>
+                            <option value="features">Features Page</option>
+                            <option value="signup">Sign Up Page</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Custom Parameters (Optional)</label>
+                        <input type="text" class="form-control" name="custom_params" placeholder="key1=value1&key2=value2">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Generate Link</button>
+                </div>
+            </form>
+
+            <!-- Generated Link Display -->
+            <div id="generatedLinkSection" class="mt-4" style="display: none;">
+                <div class="alert alert-success">
+                    <h6 class="alert-heading">Your referral link has been generated!</h6>
+                    <div class="input-group mt-2">
+                        <input type="text" class="form-control" id="generatedLink" readonly>
+                        <button class="btn btn-outline-secondary" onclick="copyLink()">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-primary" onclick="generateQRCode()">
+                            <i class="bi bi-qr-code"></i> Generate QR Code
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="shortenLink()">
+                            <i class="bi bi-link-45deg"></i> Shorten Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Links -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Your Active Links</h5>
+            <span class="badge bg-primary">{{ active_links_count|default:0 }} Active Links</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Product</th>
+                            <th>Link</th>
+                            <th>Clicks</th>
+                            <th>Conversions</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for link in referral_links %}
+                        <tr>
+                            <td>
+                                <div class="fw-medium">{{ link.campaign_name }}</div>
+                                <div class="text-muted small">{{ link.utm_source|default:"Direct" }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ link.product }}</span>
+                            </td>
+                            <td>
+                                <div class="link-wrapper">
+                                    <code class="small">{{ link.short_url|default:link.url|truncatechars:30 }}</code>
+                                    <button class="btn btn-sm btn-link" onclick="copyLinkToClipboard('{{ link.url }}')">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>{{ link.clicks|default:0 }}</td>
+                            <td>
+                                <span class="text-success">{{ link.conversions|default:0 }}</span>
+                                {% if link.clicks > 0 %}
+                                <span class="text-muted small">({{ link.conversion_rate|default:"0" }}%)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ link.created_date|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" onclick="viewLinkStats('{{ link.id }}')">
+                                        <i class="bi bi-graph-up"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="editLink('{{ link.id }}')">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="deleteLink('{{ link.id }}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <p class="mb-0">No referral links created yet.</p>
+                                <p class="text-muted small">Generate your first link using the form above!</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">QR Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qrCodeContainer"></div>
+                <button class="btn btn-primary mt-3" onclick="downloadQRCode()">Download QR Code</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Link generation and management functions
+    document.getElementById('linkGeneratorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Generate link logic
+        const generatedLink = 'https://evolve-payments.com/ref/ABC123XYZ'; // Example
+        document.getElementById('generatedLink').value = generatedLink;
+        document.getElementById('generatedLinkSection').style.display = 'block';
+    });
+
+    function copyLink() {
+        const linkInput = document.getElementById('generatedLink');
+        linkInput.select();
+        document.execCommand('copy');
+        // Show success message
+    }
+
+    function copyLinkToClipboard(link) {
+        navigator.clipboard.writeText(link).then(() => {
+            // Show success notification
+        });
+    }
+
+    function generateQRCode() {
+        // Implement QR code generation
+        const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
+        modal.show();
+    }
+
+    function viewLinkStats(linkId) {
+        // Navigate to link statistics
+        window.location.href = `/reseller/links/${linkId}/stats/`;
+    }
+</script>
+{% endblock %}

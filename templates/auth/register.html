@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Register for EvolvePay - Start accepting payments across Africa">
+    <title>Register - EvolvePay</title>
+    
+    {% load static %}
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- International Tel Input CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+    </div>
+
+    <!-- Back to Landing -->
+    <a href="{% url 'landing' %}" class="back-home">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Home</span>
+    </a>
+
+    <!-- Main Container -->
+    <div class="auth-container register">
+        <div class="auth-card">
+            <!-- Logo Section -->
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    <span>Evolve<strong>Pay</strong></span>
+                </div>
+                <h1>Create Your Account</h1>
+                <p>Join thousands of businesses across Africa</p>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active">
+                    <span>1</span>
+                    <p>Account Info</p>
+                </div>
+                <div class="step">
+                    <span>2</span>
+                    <p>Verification</p>
+                </div>
+                <div class="step">
+                    <span>3</span>
+                    <p>Complete</p>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            {% if error %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Register Form -->
+            <form method="post" action="{% url 'register_user' %}" class="auth-form">
+                {% csrf_token %}
+                
+                <!-- Role Selection -->
+                <div class="form-group">
+                    <label for="role">Register As</label>
+                    <div class="role-selector">
+                        <input type="radio" name="role" id="business_owner" value="business_owner" checked>
+                        <label for="business_owner" class="role-option">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Business Owner</span>
+                            <small>Accept payments for your business</small>
+                        </label>
+                        
+                        <input type="radio" name="role" id="reseller" value="reseller">
+                        <label for="reseller" class="role-option">
+                            <i class="fas fa-handshake"></i>
+                            <span>Reseller</span>
+                            <small>Help businesses accept payments</small>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Two Column Layout -->
+                <div class="form-row">
+                    <!-- First Name -->
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="first_name" name="first_name" placeholder="John" required>
+                        </div>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="last_name" name="last_name" placeholder="Doe" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Industry -->
+                <div class="form-group">
+                    <label for="industry">Industry</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-industry"></i>
+                        <select id="industry" name="industry" required>
+                            <option value="" disabled selected>Select your industry</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Education">Education</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Hospitality">Hospitality</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Transportation & Logistics">Transportation & Logistics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-wrapper phone-wrapper">
+                        <input type="tel" id="phone" name="phone" placeholder="712 345 678" required>
+                    </div>
+                    <span class="input-hint">We'll send a verification code to this number</span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="john@company.com" required>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('password', 'toggleIcon1')">
+                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar"></div>
+                    </div>
+                    <span class="input-hint">Minimum 8 characters with numbers and symbols</span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirm">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirm" name="confirm" placeholder="Confirm your password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirm', 'toggleIcon2')">
+                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <label class="checkbox-container terms">
+                    <input type="checkbox" name="terms" required>
+                    <span class="checkmark"></span>
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">
+                    <span>Create Account</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+
+                <!-- Login Link -->
+                <p class="auth-switch">
+                    Already have an account? 
+                    <a href="{% url 'login' %}">Login here</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Side Content -->
+        <div class="auth-side">
+            <div class="side-content">
+                <h2>Start Accepting Payments Today</h2>
+                <p>Everything you need to grow your business in Africa</p>
+                
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Quick Setup</strong>
+                            <p>Get started in less than 5 minutes</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>No Setup Fees</strong>
+                            <p>Start free, pay only when you earn</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Instant Activation</strong>
+                            <p>Begin accepting payments immediately</p>
+                        </div>
+                    </div>
+                    <div class="benefit-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Full Support</strong>
+                            <p>24/7 customer support in 5 languages</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="trust-indicators">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/MasterCard_Logo.svg" alt="Mastercard">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/M-PESA_LOGO-01.svg" alt="M-Pesa">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- International Tel Input JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    
+    <script>
+        // Initialize phone input
+        const phoneInput = document.querySelector("#phone");
+        const iti = window.intlTelInput(phoneInput, {
+            preferredCountries: ["ke", "ng", "za", "gh", "tz", "ug"],
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            initialCountry: "ke",
+        });
+
+        // Password toggle
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const toggleIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Password strength checker
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.querySelector('.strength-bar');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9]/)) strength += 25;
+            if (password.match(/[^a-zA-Z0-9]/)) strength += 25;
+            
+            strengthBar.style.width = strength + '%';
+            
+            if (strength <= 25) {
+                strengthBar.style.backgroundColor = '#ef4444';
+            } else if (strength <= 50) {
+                strengthBar.style.backgroundColor = '#f59e0b';
+            } else if (strength <= 75) {
+                strengthBar.style.backgroundColor = '#eab308';
+            } else {
+                strengthBar.style.backgroundColor = '#10b981';
+            }
+        });
+
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            // Get the international format
+            phoneInput.value = iti.getNumber();
+            
+            // Validate phone
+            if (!iti.isValidNumber()) {
+                e.preventDefault();
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Validate password match
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm').value;
+            
+            if (password !== confirm) {
+                e.preventDefault();
+                alert('Passwords do not match');
+                return;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your EvolvePay OTP</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+            background-color: #f9fafc;
+            padding: 30px;
+            color: #333;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: auto;
+            padding: 40px 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.06);
+        }
+        .logo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        .logo span {
+            color: #6366f1;
+        }
+        .headline {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .message {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .otp-code {
+            background-color: #f0f4ff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            text-align: center;
+            color: #1e40af;
+            margin: 0 auto 20px auto;
+            display: inline-block;
+        }
+        .footer-note {
+            font-size: 14px;
+            text-align: center;
+            color: #6b7280;
+            margin-top: 30px;
+        }
+        .support {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .support a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <i class="fas fa-wallet"></i> Evolve<span>Pay</span>
+        </div>
+
+        <div class="headline">Your One-Time Password (OTP)</div>
+        <div class="message">
+            Use the code below to complete your secure login to EvolvePay.
+        </div>
+
+        <div style="text-align: center;">
+            <div class="otp-code">{{ code }}</div>
+        </div>
+        
+        <div class="footer-note">
+            This code is valid for 10 minutes. If you didn't request this, please ignore this email.
+        </div>
+
+        <div class="support">
+            Need help? <a href="mailto:info@lixnet.net">Contact our support team</a>.
+        </div>
+    </div>
+</body>
+</html>

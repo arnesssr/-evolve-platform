@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Evolve Platform</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/evolve-theme.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin-dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span class="logo-text">Evolve Admin</span>
+                </div>
+                <button class="toggle-btn" id="toggleBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Dashboard</div>
+                    <a href="#" class="active"><i class="fas fa-chart-line"></i> <span>Overview</span></a>
+                    <a href="#"><i class="fas fa-analytics"></i> <span>Analytics</span></a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">User Management</div>
+                    <a href="#"><i class="fas fa-building"></i> <span>Businesses</span></a>
+                    <a href="#"><i class="fas fa-handshake"></i> <span>Resellers</span></a>
+                    <a href="#"><i class="fas fa-user-shield"></i> <span>Admins</span></a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Products</div>
+                    <a href="/edit-plans"><i class="fas fa-box"></i> <span>Plans</span></a>
+                    <a href="#"><i class="fas fa-tags"></i> <span>Pricing</span></a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Financial</div>
+                    <a href="#"><i class="fas fa-dollar-sign"></i> <span>Revenue</span></a>
+                    <a href="#"><i class="fas fa-receipt"></i> <span>Payouts</span></a>
+                    <a href="#"><i class="fas fa-file-invoice"></i> <span>Reports</span></a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a>
+                    <a href="#"><i class="fas fa-lock"></i> <span>Security</span></a>
+                    <a href="#"><i class="fas fa-history"></i> <span>Logs</span></a>
+                </div>
+                
+                <a href="{% url 'logout' %}" class="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <h1>Platform Overview</h1>
+                    <p class="subtitle">Welcome back, Admin</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-filter">
+                        <i class="fas fa-calendar"></i>
+                        <select>
+                            <option>Last 30 Days</option>
+                            <option>Last 7 Days</option>
+                            <option>Today</option>
+                        </select>
+                    </div>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </button>
+                    <div class="user-menu">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Metrics Cards -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Total Users</h3>
+                        <p class="metric-value">1,234</p>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 15.3% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon revenue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Monthly Revenue</h3>
+                        <p class="metric-value">KES 2.5M</p>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 23.1% from last month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon resellers">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Active Resellers</h3>
+                        <p class="metric-value">89</p>
+                        <div class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 8 new this month
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon growth">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Growth Rate</h3>
+                        <p class="metric-value">+34.2%</p>
+                        <div class="metric-change">
+                            <span class="status-text">On target</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Status & Activity -->
+            <section class="dashboard-row">
+                <div class="card system-status">
+                    <h3>System Health</h3>
+                    <div class="status-list">
+                        <div class="status-item">
+                            <span class="status-indicator green"></span>
+                            <span class="status-label">API Services</span>
+                            <span class="status-value">Operational</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator green"></span>
+                            <span class="status-label">Database</span>
+                            <span class="status-value">Healthy</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator green"></span>
+                            <span class="status-label">Payment Gateway</span>
+                            <span class="status-value">Active</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator yellow"></span>
+                            <span class="status-label">SMS Gateway</span>
+                            <span class="status-value">Degraded</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card activity-feed">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <i class="fas fa-user-plus"></i>
+                            <div class="activity-content">
+                                <p>New business registration: ABC Company</p>
+                                <span class="time">2 minutes ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-money-bill"></i>
+                            <div class="activity-content">
+                                <p>Commission payout: KES 15,000 to John Doe</p>
+                                <span class="time">1 hour ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="activity-content">
+                                <p>Failed payment attempt from XYZ Corp</p>
+                                <span class="time">3 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h3>Quick Actions</h3>
+                <div class="action-cards">
+                    <div class="action-card">
+                        <i class="fas fa-user-check"></i>
+                        <span>3 Pending Approvals</span>
+                    </div>
+                    <div class="action-card">
+                        <i class="fas fa-ticket-alt"></i>
+                        <span>2 Support Tickets</span>
+                    </div>
+                    <div class="action-card">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Generate Report</span>
+                    </div>
+                    <div class="action-card">
+                        <i class="fas fa-envelope"></i>
+                        <span>Send Newsletter</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
+    </script>
+</body>
+</html>

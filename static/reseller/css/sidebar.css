@@ -1,0 +1,438 @@
+/* Sidebar Styles - Single source of truth */
+
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+    --sidebar-bg: #0a2463; /* Primary dark blue to match business dashboard */
+    --sidebar-hover: #071a45; /* Darker blue on hover */
+    --sidebar-active: #1e3b8a; /* Secondary blue for active */
+    --sidebar-text: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.8);
+}
+
+/* Preload collapsed state to prevent flash/shake */
+.sidebar-preload-collapsed .sidebar {
+    width: var(--sidebar-collapsed-width) !important;
+}
+
+.sidebar-preload-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed-width) !important;
+}
+
+/* Hide elements immediately when preload collapsed */
+.sidebar-preload-collapsed .sidebar span,
+.sidebar-preload-collapsed .sidebar .logo-text,
+.sidebar-preload-collapsed .sidebar .sidebar-group > span,
+.sidebar-preload-collapsed .sidebar .toggle-btn {
+    display: none !important;
+}
+
+.sidebar-preload-collapsed .sidebar .collapsed-menu-btn {
+    display: block !important;
+}
+
+.sidebar-preload-collapsed .sidebar-nav a {
+    justify-content: center !important;
+    padding: 0.75rem !important;
+}
+
+.sidebar-preload-collapsed .sidebar-nav a i {
+    margin: 0 !important;
+}
+
+/* High specificity selector to ensure proper color application */
+.reseller-dashboard .sidebar,
+.reseller-dashboard aside.sidebar,
+.reseller-dashboard #sidebar,
+.dashboard-wrapper .sidebar,
+.dashboard-wrapper aside.sidebar,
+.dashboard-wrapper #sidebar,
+.sidebar,
+aside.sidebar,
+#sidebar {
+    width: var(--sidebar-width);
+    height: calc(100vh - 60px); /* Account for header height */
+    position: fixed;
+    left: 0;
+    top: 60px; /* Start below header */
+    background-color: var(--sidebar-bg) !important; /* Force the business dashboard color */
+    background: var(--sidebar-bg) !important; /* Double ensure */
+    color: var(--sidebar-text);
+    transition: width 0.3s ease;
+    z-index: 900; /* Below header */
+    overflow: visible; /* Allow toggle button to extend outside */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    flex-shrink: 0;
+    min-height: 60px;
+}
+
+.sidebar.collapsed .sidebar-header {
+    padding: 1rem 0.5rem;
+}
+
+.sidebar-header .logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-header .logo i {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    transition: margin 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-header .logo {
+    justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-header .logo i {
+    margin-right: 0;
+}
+
+.sidebar.collapsed .logo-text {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar .toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: -18px;
+    transform: translateY(-50%);
+    background: var(--sidebar-bg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.375rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar.collapsed .toggle-btn {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.sidebar .toggle-btn i {
+    transition: transform 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.sidebar .toggle-btn:hover {
+    background-color: var(--sidebar-hover);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.sidebar .toggle-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0; /* Important for Firefox */
+    /* Always show scrollbar on Windows/Linux, auto on Mac */
+    overflow-y: overlay; /* For Webkit browsers - shows scrollbar only when needed but doesn't take space */
+}
+
+/* Custom scrollbar for navigation */
+.sidebar-nav::-webkit-scrollbar {
+    width: 8px; /* Slightly wider for better visibility */
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4); /* More visible */
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Firefox scrollbar support */
+.sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure last items have bottom padding */
+.sidebar-nav > a:last-child {
+    margin-bottom: 2rem;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.2s;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-nav a:hover {
+    background-color: var(--sidebar-hover);
+    color: #fff;
+}
+
+.sidebar-nav a.active {
+    background-color: var(--sidebar-active);
+    color: #fff;
+}
+
+.sidebar-nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #fff;
+}
+
+/* Hide active indicator when collapsed */
+.sidebar.collapsed .sidebar-nav a.active::before {
+    display: none;
+}
+
+.sidebar-nav a i {
+    width: 1.5rem;
+    margin-right: 0.75rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Ensure spans are visible by default */
+.sidebar-nav a span {
+    display: inline-block;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Explicitly show text when sidebar is not collapsed */
+.sidebar:not(.collapsed) .sidebar-nav a span,
+.sidebar:not(.collapsed) .sidebar-group > span,
+.sidebar:not(.collapsed) .logo-text {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+}
+
+.sidebar.collapsed .sidebar-nav a span {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-nav a {
+    justify-content: center;
+    padding: 0.75rem;
+    position: relative;
+}
+
+.sidebar.collapsed .sidebar-nav a i {
+    margin: 0;
+}
+
+/* Tooltips for collapsed sidebar */
+.sidebar.collapsed .sidebar-nav a::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.sidebar.collapsed .sidebar-nav a:hover::after {
+    opacity: 1;
+}
+
+/* Sidebar Groups */
+.sidebar-group {
+    margin: 1rem 0;
+}
+
+.sidebar-group > span {
+    display: block;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+}
+
+.sidebar.collapsed .sidebar-group > span {
+    display: none;
+}
+
+/* Collapsed sidebar - clean icon-only style */
+.sidebar.collapsed .sidebar-group {
+    margin: 0;
+}
+
+/* Remove all borders and separators when collapsed */
+.sidebar.collapsed .sidebar-nav {
+    padding: 0.5rem 0;
+}
+
+/* Clean icon display when collapsed */
+.sidebar.collapsed .sidebar-nav a {
+    padding: 0.75rem;
+    margin: 0.25rem 0;
+    justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-nav a i {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    width: auto;
+}
+
+.sidebar.collapsed .sidebar-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar.collapsed .sidebar-nav a:hover i {
+    color: #fff;
+}
+
+.sidebar.collapsed .sidebar-nav a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Hide header border when collapsed */
+.sidebar.collapsed .sidebar-header {
+    border-bottom: none;
+    padding: 0.75rem;
+}
+
+/* Center logo icon when collapsed */
+.sidebar.collapsed .sidebar-header .logo i {
+    font-size: 1.5rem;
+    margin: 0 auto;
+}
+
+/* Hide all text elements when collapsed */
+.sidebar.collapsed span,
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .sidebar-group > span {
+    display: none !important;
+}
+
+/* Ensure consistent width */
+.sidebar.collapsed {
+    width: 70px !important;
+    overflow-x: hidden;
+}
+
+/* Collapsed menu button - only show when collapsed */
+.collapsed-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    width: 100%;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.sidebar.collapsed .collapsed-menu-btn {
+    display: block;
+}
+
+.sidebar.collapsed .sidebar-header {
+    padding: 0;
+}
+
+.sidebar.collapsed .sidebar-header .logo {
+    display: none;
+}
+
+.collapsed-menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Hide regular toggle button when showing collapsed menu */
+.sidebar.collapsed .toggle-btn {
+    display: none !important;
+}

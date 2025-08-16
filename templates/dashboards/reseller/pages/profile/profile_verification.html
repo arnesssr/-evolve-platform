@@ -1,0 +1,20 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Profile Verification - Reseller Dashboard{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'reseller:profile_view' %}">Profile</a></li>
+    <li class="breadcrumb-item active">Verification</li>
+{% endblock %}
+
+{% block content %}
+<div class="profile-verification">
+    <h2>Verify Your Business Profile</h2>
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Submit for Verification</button>
+    </form>
+</div>
+{% endblock %}

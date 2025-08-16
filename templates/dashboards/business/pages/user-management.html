@@ -1,0 +1,280 @@
+{% extends 'dashboards/business/layouts/business-base.html' %}
+
+{% block title %}User Management - Business Portal{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-2">User Management</h3>
+                    <p class="text-muted mb-0">Manage users and their access to your business software</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <i class="fas fa-user-plus me-2"></i>Add User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users text-primary fa-2x mb-3"></i>
+                    <h3>24</h3>
+                    <p class="text-muted mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-user-check text-success fa-2x mb-3"></i>
+                    <h3>22</h3>
+                    <p class="text-muted mb-0">Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-clock text-warning fa-2x mb-3"></i>
+                    <h3>2</h3>
+                    <p class="text-muted mb-0">Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-crown text-info fa-2x mb-3"></i>
+                    <h3>3</h3>
+                    <p class="text-muted mb-0">Administrators</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users text-primary me-2"></i>All Users
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <input type="search" class="form-control form-control-sm" placeholder="Search users..." style="width: 200px;">
+                            <select class="form-select form-select-sm" style="width: auto;">
+                                <option>All Roles</option>
+                                <option>Admin</option>
+                                <option>Manager</option>
+                                <option>Employee</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Software Access</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <span class="text-white fw-bold">JD</span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">John Doe</div>
+                                                <small class="text-muted">Administrator</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>john.doe@company.com</td>
+                                    <td><span class="badge bg-danger">Admin</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-primary">ERP</span>
+                                            <span class="badge bg-info">SACCO</span>
+                                            <span class="badge bg-success">Payroll</span>
+                                        </div>
+                                    </td>
+                                    <td>5 min ago</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
+                                                <i class="fas fa-pause"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <span class="text-white fw-bold">JS</span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Jane Smith</div>
+                                                <small class="text-muted">Manager</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>jane.smith@company.com</td>
+                                    <td><span class="badge bg-warning">Manager</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-primary">ERP</span>
+                                            <span class="badge bg-success">Payroll</span>
+                                        </div>
+                                    </td>
+                                    <td>2 hours ago</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
+                                                <i class="fas fa-pause"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <span class="text-white fw-bold">MB</span>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">Mike Brown</div>
+                                                <small class="text-muted">Employee</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>mike.brown@company.com</td>
+                                    <td><span class="badge bg-secondary">Employee</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-info">SACCO</span>
+                                        </div>
+                                    </td>
+                                    <td>Yesterday</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
+                                    <td>
+                                        <div class="d-flex gap-1">
+                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-success btn-sm" title="Activate">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus text-primary me-2"></i>Add New User
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" placeholder="John">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" placeholder="Doe">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" placeholder="john.doe@company.com">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Role</label>
+                            <select class="form-select">
+                                <option>Employee</option>
+                                <option>Manager</option>
+                                <option>Administrator</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-select">
+                                <option>Finance</option>
+                                <option>Operations</option>
+                                <option>Management</option>
+                                <option>IT</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Software Access</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="erp">
+                                <label class="form-check-label" for="erp">ERP System</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sacco">
+                                <label class="form-check-label" for="sacco">SACCO Platform</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="payroll">
+                                <label class="form-check-label" for="payroll">Payroll System</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

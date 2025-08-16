@@ -1,0 +1,275 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Invoice History - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="invoice-history">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Invoice History</h1>
+            <p class="text-muted mb-0">View and download your commission invoices</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestInvoiceModal">
+            <i class="bi bi-file-earmark-plus me-2"></i>Request Invoice
+        </button>
+    </div>
+
+    <!-- Invoice Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Invoices</div>
+                <div class="stat-value">{{ summary.total_invoices|default:0 }}</div>
+                <div class="stat-change text-muted">All time</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Paid Invoices</div>
+                <div class="stat-value text-success">{{ summary.paid_count|default:0 }}</div>
+                <div class="stat-change text-muted">${{ summary.paid_amount|default:"0"|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value text-warning">{{ summary.pending_count|default:0 }}</div>
+                <div class="stat-change text-muted">${{ summary.pending_amount|default:"0"|floatformat:2 }}</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">This Year</div>
+                <div class="stat-value text-info">${{ summary.current_year_total|default:"0"|floatformat:2 }}</div>
+                <div class="stat-change text-success">+{{ summary.year_growth|default:"0"|floatformat:1 }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="paid">Paid</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Year</label>
+                    <select name="year" class="form-select">
+                        <option value="">All Years</option>
+                        {% for year in available_years %}
+                        <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Invoice number or description">
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-secondary w-100">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Date</th>
+                            <th>Period</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in page_obj %}
+                        <tr>
+                            <td>
+                                <code>{{ invoice.invoice_number }}</code>
+                            </td>
+                            <td>{{ invoice.issue_date|date:"M d, Y" }}</td>
+                            <td>{{ invoice.period_start|date:"M Y" }}</td>
+                            <td>
+                                <div>{{ invoice.description|default:"Commission Invoice" }}</div>
+                                <div class="text-muted small">{{ invoice.line_items.count }} items</div>
+                            </td>
+                            <td class="fw-bold">${{ invoice.total_amount|floatformat:2 }}</td>
+                            <td>
+                                {% if invoice.status == 'draft' %}
+                                <span class="badge bg-secondary">Draft</span>
+                                {% elif invoice.status == 'sent' %}
+                                <span class="badge bg-info">Sent</span>
+                                {% elif invoice.status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                                {% elif invoice.status == 'overdue' %}
+                                <span class="badge bg-danger">Overdue</span>
+                                {% elif invoice.status == 'cancelled' %}
+                                <span class="badge bg-dark">Cancelled</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ invoice.status|title }}</span>
+                                {% endif %}
+                                {% if invoice.is_overdue %}
+                                <span class="badge bg-danger ms-1">Overdue</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if invoice.due_date %}
+                                {{ invoice.due_date|date:"M d, Y" }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="#" class="btn btn-outline-primary" onclick="viewInvoice('{{ invoice.id }}')">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-secondary" onclick="downloadInvoice('{{ invoice.id }}')">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    {% if invoice.status == 'draft' %}
+                                    <button class="btn btn-outline-success" onclick="sendInvoice('{{ invoice.id }}')">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <p class="mb-0">No invoices found.</p>
+                                <p class="text-muted small">Your commission invoices will appear here once generated.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Invoice pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% for page_num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Request Invoice Modal -->
+<div class="modal fade" id="requestInvoiceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="requestInvoiceForm">
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Period</label>
+                        <select class="form-select" name="period" required>
+                            <option value="">Select period</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="current_month">Current Month</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="row custom-date-range" style="display: none;">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">From Date</label>
+                                <input type="date" class="form-control" name="from_date">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">To Date</label>
+                                <input type="date" class="form-control" name="to_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Optional notes or description"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitInvoiceRequest()">Request Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Invoice management functions
+    function viewInvoice(invoiceId) {
+        // Implement view invoice logic
+        window.open(`/reseller/invoices/${invoiceId}/view/`, '_blank');
+    }
+    
+    function downloadInvoice(invoiceId) {
+        // Implement download invoice logic
+        window.location.href = `/reseller/invoices/${invoiceId}/download/`;
+    }
+    
+    function sendInvoice(invoiceId) {
+        // Implement send invoice logic
+        if (confirm('Are you sure you want to send this invoice?')) {
+            // Make API call to send invoice
+        }
+    }
+    
+    function submitInvoiceRequest() {
+        // Implement invoice request submission
+        const form = document.getElementById('requestInvoiceForm');
+        // Process form data and submit
+    }
+    
+    // Show/hide custom date range
+    document.querySelector('select[name="period"]').addEventListener('change', function(e) {
+        const customRange = document.querySelector('.custom-date-range');
+        customRange.style.display = e.target.value === 'custom' ? 'flex' : 'none';
+    });
+</script>
+{% endblock %}

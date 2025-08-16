@@ -1,0 +1,22 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Profile Statistics - Reseller Dashboard{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'reseller:profile_view' %}">Profile</a></li>
+    <li class="breadcrumb-item active">Statistics</li>
+{% endblock %}
+
+{% block content %}
+<div class="profile-statistics">
+    <h2>Detailed Profile Statistics</h2>
+    <div class="stats-container">
+        <h3>Performance Metrics</h3>
+        <p>Total Sales: ${{ stats.total_sales|floatformat:2 }}</p>
+        <p>Total Earned: ${{ stats.total_commission_earned|floatformat:2 }}</p>
+        <p>Tier: {{ reseller.tier }}</p>
+        <!-- Add more detailed statistics here -->
+    </div>
+</div>
+{% endblock %}

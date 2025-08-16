@@ -1,0 +1,134 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-edit-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    .page-header h1 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .page-header p {
+        margin-bottom: 0;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'reseller:profile_view' %}">Profile</a></li>
+    <li class="breadcrumb-item active">Edit Information</li>
+{% endblock %}
+
+{% block content %}
+<div class="profile-edit-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="bi bi-pencil-square me-2"></i>Edit Profile Information</h1>
+        <p>Update your account details and preferences</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-4">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        
+        <!-- Include Reseller Type Selector -->
+        {% include 'dashboards/reseller/pages/profile/includes/reseller_type_selector.html' %}
+        
+        <!-- Address Information (Common for both types) -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Address Information
+                </h5>
+                <div class="mb-3">
+                    <label for="{{ form.address.id_for_label }}" class="form-label">Street Address</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                        <div class="text-danger small mt-1">{{ form.address.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.city.id_for_label }}" class="form-label">City</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                            <div class="text-danger small mt-1">{{ form.city.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.state.id_for_label }}" class="form-label">State/Province</label>
+                        {{ form.state }}
+                        {% if form.state.errors %}
+                            <div class="text-danger small mt-1">{{ form.state.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.country.id_for_label }}" class="form-label">Country</label>
+                        {{ form.country }}
+                        {% if form.country.errors %}
+                            <div class="text-danger small mt-1">{{ form.country.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal/ZIP Code</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="text-danger small mt-1">{{ form.postal_code.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="{% url 'reseller:profile_view' %}" class="btn btn-light">
+                <i class="bi bi-arrow-left me-2"></i>Back to Profile
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg px-5" id="submit-button">
+                <i class="bi bi-save me-2"></i>Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Loading state for submit button
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const submitButton = document.getElementById('submit-button');
+        submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
+        submitButton.disabled = true;
+    });
+</script>
+{% endblock %}
+

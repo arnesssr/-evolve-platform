@@ -1,0 +1,50 @@
+<!-- Earnings chart component -->
+<div class="card h-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Earnings Overview</h5>
+        <div class="btn-group btn-group-sm" role="group">
+            <button type="button" class="btn btn-outline-secondary active" data-period="month">Month</button>
+            <button type="button" class="btn btn-outline-secondary" data-period="quarter">Quarter</button>
+            <button type="button" class="btn btn-outline-secondary" data-period="year">Year</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <canvas id="earningsChart" height="300"></canvas>
+        
+        <div class="chart-summary mt-3">
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="metric">
+                        <div class="metric-value text-primary">${{ total_earnings|default:"0" }}</div>
+                        <div class="metric-label text-muted">Total Earnings</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="metric">
+                        <div class="metric-value text-success">${{ average_monthly|default:"0" }}</div>
+                        <div class="metric-label text-muted">Monthly Average</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="metric">
+                        <div class="metric-value text-info">{{ growth_rate|default:"0%" }}</div>
+                        <div class="metric-label text-muted">Growth Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.metric-label {
+    font-size: 0.875rem;
+}
+.btn-group .btn {
+    padding: 0.25rem 0.75rem;
+}
+</style>

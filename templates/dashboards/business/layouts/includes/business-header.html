@@ -1,0 +1,158 @@
+<header class="header bg-white border-bottom px-3 py-2">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <button class="btn btn-link p-0 me-3" onclick="toggleSidebar()" id="sidebar-toggle">
+                <i class="fas fa-bars text-secondary"></i>
+            </button>
+            <h4 class="mb-0 text-primary fw-bold">
+                {% block page_title %}Business Dashboard{% endblock %}
+            </h4>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <!-- Notifications -->
+            <div class="dropdown">
+                <button class="btn btn-link p-2 text-secondary position-relative" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false" id="notificationDropdown">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                          style="font-size: 0.6rem;">
+                        3
+                    </span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end shadow-lg border-0" 
+                     style="width: 300px;" aria-labelledby="notificationDropdown">
+                    <div class="dropdown-header bg-light py-3">
+                        <h6 class="mb-0">Notifications</h6>
+                    </div>
+                    <div class="dropdown-item border-bottom">
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fs-6">ERP License Expiring Soon</h6>
+                                <p class="mb-1 text-muted small">Your ERP license expires in 15 days. Renew now to avoid interruption.</p>
+                                <small class="text-muted">2 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-item border-bottom">
+                        <div class="d-flex">
+                            <i class="fas fa-user-plus text-info me-3 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fs-6">New User Added</h6>
+                                <p class="mb-1 text-muted small">John Doe was added to your SACCO platform.</p>
+                                <small class="text-muted">1 day ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="d-flex">
+                            <i class="fas fa-credit-card text-success me-3 mt-1"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1 fs-6">Payment Successful</h6>
+                                <p class="mb-1 text-muted small">Your monthly subscription has been renewed.</p>
+                                <small class="text-muted">3 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown-footer text-center py-2">
+                        <a href="#" class="text-decoration-none">View All Notifications</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Profile -->
+            <div class="dropdown">
+                <button class="btn btn-link p-0 d-flex align-items-center text-decoration-none" 
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                         style="width: 40px; height: 40px;">
+                        {% if user.first_name %}
+                            <span class="text-white fw-bold">{{ user.first_name.0 }}{{ user.last_name.0 }}</span>
+                        {% else %}
+                            <i class="fas fa-user text-white"></i>
+                        {% endif %}
+                    </div>
+                    <div class="text-start d-none d-md-block">
+                        <div class="fw-medium text-dark">
+                            {% if user.first_name %}
+                                {{ user.first_name }} {{ user.last_name }}
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Business Account</small>
+                    </div>
+                    <i class="fas fa-chevron-down text-muted ms-2"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
+                    <li>
+                        <a class="dropdown-item py-2" href="{% url 'business-settings' %}">
+                            <i class="fas fa-cog me-2"></i> Account Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="{% url 'business-support' %}">
+                            <i class="fas fa-life-ring me-2"></i> Support Center
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="{% url 'business-billing' %}">
+                            <i class="fas fa-receipt me-2"></i> Billing & Invoices
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item py-2 text-danger" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+        backdrop-filter: blur(10px);
+    }
+    
+    .dropdown-menu {
+        border-radius: 10px;
+        padding: 0.5rem 0;
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(2px);
+    }
+    
+    .dropdown-header {
+        background-color: #f8f9fa !important;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .dropdown-footer {
+        border-top: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+        border-radius: 0 0 10px 10px;
+    }
+    
+    .dropdown-footer a {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .dropdown-footer a:hover {
+        color: var(--secondary-color);
+    }
+</style>

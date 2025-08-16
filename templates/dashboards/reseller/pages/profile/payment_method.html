@@ -1,0 +1,347 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Payment Method Configuration - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-method-cards {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .payment-method-card {
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    
+    .payment-method-card:hover {
+        border-color: #007bff;
+        box-shadow: 0 4px 8px rgba(0,123,255,0.1);
+    }
+    
+    .payment-method-card.active {
+        border-color: #007bff;
+        background: #f0f8ff;
+    }
+    
+    .payment-method-card i {
+        font-size: 48px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .payment-method-card.active i {
+        color: #007bff;
+    }
+    
+    .payment-method-card h4 {
+        margin: 10px 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .payment-method-card p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+    }
+    
+    .payment-method-form {
+        display: none;
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+    
+    .payment-method-form.active {
+        display: block;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+    }
+    
+    .btn-save {
+        background: #007bff;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        background: #0056b3;
+    }
+    
+    .current-method {
+        background: #e8f5e9;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px solid #4caf50;
+    }
+    
+    .current-method strong {
+        color: #2e7d32;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'reseller:profile_view' %}">Profile</a></li>
+    <li class="breadcrumb-item active">Payment Method</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Payment Method Configuration</h4>
+                </div>
+                <div class="card-body">
+                    {% if reseller.payment_method %}
+                    <div class="current-method">
+                        <i class="fas fa-check-circle"></i> <strong>Current Payment Method:</strong> {{ reseller.get_payment_method_display|default:reseller.payment_method|title }}
+                    </div>
+                    {% endif %}
+                    
+                    <h5 class="mb-4">Select your preferred payment method:</h5>
+                    
+                    <div class="payment-method-cards">
+                        <div class="payment-method-card{% if reseller.payment_method == 'bank' %} active{% endif %}" data-method="bank">
+                            <i class="fas fa-university"></i>
+                            <h4>Bank Transfer</h4>
+                            <p>Receive payments directly to your bank account</p>
+                        </div>
+                        
+                        <div class="payment-method-card{% if reseller.payment_method == 'paypal' %} active{% endif %}" data-method="paypal">
+                            <i class="fab fa-paypal"></i>
+                            <h4>PayPal</h4>
+                            <p>Fast international payments via PayPal</p>
+                        </div>
+                        
+                        <div class="payment-method-card{% if reseller.payment_method == 'pesapal' %} active{% endif %}" data-method="pesapal">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4>PesaPal</h4>
+                            <p>Mobile money transfers via PesaPal</p>
+                        </div>
+                        
+                        <div class="payment-method-card{% if reseller.payment_method == 'mpesa' %} active{% endif %}" data-method="mpesa">
+                            <i class="fas fa-mobile"></i>
+                            <h4>M-Pesa</h4>
+                            <p>Direct M-Pesa payments to your phone</p>
+                        </div>
+                    </div>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="payment-method-form">
+                        {% csrf_token %}
+                        {{ form.payment_method }}
+                        
+                        <!-- Bank Transfer Form -->
+                        <div class="payment-method-form" id="bank-form">
+                            <h5 class="mb-4">Bank Account Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.bank_name.id_for_label }}">Bank Name</label>
+                                        <input type="text" class="form-control" id="{{ form.bank_name.id_for_label }}" name="bank_name" placeholder="e.g., KCB Bank" value="{{ form.bank_name.value|default:'' }}">
+                                        {% if form.bank_name.errors %}
+                                            <div class="text-danger small">{{ form.bank_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.bank_routing_number.id_for_label }}">Routing/Branch Number</label>
+                                        <input type="text" class="form-control" id="{{ form.bank_routing_number.id_for_label }}" name="bank_routing_number" placeholder="e.g., 001" value="{{ form.bank_routing_number.value|default:'' }}">
+                                        {% if form.bank_routing_number.errors %}
+                                            <div class="text-danger small">{{ form.bank_routing_number.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.bank_account_name.id_for_label }}">Account Name</label>
+                                        <input type="text" class="form-control" id="{{ form.bank_account_name.id_for_label }}" name="bank_account_name" placeholder="Your account name" value="{{ form.bank_account_name.value|default:'' }}">
+                                        {% if form.bank_account_name.errors %}
+                                            <div class="text-danger small">{{ form.bank_account_name.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.bank_account_number.id_for_label }}">Account Number</label>
+                                        <input type="text" class="form-control" id="{{ form.bank_account_number.id_for_label }}" name="bank_account_number" placeholder="Your account number" value="{{ form.bank_account_number.value|default:'' }}">
+                                        {% if form.bank_account_number.errors %}
+                                            <div class="text-danger small">{{ form.bank_account_number.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-save">Save Bank Details</button>
+                        </div>
+                        
+                        <!-- PayPal Form -->
+                        <div class="payment-method-form" id="paypal-form">
+                            <h5 class="mb-4">PayPal Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.paypal_email.id_for_label }}">PayPal Email</label>
+                                        <input type="email" class="form-control" id="{{ form.paypal_email.id_for_label }}" name="paypal_email" placeholder="your@email.com" value="{{ form.paypal_email.value|default:'' }}">
+                                        {% if form.paypal_email.errors %}
+                                            <div class="text-danger small">{{ form.paypal_email.errors.0 }}</div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Enter your PayPal registered email address</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-save">Save PayPal Details</button>
+                        </div>
+                        
+                        <!-- PesaPal Form -->
+                        <div class="payment-method-form" id="pesapal-form">
+                            <h5 class="mb-4">PesaPal Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="pesapal_phone">Phone Number</label>
+                                        <input type="tel" class="form-control" id="pesapal_phone" name="phone_number" placeholder="+254700000000" value="{{ reseller.phone_number|default:'' }}">
+                                        <small class="form-text text-muted">Use your registered phone number for PesaPal payments</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-save">Save PesaPal Details</button>
+                        </div>
+                        
+                        <!-- M-Pesa Form -->
+                        <div class="payment-method-form" id="mpesa-form">
+                            <h5 class="mb-4">M-Pesa Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="mpesa_phone">M-Pesa Phone Number</label>
+                                        <input type="tel" class="form-control" id="mpesa_phone" name="phone_number" placeholder="+254700000000" value="{{ reseller.phone_number|default:'' }}">
+                                        <small class="form-text text-muted">Use your registered phone number for M-Pesa payments</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-save">Save M-Pesa Details</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.payment-method-card');
+        const forms = document.querySelectorAll('.payment-method-form');
+        const methodInput = document.getElementById('payment-method-input');
+        
+        // Set initial active form based on current payment method
+        const currentMethod = '{{ reseller.payment_method|default:"" }}';
+        if (currentMethod) {
+            const currentForm = document.getElementById(currentMethod + '-form');
+            if (currentForm) {
+                currentForm.classList.add('active');
+                methodInput.value = currentMethod;
+            }
+        }
+        
+        cards.forEach(card => {
+            card.addEventListener('click', function() {
+                const method = this.getAttribute('data-method');
+                
+                // Remove active class from all cards and forms
+                cards.forEach(c => c.classList.remove('active'));
+                forms.forEach(f => f.classList.remove('active'));
+                
+                // Add active class to clicked card and corresponding form
+                this.classList.add('active');
+                document.getElementById(method + '-form').classList.add('active');
+                
+                // Set the payment method value
+                methodInput.value = method;
+                document.getElementById('id_payment_method').value = method;
+            });
+        });
+        
+        // Form validation
+        document.getElementById('payment-method-form').addEventListener('submit', function(e) {
+            if (!methodInput.value) {
+                e.preventDefault();
+                alert('Please select a payment method first');
+                return false;
+            }
+            
+            // Validate required fields in active form
+            const activeForm = document.querySelector('.payment-method-form.active');
+            const requiredFields = activeForm.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    e.preventDefault();
+                    field.focus();
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+

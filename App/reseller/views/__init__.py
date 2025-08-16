@@ -1,0 +1,1 @@
+"""Reseller views module."""

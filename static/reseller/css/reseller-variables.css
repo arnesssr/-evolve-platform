@@ -1,0 +1,55 @@
+/* CSS variables for theming */
+:root {
+    --primary-color: #0a2463;
+    --secondary-color: #1e3b8a;
+    --success-color: #4cc9f0;
+    --info-color: #3e78b2;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --font-family-sans: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    --font-family-monospace: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Additional theme variables */
+:root {
+    --body-bg-color: #e9ecef;
+    --body-text-color: #212529;
+    --heading-color: #333333;
+    --link-color: var(--primary-color);
+    --link-hover-color: #071a45;
+}
+
+/* Container sizes */
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}

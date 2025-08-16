@@ -1,0 +1,136 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Reseller Dashboard - Evolve Payments{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/dashboard-page.css' %}">
+{% endblock %}
+
+{% block content %}
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Key Metrics Widgets -->
+            <section class="widgets">
+                <div class="card widget">
+                    <i class="fas fa-layer-group widget-icon"></i>
+                    <div>
+                        <h3>Current Tier</h3>
+                        <p>{{ current_tier|default:"Silver Partner" }}</p>
+                    </div>
+                </div>
+                <div class="card widget">
+                    <i class="fas fa-dollar-sign widget-icon"></i>
+                    <div>
+                        <h3>Commission Payouts</h3>
+                        <p>KES {{ total_commission|default:"15,000" }}</p>
+                    </div>
+                </div>
+                <div class="card widget">
+                    <i class="fas fa-tags widget-icon"></i>
+                    <div>
+                        <h3>Subscription Level</h3>
+                        <p>{{ subscription_level|default:"Pro Tier" }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Subscription Info -->
+            <section class="sub-info">
+                <div class="card">
+                    <h4>Start Date</h4>
+                    <p>{{ start_date|date:"d M Y"|default:"01 Jan 2025" }}</p>
+                </div>
+                <div class="card">
+                    <h4>End Date</h4>
+                    <p>{{ end_date|date:"d M Y"|default:"01 Jan 2026" }}</p>
+                </div>
+                <div class="card">
+                    <h4>Referring Reseller</h4>
+                    <p>Code: {{ referral_code }}</p>
+                </div>
+            </section>
+
+            <!-- Main Panel with Chart and Table -->
+            <section class="main-panel">
+                <!-- Earnings Chart Component -->
+                <div class="chart-section">
+                    {% include 'dashboards/reseller/components/earnings-chart.html' %}
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card table-card">
+                    <h3>Recent Transactions</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in recent_transactions %}
+                                <tr>
+                                    <td>{{ transaction.id }}</td>
+                                    <td>KES {{ transaction.amount|floatformat:0 }}</td>
+                                    <td>{{ transaction.date|date:"M d" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ transaction.status_color }}">
+                                            {{ transaction.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No recent transactions</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="#" class="btn btn-sm btn-primary">
+                            View All Transactions →
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional Dashboard Components -->
+            <section class="dashboard-extras mt-4">
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <!-- Referral Pipeline Card -->
+                        {% include 'dashboards/reseller/components/referral-card.html' %}
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <!-- Activity Feed -->
+                        {% include 'dashboards/reseller/components/activity-feed.html' %}
+                    </div>
+                </div>
+            </section>
+        </div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast">✔ Commission Paid Successfully</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'reseller/js/reseller-app.js' %}"></script>
+<script src="{% static 'reseller/js/chart-builder.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+<script src="{% static 'js/toasts.js' %}"></script>
+<script>
+    // Initialize dashboard-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize charts with data from backend
+        if (typeof initializeRevenueChart === 'function') {
+            initializeRevenueChart();
+        }
+    });
+</script>
+{% endblock %}

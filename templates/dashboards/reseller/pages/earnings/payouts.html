@@ -1,0 +1,253 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Payout History - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="payout-history">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Payout History</h1>
+            <p class="text-muted mb-0">Track your commission payouts and withdrawals</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestPayoutModal">
+            <i class="bi bi-cash-coin me-2"></i>Request Payout
+        </button>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${{ summary.total_paid|default:"0"|floatformat:2 }}</div>
+                <div class="stat-label">Total Paid</div>
+                <div class="stat-change text-muted">All time</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${{ summary.available_balance|default:"0"|floatformat:2 }}</div>
+                <div class="stat-label">Available Balance</div>
+                <div class="stat-change text-success">Ready to withdraw</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">${{ summary.pending_amount|default:"0"|floatformat:2 }}</div>
+                <div class="stat-label">Pending</div>
+                <div class="stat-change text-warning">In processing</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value">{{ summary.next_payout_date|date:"M d"|default:"TBD" }}</div>
+                <div class="stat-label">Next Payout</div>
+                <div class="stat-change text-muted">Scheduled date</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payout Requests -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Payout Requests</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for payout in summary.recent_requests %}
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="me-3">
+                        <div><strong>Request #{{ payout.id }}</strong></div>
+                        <div class="small text-muted">Requested on {{ payout.request_date|date:"M d, Y" }}</div>
+                        <div class="mt-1">Status: 
+                            {% if payout.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif payout.status == 'processing' %}
+                            <span class="badge bg-info">Processing</span>
+                            {% elif payout.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif payout.status == 'failed' %}
+                            <span class="badge bg-danger">Failed</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ payout.status|title }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold">${{ payout.amount|floatformat:2 }}</div>
+                        <div><button class="btn btn-secondary btn-sm" onclick="viewPayoutDetails({{ payout.id }})">View Details</button></div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-center text-muted">No payout requests found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Payout Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Detailed Payout History</h5>
+            <button class="btn btn-outline-primary btn-sm" onclick="exportPayouts()">Export CSV</button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reference</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payout in page_obj %}
+                        <tr>
+                            <td>{{ payout.payout_date|date:"M d, Y" }}</td>
+                            <td><strong>{{ payout.reference_number }}</strong></td>
+                            <td>${{ payout.amount|floatformat:2 }}</td>
+                            <td>{{ payout.get_payment_method_display|default:payout.payment_method|title }}</td>
+                            <td>
+                                {% if payout.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif payout.status == 'processing' %}
+                                <span class="badge bg-info">Processing</span>
+                                {% elif payout.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif payout.status == 'failed' %}
+                                <span class="badge bg-danger">Failed</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payout.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="viewPayoutDetails({{ payout.id }})">Details</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                No payouts have been processed yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Payout pagination">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                        {% for page_num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Payout Modal -->
+<div class="modal fade" id="requestPayoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Payout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="requestPayoutForm">
+                    <div class="mb-3">
+                        <label class="form-label">Available Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" value="{{ summary.available_balance|default:'0'|floatformat:2 }}" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payout Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" name="amount" step="0.01" min="50" max="{{ summary.available_balance|default:'0' }}" required>
+                        </div>
+                        <small class="text-muted">Minimum payout amount: $50.00</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-select" name="payment_method" required>
+                            <option value="">Select payment method</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="wise">Wise (TransferWise)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Any special instructions or notes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitPayoutRequest()">Request Payout</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'reseller/js/commission-tracker.js' %}"></script>
+<script>
+    function exportPayouts() {
+        // Implement CSV export logic
+        console.log('Exporting payouts to CSV...');
+    }
+    
+    function viewPayoutDetails(payoutId) {
+        // Implement view details logic
+        console.log('Viewing payout details for ID:', payoutId);
+    }
+    
+    function submitPayoutRequest() {
+        const form = document.getElementById('requestPayoutForm');
+        const formData = new FormData(form);
+        
+        // Validate form
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        
+        // Here you would make an AJAX call to submit the payout request
+        console.log('Submitting payout request...', Object.fromEntries(formData));
+        
+        // For now, just close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('requestPayoutModal'));
+        modal.hide();
+        
+        // Show success message (you'd typically do this after the AJAX call succeeds)
+        alert('Payout request submitted successfully!');
+    }
+</script>
+{% endblock %}
+

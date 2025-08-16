@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify OTP</title>
+  {% load static %}
+
+  <!-- MDB CSS & JS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .card-custom {
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(4, 65, 196, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<section class="min vh-100">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <div class="card card-custom p-4">
+          <form method="post" action="{% url action %}">
+            {% csrf_token %}
+
+            
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            
+            <h4 class="text-center mb-4"> OTP Verification</h4>
+
+            <p class="text-center mb-3">We've sent an OTP to your email. Please enter it below to continue.</p>
+
+            <!-- OTP Input -->
+            <div class="form-outline mb-4" data-mdb-input-init>
+              <input type="text" name="otp" class="form-control" placeholder="Enter OTP" required />
+              <label class="form-label" for="otp">One-Time Password</label>
+            </div>
+
+            <div class="text-center mt-4 pt-2">
+              <button type="submit" class="btn btn-primary btn-lg w-100">Verify OTP</button>
+              <p class="small fw-bold mt-2 pt-1 mb-0 text-center">
+                Didn't receive it? <a href="#" class="link-danger" id="resendOtp">Resend OTP</a>
+              </p>
+              <!-- Success/Error message area -->
+              <div id="messageArea" class="mt-3" style="display: none;"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MDB JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.js"></script>
+
+<!-- NEW: Resend OTP JavaScript functionality - Added by AI Assistant on 2025-01-10 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resendButton = document.getElementById('resendOtp');
+    const messageArea = document.getElementById('messageArea');
+    
+    // Determine which resend URL to use based on current page action
+    const currentAction = "{{ action }}";
+    let resendUrl;
+    
+    if (currentAction === 'verify_register_otp') {
+        resendUrl = '{% url "resend_register_otp" %}';
+    } else if (currentAction === 'verify_login_otp') {
+        resendUrl = '{% url "resend_login_otp" %}';
+    } else {
+        console.error('Unknown action:', currentAction);
+        return;
+    }
+    
+    resendButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Disable button during request
+        resendButton.style.pointerEvents = 'none';
+        resendButton.textContent = 'Sending...';
+        
+        // Get CSRF token from the form
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch(resendUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Show message area
+            messageArea.style.display = 'block';
+            
+            if (data.success) {
+                // Success message
+                messageArea.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + data.message + '</div>';
+            } else {
+                // Error message
+                messageArea.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ' + data.message + '</div>';
+            }
+            
+            // Re-enable button after 3 seconds
+            setTimeout(() => {
+                resendButton.style.pointerEvents = 'auto';
+                resendButton.textContent = 'Resend OTP';
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            messageArea.style.display = 'block';
+            messageArea.innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Network error. Please try again.</div>';
+            
+            // Re-enable button
+            resendButton.style.pointerEvents = 'auto';
+            resendButton.textContent = 'Resend OTP';
+        });
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - Evolve Payments Platform</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>🚀 Evolve Platform</h1>
+                <p>Developer Documentation</p>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">🏠 Home</a></li>
+                <li><a href="architecture.html">🏗️ Architecture</a></li>
+                <li><a href="folder-structure.html">📁 Folder Structure</a></li>
+                <li><a href="getting-started.html" class="active">🚀 Getting Started</a></li>
+                <li><a href="#modules">📦 Modules</a></li>
+                <li><a href="#apis">🔌 API Reference</a></li>
+                <li><a href="#deployment">🚢 Deployment</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a href="index.html">Home</a> > <span>Getting Started</span>
+            </div>
+
+            <h1>🚀 Getting Started</h1>
+            <p>This guide will help you set up your local development environment and get the Evolve Payments Platform running on your machine.</p>
+
+            <!-- Prerequisites -->
+            <h2>📋 Prerequisites</h2>
+            <div class="card">
+                <h3>Required Software</h3>
+                <table>
+                    <tr>
+                        <th>Software</th>
+                        <th>Version</th>
+                        <th>Purpose</th>
+                        <th>Download Link</th>
+                    </tr>
+                    <tr>
+                        <td>Python</td>
+                        <td>3.8 or higher</td>
+                        <td>Backend runtime</td>
+                        <td><a href="https://python.org/downloads/" target="_blank">python.org</a></td>
+                    </tr>
+                    <tr>
+                        <td>Git</td>
+                        <td>Latest</td>
+                        <td>Version control</td>
+                        <td><a href="https://git-scm.com/" target="_blank">git-scm.com</a></td>
+                    </tr>
+                    <tr>
+                        <td>PowerShell</td>
+                        <td>7.x (Windows)</td>
+                        <td>Running scripts</td>
+                        <td><a href="https://github.com/PowerShell/PowerShell" target="_blank">GitHub</a></td>
+                    </tr>
+                    <tr>
+                        <td>VS Code</td>
+                        <td>Latest</td>
+                        <td>Code editor (recommended)</td>
+                        <td><a href="https://code.visualstudio.com/" target="_blank">code.visualstudio.com</a></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>🔧 IDE Recommendation:</strong> The project includes PyCharm configuration in <code>.idea/</code>. You can use PyCharm, VS Code, or any Python-compatible IDE.
+            </div>
+
+            <!-- Setup Steps -->
+            <h2>⚙️ Environment Setup</h2>
+
+            <!-- Step 1: Clone -->
+            <div class="card">
+                <h3>1️⃣ Clone the Repository</h3>
+                <pre><code># Clone the repository
+git clone https://github.com/JoyNyayieka/evolve-payments-platform.git
+
+# Navigate to project directory
+cd evolve-payments-platform</code></pre>
+            </div>
+
+            <!-- Step 2: Virtual Environment -->
+            <div class="card">
+                <h3>2️⃣ Create Virtual Environment</h3>
+                <p>Always use a virtual environment to isolate project dependencies.</p>
+                
+                <h4>Windows (PowerShell):</h4>
+                <pre><code># Create virtual environment
+python -m venv evolve_env
+
+# Activate virtual environment
+.\evolve_env\Scripts\Activate.ps1
+
+# Verify activation (should show virtual env name in prompt)
+# (evolve_env) PS C:\path\to\project></code></pre>
+
+                <h4>macOS/Linux:</h4>
+                <pre><code># Create virtual environment
+python3 -m venv evolve_env
+
+# Activate virtual environment
+source evolve_env/bin/activate
+
+# Verify activation
+# (evolve_env) user@machine:~/project$</code></pre>
+                
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Always activate the virtual environment before working on the project. You'll need to do this every time you open a new terminal session.
+                </div>
+            </div>
+
+            <!-- Step 3: Dependencies -->
+            <div class="card">
+                <h3>3️⃣ Install Dependencies</h3>
+                <pre><code># Make sure virtual environment is activated
+# Install all required packages
+pip install -r requirements.txt
+
+# Verify installation
+pip list</code></pre>
+                
+                <p><strong>Current dependencies include:</strong></p>
+                <ul style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li>Django 5.2.4 (web framework)</li>
+                    <li>python-decouple 3.8 (environment configuration)</li>
+                    <li>requests 2.32.4 (HTTP client for API integrations)</li>
+                </ul>
+            </div>
+
+            <!-- Step 4: Environment Variables -->
+            <div class="card">
+                <h3>4️⃣ Configure Environment Variables</h3>
+                <p>Create a <code>.env</code> file in the root directory with the following configuration:</p>
+                
+                <pre><code># SMS Configuration (SMSLeopard)
+SMSLEOPARD_ENVIRONMENT=sandbox
+SMSLEOPARD_API_KEY=your_api_key_here
+SMSLEOPARD_API_SECRET=your_api_secret_here
+SMSLEOPARD_ACCESS_TOKEN=your_access_token_here
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your_email@gmail.com
+EMAIL_HOST_PASSWORD=your_app_password
+
+# Pesapal Configuration (Payment Gateway)
+PESAPAL_CONSUMER_KEY=your_consumer_key
+PESAPAL_CONSUMER_SECRET=your_consumer_secret</code></pre>
+
+                <div class="alert alert-warning">
+                    <strong>🔐 Security Note:</strong> Never commit the <code>.env</code> file to version control. It's already in <code>.gitignore</code>. Get the actual values from your team lead or project documentation.
+                </div>
+            </div>
+
+            <!-- Step 5: Database -->
+            <div class="card">
+                <h3>5️⃣ Setup Database</h3>
+                <p>The project uses SQLite for development (no additional setup required).</p>
+                
+                <pre><code># Apply database migrations
+python manage.py migrate
+
+# Create superuser account
+python manage.py createsuperuser
+
+# Follow prompts to create admin account</code></pre>
+            </div>
+
+            <!-- Step 6: Run Server -->
+            <div class="card">
+                <h3>6️⃣ Run Development Server</h3>
+                
+                <h4>Option 1: Using PowerShell Script (Windows)</h4>
+                <pre><code># Run the server using the provided script
+.\run_server.ps1</code></pre>
+                
+                <h4>Option 2: Manual Command</h4>
+                <pre><code># Run development server manually
+python manage.py runserver
+
+# Server will start at http://127.0.0.1:8000/</code></pre>
+
+                <div class="alert alert-success">
+                    <strong>✅ Success!</strong> If everything is working correctly, you should see the Django development server running and be able to access the application at <code>http://127.0.0.1:8000/</code>
+                </div>
+            </div>
+
+            <!-- Development Workflow -->
+            <h2>🔄 Development Workflow</h2>
+
+            <div class="card">
+                <h3>Daily Development Commands</h3>
+                <pre><code># Start your development session
+cd path/to/evolve-payments-platform
+.\evolve_env\Scripts\Activate.ps1  # Windows
+# source evolve_env/bin/activate    # macOS/Linux
+
+# Run server
+python manage.py runserver
+
+# In another terminal (for database changes)
+python manage.py makemigrations
+python manage.py migrate
+
+# Run tests
+python manage.py test
+
+# Collect static files (if working with CSS/JS)
+python manage.py collectstatic</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Git Workflow</h3>
+                <pre><code># Create a new feature branch
+git checkout -b feature/your-feature-name
+
+# Make your changes, then
+git add .
+git commit -m "Add: your feature description"
+
+# Push to remote
+git push origin feature/your-feature-name
+
+# Create pull request on GitHub</code></pre>
+            </div>
+
+            <!-- Common Tasks -->
+            <h2>🛠️ Common Development Tasks</h2>
+
+            <div class="card">
+                <h3>Adding New Dependencies</h3>
+                <ol style="margin: 16px 0; padding-left: 20px; color: #ccc;">
+                    <li>Install the package: <code>pip install package_name</code></li>
+                    <li>Test your application to make sure it works</li>
+                    <li>Update requirements.txt: <code>pip freeze > requirements.txt</code></li>
+                    <li>Or manually add: <code>package_name==version</code></li>
+                    <li>Commit both your code and the updated requirements.txt</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h3>Working with Models</h3>
+                <pre><code># After creating or modifying models
+python manage.py makemigrations
+python manage.py migrate
+
+# To see migration SQL (optional)
+python manage.py sqlmigrate app_name migration_number</code></pre>
+            </div>
+
+            <div class="card">
+                <h3>Testing</h3>
+                <pre><code># Run all tests
+python manage.py test
+
+# Run tests for specific app
+python manage.py test App.admin
+
+# Run tests with verbosity
+python manage.py test --verbosity=2
+
+# Run specific test class
+python manage.py test App.admin.tests.TestUserModel</code></pre>
+            </div>
+
+            <!-- Troubleshooting -->
+            <h2>🔧 Troubleshooting</h2>
+
+            <div class="card">
+                <h3>Common Issues</h3>
+                
+                <h4>❌ "No module named 'decouple'"</h4>
+                <p><strong>Solution:</strong> Make sure virtual environment is activated and dependencies are installed:</p>
+                <pre><code>.\evolve_env\Scripts\Activate.ps1  # Windows
+pip install -r requirements.txt</code></pre>
+                
+                <h4>❌ "django.core.exceptions.ImproperlyConfigured"</h4>
+                <p><strong>Solution:</strong> Check your <code>.env</code> file exists and has the required variables.</p>
+                
+                <h4>❌ "Permission denied" on PowerShell</h4>
+                <p><strong>Solution:</strong> Enable PowerShell execution policy:</p>
+                <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+                
+                <h4>❌ Database errors</h4>
+                <p><strong>Solution:</strong> Reset database (development only):</p>
+                <pre><code># Delete db.sqlite3 file
+rm db.sqlite3
+
+# Run migrations again
+python manage.py migrate
+python manage.py createsuperuser</code></pre>
+            </div>
+
+            <!-- Next Steps -->
+            <h2>🎯 Next Steps</h2>
+            <div class="quick-links">
+                <a href="folder-structure.html" class="quick-link">
+                    <h3>📁 Explore Folder Structure</h3>
+                    <p>Understand how the codebase is organized and where to find specific functionality.</p>
+                </a>
+
+                <a href="architecture.html" class="quick-link">
+                    <h3>🏗️ Learn the Architecture</h3>
+                    <p>Get familiar with the system design and how different modules work together.</p>
+                </a>
+
+                <a href="#modules" class="quick-link">
+                    <h3>📦 Module Documentation</h3>
+                    <p>Deep dive into specific modules: Admin, Business, Reseller, and Integrations.</p>
+                </a>
+
+                <a href="#deployment" class="quick-link">
+                    <h3>🚢 Deployment Guide</h3>
+                    <p>Learn how to deploy the application using Docker and CI/CD pipelines.</p>
+                </a>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>💡 Pro Tip:</strong> Join the team Slack/Discord channel for quick help and to stay updated on project developments. Don't hesitate to ask questions!
+            </div>
+        </main>
+    </div>
+</body>
+</html>

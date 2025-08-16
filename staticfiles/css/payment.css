@@ -1,0 +1,81 @@
+body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .heading {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .plan-card {
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      transition: transform 0.2s ease;
+      height: 100%;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .price {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #001f4d;
+    }
+
+    .currency {
+      font-size: 1.2rem;
+      vertical-align: super;
+    }
+
+    .interval {
+      color: #6c757d;
+      font-size: 0.95rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 1rem;
+    }
+
+    .feature-list li {
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .purchase-btn {
+      background-color: #001f4d;
+      color: white;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+    }
+
+    .badge-label {
+      background-color: #002a80;
+      color: white;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    .selected {
+      border: 2px solid #002a80;
+    }

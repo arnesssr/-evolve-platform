@@ -1,0 +1,87 @@
+<!-- Compact Software Tile for Dashboard -->
+<div class="card h-100 border-{% if status == 'active' %}success{% elif status == 'trial' %}info{% elif status == 'expired' %}warning{% else %}primary{% endif %}">
+    <div class="card-body text-center">
+        <div class="mb-3">
+            <i class="fas fa-{{ icon|default:'cog' }} fa-2x text-{% if status == 'active' %}success{% elif status == 'trial' %}info{% elif status == 'expired' %}warning{% else %}primary{% endif %}"></i>
+        </div>
+        
+        <h6 class="card-title mb-2">{{ name|default:'Software' }}</h6>
+        
+        <div class="mb-3">
+            {% if status == 'active' %}
+                <span class="badge bg-success mb-2">Active License</span>
+            {% elif status == 'trial' %}
+                <span class="badge bg-info mb-2">Trial Access</span>
+            {% elif status == 'expired' %}
+                <span class="badge bg-danger mb-2">Expired License</span>
+            {% else %}
+                <span class="badge bg-primary mb-2">Available</span>
+            {% endif %}
+            
+            {% if users or expires_in %}
+                <div class="small text-muted">
+                    {% if users %}<div>{{ users }} active users</div>{% endif %}
+                    {% if expires_in %}
+                        <div class="{% if status == 'trial' or expires_in|slice:':2'|add:0 < 30 %}text-warning{% else %}text-success{% endif %}">
+                            {% if status == 'trial' %}Trial ends in {{ expires_in }}{% else %}Expires in {{ expires_in }}{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="d-grid gap-2">
+            {% if status == 'active' or status == 'trial' %}
+                <a href="{{ launch_url|default:'#' }}" target="_blank" class="btn {{ button_class|default:'btn-success' }} btn-sm">
+                    <i class="fas fa-external-link-alt me-1"></i>{{ button_text|default:"Launch" }}
+                </a>
+                {% if status == 'active' and expires_in and expires_in|slice:':2'|add:0 < 30 %}
+                    <button class="btn btn-outline-warning btn-sm">Renew Soon</button>
+                {% elif status == 'trial' %}
+                    <button class="btn btn-primary btn-sm">Purchase License</button>
+                {% endif %}
+            {% elif status == 'expired' %}
+                <button class="btn btn-warning btn-sm">Renew License</button>
+            {% else %}
+                <button class="btn btn-primary btn-sm">Purchase</button>
+                <button class="btn btn-outline-success btn-sm">Free Trial</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.software-tile {
+    transition: all 0.3s ease;
+}
+
+.software-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.software-tile .btn {
+    transition: all 0.2s ease;
+}
+
+.software-tile:hover .btn {
+    transform: scale(1.05);
+}
+
+/* License status specific styling */
+.software-tile.border-success {
+    border-width: 2px !important;
+}
+
+.software-tile.border-info {
+    border-width: 2px !important;
+}
+
+.software-tile.border-warning {
+    border-width: 2px !important;
+}
+
+.software-tile.border-danger {
+    border-width: 2px !important;
+}
+</style>

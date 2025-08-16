@@ -1,0 +1,232 @@
+<!-- Reseller Type Selection with Dynamic Fields -->
+<div class="reseller-type-container">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-4">
+                <i class="bi bi-person-badge me-2"></i>Select Your Account Type
+            </h5>
+            
+            <!-- Account Type Selection -->
+            <div class="account-type-selector">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="account-type-card">
+                            <input type="radio" name="{{ form.reseller_type.name }}" value="individual" 
+                                   {% if form.reseller_type.value == 'individual' %}checked{% endif %}
+                                   class="account-type-radio" id="individual-type">
+                            <div class="card h-100 account-type-option">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-person-fill display-4 text-primary mb-3"></i>
+                                    <h6 class="card-title">Individual Affiliate</h6>
+                                    <p class="card-text small text-muted">
+                                        Perfect for individuals who want to refer customers and earn commissions
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="account-type-card">
+                            <input type="radio" name="{{ form.reseller_type.name }}" value="business" 
+                                   {% if form.reseller_type.value == 'business' %}checked{% endif %}
+                                   class="account-type-radio" id="business-type">
+                            <div class="card h-100 account-type-option">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-building display-4 text-primary mb-3"></i>
+                                    <h6 class="card-title">Business Partner</h6>
+                                    <p class="card-text small text-muted">
+                                        For agencies, VARs, and companies who resell or bundle our services
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                {% if form.reseller_type.errors %}
+                    <div class="text-danger small mt-2">{{ form.reseller_type.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual Affiliate Fields -->
+    <div id="individual-fields" class="type-specific-fields" style="display: none;">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-person-fill me-2"></i>Individual Information
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.alternate_email.id_for_label }}" class="form-label">Alternate Email</label>
+                        {{ form.alternate_email }}
+                        {% if form.alternate_email.errors %}
+                            <div class="text-danger small mt-1">{{ form.alternate_email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    As an individual affiliate, you can start earning commissions immediately by referring customers.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Partner Fields -->
+    <div id="business-fields" class="type-specific-fields" style="display: none;">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-building me-2"></i>Company Information
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.company_name.id_for_label }}" class="form-label required">Company Name</label>
+                        {{ form.company_name }}
+                        {% if form.company_name.errors %}
+                            <div class="text-danger small mt-1">{{ form.company_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.company_website.id_for_label }}" class="form-label">Company Website</label>
+                        {{ form.company_website }}
+                        {% if form.company_website.errors %}
+                            <div class="text-danger small mt-1">{{ form.company_website.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.company_description.id_for_label }}" class="form-label">Company Description</label>
+                    {{ form.company_description }}
+                    {% if form.company_description.errors %}
+                        <div class="text-danger small mt-1">{{ form.company_description.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <h6 class="mt-4 mb-3">Contact Information</h6>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label required">Business Phone</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.alternate_email.id_for_label }}" class="form-label">Business Email</label>
+                        {{ form.alternate_email }}
+                        {% if form.alternate_email.errors %}
+                            <div class="text-danger small mt-1">{{ form.alternate_email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-type-card {
+        cursor: pointer;
+        display: block;
+    }
+    
+    .account-type-radio {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .account-type-option {
+        transition: all 0.3s ease;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .account-type-option:hover {
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,123,255,0.15);
+    }
+    
+    .account-type-radio:checked + .account-type-option {
+        border-color: #007bff;
+        background-color: #f0f8ff;
+    }
+    
+    .account-type-radio:checked + .account-type-option .bi {
+        color: #007bff !important;
+    }
+    
+    .type-specific-fields {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .required::after {
+        content: " *";
+        color: #dc3545;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const individualRadio = document.getElementById('individual-type');
+    const businessRadio = document.getElementById('business-type');
+    const individualFields = document.getElementById('individual-fields');
+    const businessFields = document.getElementById('business-fields');
+    
+    function showFieldsForType(type) {
+        if (type === 'individual') {
+            individualFields.style.display = 'block';
+            businessFields.style.display = 'none';
+            
+            // Clear company field requirements
+            document.querySelectorAll('#business-fields input[required], #business-fields textarea[required]').forEach(field => {
+                field.removeAttribute('required');
+            });
+        } else if (type === 'business') {
+            individualFields.style.display = 'none';
+            businessFields.style.display = 'block';
+            
+            // Set company name as required
+            const companyNameField = document.getElementById('{{ form.company_name.id_for_label }}');
+            if (companyNameField) {
+                companyNameField.setAttribute('required', 'required');
+            }
+        }
+    }
+    
+    // Initial display
+    if (individualRadio.checked) {
+        showFieldsForType('individual');
+    } else if (businessRadio.checked) {
+        showFieldsForType('business');
+    }
+    
+    // Add event listeners
+    individualRadio.addEventListener('change', function() {
+        if (this.checked) showFieldsForType('individual');
+    });
+    
+    businessRadio.addEventListener('change', function() {
+        if (this.checked) showFieldsForType('business');
+    });
+});
+</script>

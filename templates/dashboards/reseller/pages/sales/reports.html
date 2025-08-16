@@ -1,0 +1,248 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Sales Reports - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="sales-reports">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Sales Reports & Analytics</h1>
+            <p class="text-muted mb-0">Comprehensive insights into your sales performance</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" onclick="exportReport('pdf')">
+                <i class="bi bi-file-pdf me-2"></i>Export PDF
+            </button>
+            <button class="btn btn-outline-secondary" onclick="exportReport('excel')">
+                <i class="bi bi-file-excel me-2"></i>Export Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3 align-items-end">
+                <div class="col-12 col-md-3">
+                    <label class="form-label">Period</label>
+                    <select class="form-select" id="periodSelect">
+                        <option value="custom">Custom Range</option>
+                        <option value="today">Today</option>
+                        <option value="week" selected>This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="fromDate" value="{{ default_from_date }}">
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="toDate" value="{{ default_to_date }}">
+                </div>
+                <div class="col-12 col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Key Performance Indicators -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Revenue Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Performance Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="performance-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Total Revenue</span>
+                            <span class="fw-bold">${{ total_revenue|floatformat:0 }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ revenue_progress }}%"></div>
+                        </div>
+                    </div>
+                    <div class="performance-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Referrals Made</span>
+                            <span class="fw-bold">{{ total_referrals }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {{ referral_progress }}%"></div>
+                        </div>
+                    </div>
+                    <div class="performance-metric mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Conversions</span>
+                            <span class="fw-bold">{{ total_conversions }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: {{ conversion_progress }}%"></div>
+                        </div>
+                    </div>
+                    <div class="performance-metric">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">Avg Deal Size</span>
+                            <span class="fw-bold">${{ avg_deal_size|floatformat:0 }}</span>
+                        </div>
+                        <div class="text-muted small">{{ deal_size_trend }}% vs last period</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Performance -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Product Performance</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="productChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Conversion Funnel</h5>
+                </div>
+                <div class="card-body">
+                    <div class="funnel-stage mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Leads Generated</span>
+                            <span class="fw-bold">{{ funnel.leads }}</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-info" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-stage mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Qualified Leads</span>
+                            <span class="fw-bold">{{ funnel.qualified }}</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-primary" style="width: {{ funnel.qualified_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-stage mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Proposals Sent</span>
+                            <span class="fw-bold">{{ funnel.proposals }}</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-warning" style="width: {{ funnel.proposal_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div class="funnel-stage">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Closed Deals</span>
+                            <span class="fw-bold">{{ funnel.closed }}</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" style="width: {{ funnel.close_rate }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Report Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Detailed Sales Report</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Product</th>
+                            <th>Deal Value</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                            <th>Stage Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales_data %}
+                        <tr>
+                            <td>{{ sale.date|date:"M d, Y" }}</td>
+                            <td>
+                                <div>{{ sale.client_name }}</div>
+                                <div class="text-muted small">{{ sale.client_company }}</div>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ sale.product }}</span></td>
+                            <td>${{ sale.deal_value|floatformat:0 }}</td>
+                            <td class="fw-medium text-success">${{ sale.commission|floatformat:0 }}</td>
+                            <td>
+                                <span class="badge bg-{{ sale.status_color }}">{{ sale.status }}</span>
+                            </td>
+                            <td>{{ sale.stage_duration }} days</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                No sales data available for the selected period.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if sales_data %}
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="3">Total</td>
+                            <td>${{ total_deal_value|floatformat:0 }}</td>
+                            <td class="text-success">${{ total_commission|floatformat:0 }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'reseller/js/chart-builder.js' %}"></script>
+<script>
+    // Initialize charts and report functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeRevenueChart();
+        initializeProductChart();
+        
+        // Period selector handler
+        document.getElementById('periodSelect').addEventListener('change', function(e) {
+            updateDateRange(e.target.value);
+        });
+    });
+</script>
+{% endblock %}

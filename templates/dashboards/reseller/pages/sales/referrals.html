@@ -1,0 +1,189 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Active Referrals - Reseller Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="referrals-tracking">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <h1 class="h3 mb-0">Active Referrals</h1>
+        <p class="text-muted mb-0">Monitor your referral pipeline and track progress</p>
+    </div>
+
+    <!-- Referral Pipeline Overview -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Referral Pipeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="pipeline-stages d-flex justify-content-between">
+                        <div class="stage text-center flex-fill">
+                            <div class="stage-count">{{ stage_counts.registered|default:0 }}</div>
+                            <div class="stage-label">Registered</div>
+                            <div class="stage-bar bg-info" style="height: 4px; margin-top: 8px;"></div>
+                        </div>
+                        <div class="stage text-center flex-fill">
+                            <div class="stage-count">{{ stage_counts.trial|default:0 }}</div>
+                            <div class="stage-label">Trial</div>
+                            <div class="stage-bar bg-warning" style="height: 4px; margin-top: 8px;"></div>
+                        </div>
+                        <div class="stage text-center flex-fill">
+                            <div class="stage-count">{{ stage_counts.demo|default:0 }}</div>
+                            <div class="stage-label">Demo Scheduled</div>
+                            <div class="stage-bar bg-primary" style="height: 4px; margin-top: 8px;"></div>
+                        </div>
+                        <div class="stage text-center flex-fill">
+                            <div class="stage-count">{{ stage_counts.negotiation|default:0 }}</div>
+                            <div class="stage-label">Negotiation</div>
+                            <div class="stage-bar bg-purple" style="height: 4px; margin-top: 8px;"></div>
+                        </div>
+                        <div class="stage text-center flex-fill">
+                            <div class="stage-count">{{ stage_counts.converted|default:0 }}</div>
+                            <div class="stage-label">Converted</div>
+                            <div class="stage-bar bg-success" style="height: 4px; margin-top: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value text-primary">{{ monthly_referrals|default:0 }}</div>
+                <div class="stat-label">This Month</div>
+                <div class="stat-change text-success">+{{ monthly_growth|default:"0" }}% vs last month</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value text-warning">{{ pending_commission|default:"$0" }}</div>
+                <div class="stat-label">Pending Commission</div>
+                <div class="stat-change text-muted">{{ pending_count|default:0 }} referrals</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value text-success">{{ conversion_rate|default:"0%" }}</div>
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-change text-muted">Industry avg: 25%</div>
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="stat-value text-info">{{ avg_deal_size|default:"$0" }}</div>
+                <div class="stat-label">Avg Deal Size</div>
+                <div class="stat-change text-muted">Per referral</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Referrals Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Active Referrals</h5>
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Search referrals..." id="referralSearch">
+                <select class="form-select form-select-sm" id="stageFilter">
+                    <option value="">All Stages</option>
+                    <option value="registered">Registered</option>
+                    <option value="trial">Trial</option>
+                    <option value="demo">Demo</option>
+                    <option value="negotiation">Negotiation</option>
+                    <option value="converted">Converted</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Referral Details</th>
+                            <th>Product</th>
+                            <th>Stage</th>
+                            <th>Days in Stage</th>
+                            <th>Est. Commission</th>
+                            <th>Next Action</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for referral in referrals %}
+                        <tr>
+                            <td>
+                                <div class="referral-info">
+                                    <div class="fw-medium">{{ referral.company_name }}</div>
+                                    <div class="text-muted small">{{ referral.contact_name }} • {{ referral.created_date|date:"M d, Y" }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ referral.product }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="stage-indicator bg-{{ referral.stage_color }} rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                                    {{ referral.stage }}
+                                </div>
+                            </td>
+                            <td>{{ referral.days_in_stage }} days</td>
+                            <td class="fw-medium">${{ referral.estimated_commission|floatformat:0 }}</td>
+                            <td>
+                                <div class="next-action">
+                                    <div class="small">{{ referral.next_action }}</div>
+                                    <div class="text-muted small">{{ referral.next_action_date|date:"M d" }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="viewReferralDetails({{ referral.id }})">View Details</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="updateReferralStage({{ referral.id }})">Update Stage</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="addNote({{ referral.id }})">Add Note</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="#" onclick="contactReferral({{ referral.id }})">Send Follow-up</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <p class="mb-0">No active referrals yet. Share your referral links to get started!</p>
+                                <a href="{% url 'reseller:links' %}" class="btn btn-primary btn-sm mt-2">Get Referral Links</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'reseller/js/reseller-app.js' %}"></script>
+<script>
+    // Referral search and filter functionality
+    document.getElementById('referralSearch').addEventListener('input', function(e) {
+        // Implement search logic
+    });
+    
+    document.getElementById('stageFilter').addEventListener('change', function(e) {
+        // Implement filter logic
+    });
+</script>
+{% endblock %}

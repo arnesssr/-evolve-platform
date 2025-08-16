@@ -1,0 +1,354 @@
+{% extends "dashboards/reseller/layouts/reseller-base.html" %}
+{% load static %}
+
+{% block title %}Commission Overview - Reseller Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Commissions</li>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'reseller/css/reseller-components.css' %}">
+<link rel="stylesheet" href="{% static 'reseller/css/commission-tabs.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="commission-overview">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-end align-items-center mb-3">
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="refreshData()" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="btn btn-primary" onclick="downloadStatement()">
+                <i class="bi bi-download me-2"></i>Download Statement
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs nav-justified mb-4" id="commissionTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                <i class="bi bi-speedometer2 me-2"></i>Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">
+                <i class="bi bi-list-ul me-2"></i>Transactions
+                {% if pending_count > 0 %}
+                <span class="badge bg-warning text-dark ms-2">{{ pending_count }}</span>
+                {% endif %}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                <i class="bi bi-graph-up me-2"></i>Analytics
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="commissionTabContent">
+        
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+            <!-- Commission Stats -->
+    <div class="row g-2 mb-4">
+        <div class="col">
+            <div class="stat-card stat-card-square">
+                <i class="bi bi-cash-stack stat-icon-minimal text-success"></i>
+                <div class="stat-value-minimal">${{ current_month_earnings|default:"0" }}</div>
+                <div class="stat-label-minimal">This Month</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card stat-card-square">
+                <i class="bi bi-hourglass-split stat-icon-minimal text-warning"></i>
+                <div class="stat-value-minimal">${{ pending_amount|default:"0" }}</div>
+                <div class="stat-label-minimal">Pending</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card stat-card-square">
+                <i class="bi bi-check-circle stat-icon-minimal text-info"></i>
+                <div class="stat-value-minimal">${{ lifetime_earnings|default:"0" }}</div>
+                <div class="stat-label-minimal">Lifetime</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card stat-card-square">
+                <i class="bi bi-trophy stat-icon-minimal text-primary"></i>
+                <div class="stat-value-minimal">{{ current_tier|default:"Bronze" }}</div>
+                <div class="stat-label-minimal">Tier</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commission Structure -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Earnings Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="earningsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Commission Tiers</h5>
+                </div>
+                <div class="card-body">
+                    <div class="tier-progress mb-4">
+                        <div class="tier-item mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="badge bg-bronze">Bronze</span>
+                                <span>10% commission</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-bronze" style="width: 100%"></div>
+                            </div>
+                            <small class="text-muted">$0 - $5,000/month</small>
+                        </div>
+                        <div class="tier-item mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="badge bg-silver">Silver</span>
+                                <span>15% commission</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-silver" style="width: {{ silver_progress|default:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">$5,001 - $15,000/month</small>
+                        </div>
+                        <div class="tier-item">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="badge bg-gold">Gold</span>
+                                <span>20% commission</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-gold" style="width: {{ gold_progress|default:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">$15,001+/month</small>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>{{ amount_to_next_tier|default:"$5,000" }}</strong> more in sales to reach {{ next_tier|default:"Silver" }} tier
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Recent Activity -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Recent Activity</h5>
+                    <a href="#" onclick="document.getElementById('transactions-tab').click()" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-list">
+                        {% for commission in recent_activity|slice:":5" %}
+                        <div class="activity-item d-flex justify-content-between align-items-center py-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div>
+                                <div class="fw-semibold">{{ commission.client_name }}</div>
+                                <div class="text-muted small">{{ commission.product_name }} • {{ commission.calculation_date|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">${{ commission.amount|floatformat:2 }}</div>
+                                <div>
+                                    {% if commission.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif commission.status == 'approved' %}
+                                    <span class="badge bg-info">Approved</span>
+                                    {% elif commission.status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center py-3">No recent activity</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div class="tab-pane fade" id="transactions" role="tabpanel">
+            <!-- Commission Details Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Commission Details</h5>
+            <div class="d-flex gap-2">
+                <select class="form-select form-select-sm" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="paid">Paid</option>
+                </select>
+                <input type="month" class="form-control form-control-sm" id="monthFilter" value="{{ current_month }}">
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reference</th>
+                            <th>Client</th>
+                            <th>Product</th>
+                            <th>Sale Amount</th>
+                            <th>Rate</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for commission in page_obj %}
+                        <tr>
+                            <td>{{ commission.calculation_date|date:"M d, Y" }}</td>
+                            <td>
+                                <code>{{ commission.transaction_reference }}</code>
+                            </td>
+                            <td>{{ commission.client_name }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ commission.product_name }}</span>
+                            </td>
+                            <td>${{ commission.sale_amount|floatformat:0 }}</td>
+                            <td>{{ commission.commission_rate|floatformat:1 }}%</td>
+                            <td class="fw-bold">${{ commission.amount|floatformat:2 }}</td>
+                            <td>
+                                {% if commission.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif commission.status == 'approved' %}
+                                <span class="badge bg-info">Approved</span>
+                                {% elif commission.status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ commission.status|title }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                No commission records found for the selected period.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if page_obj %}
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="6" class="text-end">Total:</td>
+                            <td>${{ total_commission|floatformat:2 }}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Commission pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% for page_num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == page_num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-pane fade" id="analytics" role="tabpanel">
+            <div class="row g-3">
+                <!-- Commission by Product -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Commission by Product</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="productChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monthly Comparison -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Monthly Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="monthlyChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Performance Metrics -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Performance Metrics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <div class="metric-box text-center p-3 border rounded">
+                                        <div class="metric-value h3 mb-1">{{ avg_sale_amount|default:"0" }}</div>
+                                        <div class="metric-label text-muted">Avg. Sale Amount</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-box text-center p-3 border rounded">
+                                        <div class="metric-value h3 mb-1">{{ conversion_rate|default:"0" }}%</div>
+                                        <div class="metric-label text-muted">Conversion Rate</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-box text-center p-3 border rounded">
+                                        <div class="metric-value h3 mb-1">{{ total_clients|default:"0" }}</div>
+                                        <div class="metric-label text-muted">Active Clients</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="metric-box text-center p-3 border rounded">
+                                        <div class="metric-value h3 mb-1">{{ avg_commission|default:"0" }}</div>
+                                        <div class="metric-label text-muted">Avg. Commission</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'reseller/js/commission-tracker.js' %}"></script>
+<script src="{% static 'reseller/js/chart-builder.js' %}"></script>
+<script src="{% static 'reseller/js/tab-manager.js' %}"></script>
+{% endblock %}
+
