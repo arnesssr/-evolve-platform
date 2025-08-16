@@ -1,0 +1,30 @@
+title: Evolve Platform Documentation
+description: Developer documentation for the Evolve Payments Platform
+baseurl: "/-evolve-platform"
+url: "https://arnesssr.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Exclude files from processing
+exclude:
+  - README.md
+  - DOCKER.md
+
+# Include files that start with underscores
+include:
+  - _config.yml
+
+# Set the default layout
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: default
+
+# Enable GitHub Pages features
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
