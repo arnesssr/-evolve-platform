@@ -7,7 +7,7 @@
 {% block page_subtitle %}Complete reseller profile and performance analytics{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'admin:resellers_list' %}">Resellers</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:resellers-list' %}">Resellers</a></li>
     <li class="breadcrumb-item active">{{ reseller.name|default:"Reseller Details" }}</li>
 {% endblock %}
 

@@ -7,7 +7,7 @@
 {% block page_subtitle %}Complete business profile and subscription management{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'admin:businesses_list' %}">Business Customers</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:businesses-list' %}">Business Customers</a></li>
     <li class="breadcrumb-item active">{{ business.company_name|default:"Business Details" }}</li>
 {% endblock %}
 

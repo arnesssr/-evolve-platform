@@ -22,7 +22,7 @@
                 <!-- Dashboard -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
-                       href="{% url 'admin:dashboard' %}">
+                       href="{% url 'platform_admin:dashboard' %}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <span class="nav-text">Dashboard</span>
                     </a>
@@ -43,21 +43,21 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'businesses/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:businesses-list' %}">
+                                   href="{% url 'platform_admin:businesses-list' %}">
                                     <i class="nav-icon fas fa-building"></i>
                                     <span class="nav-text">Businesses</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'resellers/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:resellers-list' %}">
+                                   href="{% url 'platform_admin:resellers-list' %}">
                                     <i class="nav-icon fas fa-handshake"></i>
                                     <span class="nav-text">Resellers</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'admins/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:admins-list' %}">
+                                   href="{% url 'platform_admin:admins-list' %}">
                                     <i class="nav-icon fas fa-user-shield"></i>
                                     <span class="nav-text">Administrators</span>
                                 </a>
@@ -81,14 +81,14 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'products/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:products-list' %}">
+                                   href="{% url 'platform_admin:products-list' %}">
                                     <i class="nav-icon fas fa-cube"></i>
                                     <span class="nav-text">All Products</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'plans/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:plans-list' %}">
+                                   href="{% url 'platform_admin:plans-list' %}">
                                     <i class="nav-icon fas fa-layer-group"></i>
                                     <span class="nav-text">Subscription Plans</span>
                                 </a>
@@ -112,14 +112,14 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'financial/revenue' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:financial-revenue' %}">
+                                   href="{% url 'platform_admin:financial-revenue' %}">
                                     <i class="nav-icon fas fa-dollar-sign"></i>
                                     <span class="nav-text">Revenue</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'financial/commissions' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:financial-commissions' %}">
+                                   href="{% url 'platform_admin:financial-commissions' %}">
                                     <i class="nav-icon fas fa-percentage"></i>
                                     <span class="nav-text">Commissions</span>
                                     {% if pending_commissions_count > 0 %}
@@ -129,21 +129,21 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'financial/payouts' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:financial-payouts' %}">
+                                   href="{% url 'platform_admin:financial-payouts' %}">
                                     <i class="nav-icon fas fa-money-bill-wave"></i>
                                     <span class="nav-text">Payouts</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'financial/invoices' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:financial-invoices' %}">
+                                   href="{% url 'platform_admin:financial-invoices' %}">
                                     <i class="nav-icon fas fa-file-invoice"></i>
                                     <span class="nav-text">Invoices</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'financial/transactions' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:financial-transactions' %}">
+                                   href="{% url 'platform_admin:financial-transactions' %}">
                                     <i class="nav-icon fas fa-exchange-alt"></i>
                                     <span class="nav-text">Transactions</span>
                                 </a>
@@ -155,7 +155,7 @@
                 <!-- Analytics -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'analytics' in request.path %}active{% endif %}" 
-                       href="{% url 'admin:analytics-overview' %}">
+                       href="{% url 'platform_admin:analytics-overview' %}">
                         <i class="nav-icon fas fa-chart-bar"></i>
                         <span class="nav-text">Analytics</span>
                     </a>
@@ -164,7 +164,7 @@
                 <!-- Reports -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'reports' in request.path %}active{% endif %}" 
-                       href="{% url 'admin:reports-generate' %}">
+                       href="{% url 'platform_admin:reports-generate' %}">
                         <i class="nav-icon fas fa-file-alt"></i>
                         <span class="nav-text">Reports</span>
                     </a>
@@ -190,21 +190,21 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/general' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:settings-general' %}">
+                                   href="{% url 'platform_admin:settings-general' %}">
                                     <i class="nav-icon fas fa-sliders-h"></i>
                                     <span class="nav-text">General</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/security' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:settings-security' %}">
+                                   href="{% url 'platform_admin:settings-security' %}">
                                     <i class="nav-icon fas fa-shield-alt"></i>
                                     <span class="nav-text">Security</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/notifications' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:settings-notifications' %}">
+                                   href="{% url 'platform_admin:settings-notifications' %}">
                                     <i class="nav-icon fas fa-bell"></i>
                                     <span class="nav-text">Notifications</span>
                                 </a>
@@ -228,7 +228,7 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/status' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:system-status' %}">
+                                   href="{% url 'platform_admin:system-status' %}">
                                     <i class="nav-icon fas fa-heartbeat"></i>
                                     <span class="nav-text">Status</span>
                                     <span class="status-indicator bg-success"></span>
@@ -236,14 +236,14 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/logs' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:system-logs' %}">
+                                   href="{% url 'platform_admin:system-logs' %}">
                                     <i class="nav-icon fas fa-list"></i>
                                     <span class="nav-text">System Logs</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/backup' in request.path %}active{% endif %}" 
-                                   href="{% url 'admin:system-backup' %}">
+                                   href="{% url 'platform_admin:system-backup' %}">
                                     <i class="nav-icon fas fa-download"></i>
                                     <span class="nav-text">Backups</span>
                                 </a>
@@ -284,7 +284,7 @@
                     <a href="#" class="text-light me-3" title="Help">
                         <i class="fas fa-question-circle"></i>
                     </a>
-                    <a href="{% url 'admin:system-status' %}" class="text-light me-3" title="System Status">
+                    <a href="{% url 'platform_admin:system-status' %}" class="text-light me-3" title="System Status">
                         <i class="fas fa-heartbeat"></i>
                     </a>
                     <a href="#" onclick="toggleTheme()" class="text-light" title="Toggle Theme">

@@ -7,13 +7,13 @@
 {% block page_subtitle %}{% if plan.id %}Update subscription plan details{% else %}Create a new subscription plan{% endif %}{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'admin:plans_list' %}">Plan Management</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:plans-list' %}">Plan Management</a></li>
     <li class="breadcrumb-item active">{% if plan.id %}Edit{% else %}Add{% endif %} Plan</li>
 {% endblock %}
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    <a href="{% url 'admin:plans_list' %}" class="btn btn-outline-secondary">
+    <a href="{% url 'platform_admin:plans-list' %}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <button type="button" class="btn btn-outline-primary" onclick="saveAsDraft()">
@@ -542,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast('Plan {% if plan.id %}updated{% else %}created{% endif %} successfully!', 'success');
         
         setTimeout(() => {
-            window.location.href = "{% url 'admin:plans_list' %}";
+            window.location.href = "{% url 'platform_admin:plans-list' %}";
         }, 1500);
     });
     

@@ -7,13 +7,13 @@
 {% block page_subtitle %}{% if product.id %}Update product information and settings{% else %}Create a new product for the marketplace{% endif %}{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'admin:products_list' %}">Product Management</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:products-list' %}">Product Management</a></li>
     <li class="breadcrumb-item active">{% if product.id %}Edit{% else %}Add{% endif %} Product</li>
 {% endblock %}
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    <a href="{% url 'admin:products_list' %}" class="btn btn-outline-secondary">
+    <a href="{% url 'platform_admin:products-list' %}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <button type="button" class="btn btn-outline-primary" onclick="saveAsDraft()">
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast('Product {% if product.id %}updated{% else %}created{% endif %} successfully!', 'success');
         
         setTimeout(() => {
-            window.location.href = "{% url 'admin:products_list' %}";
+            window.location.href = "{% url 'platform_admin:products-list' %}";
         }, 1500);
     });
     
