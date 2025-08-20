@@ -15,7 +15,7 @@
     <button class="btn btn-outline-primary" onclick="exportPlans()">
         <i class="fas fa-download me-2"></i>Export
     </button>
-    <a href="{% url 'admin:plans_form' %}" class="btn btn-primary">
+    <a href="{% url 'platform_admin:plans-form' %}" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Add Plan
     </a>
 </div>
@@ -171,7 +171,7 @@
                 
                 <div class="plan-actions">
                     <div class="btn-group w-100">
-                        <a href="{% url 'admin:plans_form' %}?id=1" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'platform_admin:plans-form' %}?id=1" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
                         <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(1)">
@@ -243,7 +243,7 @@
                 
                 <div class="plan-actions">
                     <div class="btn-group w-100">
-                        <a href="{% url 'admin:plans_form' %}?id=2" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'platform_admin:plans-form' %}?id=2" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
                         <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(2)">
@@ -314,7 +314,7 @@
                 
                 <div class="plan-actions">
                     <div class="btn-group w-100">
-                        <a href="{% url 'admin:plans_form' %}?id=3" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'platform_admin:plans-form' %}?id=3" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
                         <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(3)">
@@ -385,7 +385,7 @@
                 
                 <div class="plan-actions">
                     <div class="btn-group w-100">
-                        <a href="{% url 'admin:plans_form' %}?id=4" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'platform_admin:plans-form' %}?id=4" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-edit me-1"></i>Edit
                         </a>
                         <button class="btn btn-outline-success btn-sm" onclick="activatePlan(4)">
@@ -443,7 +443,7 @@
                         <td>Dec 1, 2023</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{% url 'admin:plans_form' %}?id=1" class="btn btn-outline-primary">
+                                <a href="{% url 'platform_admin:plans-form' %}?id=1" class="btn btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" onclick="duplicatePlan(1)">
@@ -467,7 +467,7 @@
                         <td>Dec 1, 2023</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{% url 'admin:plans_form' %}?id=2" class="btn btn-outline-primary">
+                                <a href="{% url 'platform_admin:plans-form' %}?id=2" class="btn btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" onclick="duplicatePlan(2)">
@@ -491,7 +491,7 @@
                         <td>Dec 1, 2023</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{% url 'admin:plans_form' %}?id=3" class="btn btn-outline-primary">
+                                <a href="{% url 'platform_admin:plans-form' %}?id=3" class="btn btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button class="btn btn-outline-secondary" onclick="duplicatePlan(3)">
@@ -515,7 +515,7 @@
                         <td>Dec 15, 2023</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{% url 'admin:plans_form' %}?id=4" class="btn btn-outline-primary">
+                                <a href="{% url 'platform_admin:plans-form' %}?id=4" class="btn btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <button class="btn btn-outline-success" onclick="activatePlan(4)">

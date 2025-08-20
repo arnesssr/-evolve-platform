@@ -13,7 +13,7 @@
 {% block page_actions %}
 <div class="d-flex gap-2">
     {% include 'dashboards/admin/components/export-button.html' with export_type="admins" %}
-    <button type="button" class="btn btn-primary" href="{% url 'admin:admins_form' %}" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+    <button type="button" class="btn btn-primary" href="{% url 'platform_admin:admins-list' %}" data-bs-toggle="modal" data-bs-target="#addAdminModal">
         <i class="fas fa-plus me-2"></i>Add Admin
     </button>
 </div>

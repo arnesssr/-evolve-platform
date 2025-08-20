@@ -92,7 +92,7 @@
                             
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item text-center">
-                                <a href="{% url 'admin:notifications' %}" class="btn btn-sm btn-primary">
+                                <a href="{% url 'platform_admin:settings-notifications' %}" class="btn btn-sm btn-primary">
                                     View All Notifications
                                 </a>
                             </div>
@@ -146,19 +146,19 @@
                             <li><hr class="dropdown-divider"></li>
                             
                             <li>
-                                <a class="dropdown-item" href="{% url 'admin:profile' %}">
+                                <a class="dropdown-item" href="{% url 'platform_admin:settings-general' %}">
                                     <i class="fas fa-user me-2 text-primary"></i>
                                     My Profile
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'admin:settings' %}">
+                                <a class="dropdown-item" href="{% url 'platform_admin:settings-general' %}">
                                     <i class="fas fa-cog me-2 text-secondary"></i>
                                     Account Settings
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'admin:activity-log' %}">
+                                <a class="dropdown-item" href="{% url 'platform_admin:system-logs' %}">
                                     <i class="fas fa-history me-2 text-info"></i>
                                     Activity Log
                                 </a>
@@ -167,13 +167,13 @@
                             <li><hr class="dropdown-divider"></li>
                             
                             <li>
-                                <a class="dropdown-item" href="{% url 'help' %}">
+                                <a class="dropdown-item" href="#">
                                     <i class="fas fa-question-circle me-2 text-warning"></i>
                                     Help & Support
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{% url 'admin:system-status' %}">
+                                <a class="dropdown-item" href="{% url 'platform_admin:system-status' %}">
                                     <i class="fas fa-server me-2 text-success"></i>
                                     System Status
                                 </a>
@@ -607,7 +607,7 @@ function refreshDashboard() {
     if (window.location.pathname.includes('/dashboard')) {
         window.location.reload();
     } else {
-        AdminApp.navigateTo('{% url "admin:dashboard" %}');
+        AdminApp.navigateTo('{% url "platform_admin:dashboard" %}');
     }
 }
 

@@ -4,7 +4,6 @@ from App import views
 
 urlpatterns = [
     path('', views.landing_page, name = 'landing'),
-    path('admin/', admin.site.urls),
 
     # Register & OTP Flow
     path('register/', views.register_view, name='register'),
