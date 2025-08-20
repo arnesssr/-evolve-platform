@@ -15,7 +15,7 @@
     <button class="btn btn-outline-primary" onclick="exportProducts()">
         <i class="fas fa-download me-2"></i>Export
     </button>
-    <a href="{% url 'admin:products_form' %}" class="btn btn-primary">
+    <a href="{% url 'platform_admin:products-form' %}" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Add Product
     </a>
 </div>
@@ -163,7 +163,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=1">
+                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=1">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="viewProduct(1)">
@@ -208,7 +208,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=2">
+                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=2">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="viewProduct(2)">
@@ -253,7 +253,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=3">
+                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=3">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="viewProduct(3)">
@@ -298,7 +298,7 @@
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=4">
+                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=4">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="viewProduct(4)">

@@ -7,13 +7,13 @@
 {% block page_subtitle %}{% if admin.id %}Update administrator information and permissions{% else %}Create a new platform administrator{% endif %}{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'admin:admins_list' %}">Admin Users</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:admins-list' %}">Admin Users</a></li>
     <li class="breadcrumb-item active">{% if admin.id %}Edit{% else %}Add{% endif %} Administrator</li>
 {% endblock %}
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    <a href="{% url 'admin:admins_list' %}" class="btn btn-outline-secondary">
+    <a href="{% url 'platform_admin:admins-list' %}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <button type="submit" form="adminForm" class="btn btn-primary">
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Redirect after a delay (in real app, this would happen after successful server response)
         setTimeout(() => {
-            window.location.href = "{% url 'admin:admins_list' %}";
+            window.location.href = "{% url 'platform_admin:admins-list' %}";
         }, 1500);
     });
 });
