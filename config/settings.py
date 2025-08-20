@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'App',
     'App.reseller',
+    'App.business',
 ]
 
 #Pesapal Configurations
@@ -148,4 +149,3 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
 
 LOGIN_URL = '/login/'
-

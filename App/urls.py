@@ -38,6 +38,9 @@ urlpatterns = [
 
     path('logout/', views.logout, name='logout'),
     
+    # Business app URL
+    path("business/", include("App.business.urls", namespace="business")),
+    
     # Business Dashboard URLs
     path('business-dashboard/', views.business_dashboard, name='business-dashboard'),
     path('business-subscriptions/', views.business_subscriptions, name='business-subscriptions'),

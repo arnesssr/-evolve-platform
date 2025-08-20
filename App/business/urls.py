@@ -1,10 +1,10 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
-app_name = 'business'
+app_name = "business"
 
 urlpatterns = [
-    # Business dashboard URLs will be added here
-    # path('', views.dashboard, name='dashboard'),
-    # path('api/', include('App.business.api.urls')),
+    path("users/", views.user_management, name="user_management"),
+    path("users/add/", views.add_user, name="add_user"),
+    path("users/<int:user_id>/toggle-status/", views.toggle_user_status, name="toggle_user_status"),
 ]

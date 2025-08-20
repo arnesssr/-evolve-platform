@@ -29,7 +29,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-users text-primary fa-2x mb-3"></i>
-                    <h3>24</h3>
+                    <h3>{{ total_users }}</h3>
                     <p class="text-muted mb-0">Total Users</p>
                 </div>
             </div>
@@ -38,7 +38,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-user-check text-success fa-2x mb-3"></i>
-                    <h3>22</h3>
+                    <h3>{{ active_users }}</h3>
                     <p class="text-muted mb-0">Active Users</p>
                 </div>
             </div>
@@ -47,7 +47,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-clock text-warning fa-2x mb-3"></i>
-                    <h3>2</h3>
+                    <h3>{{ pending_users}}</h3>
                     <p class="text-muted mb-0">Pending</p>
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-crown text-info fa-2x mb-3"></i>
-                    <h3>3</h3>
+                    <h3>{{ admins }}</h3>
                     <p class="text-muted mb-0">Administrators</p>
                 </div>
             </div>
@@ -98,105 +98,61 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for bu in users %}
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">JD</span>
+                                                <span class="text-white fw-bold">{{ bu.user.first_name|slice:":1" }}{{ bu.user.last_name|slice:":1" }}</span>
                                             </div>
                                             <div>
-                                                <div class="fw-bold">John Doe</div>
-                                                <small class="text-muted">Administrator</small>
+                                                <div class="fw-bold">{{ bu.user.get_full_name }}</div>
+                                                <small class="text-muted">{{ bu.get_role_display }}</small>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>john.doe@company.com</td>
-                                    <td><span class="badge bg-danger">Admin</span></td>
+                                    <td>{{ bu.user.email }}</td>
                                     <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-primary">ERP</span>
-                                            <span class="badge bg-info">SACCO</span>
-                                            <span class="badge bg-success">Payroll</span>
+                                        {% if bu.role == "admin" %}
+                                            <span class="badge bg-danger">{{ bu.get_role_display }}</span>
+                                        {% elif bu.role == "manager" %}
+                                            <span class="badge bg-warning">{{ bu.get_role_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ bu.get_role_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-1 flex-wrap">
+                                            {% for s in bu.software_access.all %}
+                                            <span class="badge bg-info">{{ s.name }}</span>
+                                            {% empty %}
+                                            <span class="text-muted">No access</span>
+                                            {% endfor %}
                                         </div>
                                     </td>
-                                    <td>5 min ago</td>
-                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>{% if bu.last_active %}{{ bu.last_active|timesince }} ago{% else %}Never{% endif %}</td>
+                                    <td>
+                                        {% if bu.status == "active" %}
+                                            <span class="badge bg-success">{{ bu.get_status_display }}</span>
+                                        {% elif bu.status == "pending" %}
+                                            <span class="badge bg-warning">{{ bu.get_status_display }}</span>
+                                        {% elif bu.status == "suspended" %}
+                                            <span class="badge bg-danger">{{ bu.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
+                                            <a href="{% url 'business:toggle_user_status' bu.id %}" class="btn btn-outline-warning btn-sm">
+                                                {% if bu.status == "active" %}
                                                 <i class="fas fa-pause"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">JS</span>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">Jane Smith</div>
-                                                <small class="text-muted">Manager</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>jane.smith@company.com</td>
-                                    <td><span class="badge bg-warning">Manager</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-primary">ERP</span>
-                                            <span class="badge bg-success">Payroll</span>
-                                        </div>
-                                    </td>
-                                    <td>2 hours ago</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
-                                                <i class="fas fa-pause"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">MB</span>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">Mike Brown</div>
-                                                <small class="text-muted">Employee</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>mike.brown@company.com</td>
-                                    <td><span class="badge bg-secondary">Employee</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-info">SACCO</span>
-                                        </div>
-                                    </td>
-                                    <td>Yesterday</td>
-                                    <td><span class="badge bg-warning">Pending</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-success btn-sm" title="Activate">
+                                                {% else %}
                                                 <i class="fas fa-check"></i>
-                                            </button>
+                                                {% endif %}
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -217,62 +173,57 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form>
+                <form method="POST" action="{% url 'business:add_user' %}">
+                    {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" placeholder="John">
+                            <input type="text" name="first_name" class="form-control" placeholder="John" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" placeholder="Doe">
+                            <input type="text" name="last_name" class="form-control" placeholder="Doe" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control" placeholder="john.doe@company.com">
+                        <input type="email" name="email" class="form-control" placeholder="john.doe@company.com" required>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Role</label>
-                            <select class="form-select">
-                                <option>Employee</option>
-                                <option>Manager</option>
-                                <option>Administrator</option>
+                            <select class="form-select" name="role" required>
+                                <option value="employee">Employee</option>
+                                <option value="manager">Manager</option>
+                                <option value="admin">Administrator</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Department</label>
-                            <select class="form-select">
-                                <option>Finance</option>
-                                <option>Operations</option>
-                                <option>Management</option>
-                                <option>IT</option>
+                            <select class="form-select" name="department">
+                                <option value="">-- Select Department --</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Software Access</label>
-                        <div class="d-flex gap-3">
+                        <div class="d-flex gap-3 flex-wrap">
+                            {% for software in software_list %}
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="erp">
-                                <label class="form-check-label" for="erp">ERP System</label>
+                                <input class="form-check-input" type="checkbox" name="software" value="{{ software.id }}" id="soft{{ software.id }}">
+                                <label class="form-check-label" for="soft{{ software.id }}">{{ software.name }}</label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="sacco">
-                                <label class="form-check-label" for="sacco">SACCO Platform</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="payroll">
-                                <label class="form-check-label" for="payroll">Payroll System</label>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Add User</button>
             </div>
         </div>
     </div>
