@@ -1,0 +1,458 @@
+<!-- Notification Settings Form Component -->
+<div class="notification-settings-form">
+    <form id="notificationSettingsForm" method="POST">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-bell text-primary me-2"></i>
+                        Notification Settings
+                    </h6>
+                    <div class="notification-actions">
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="testNotifications()">
+                            <i class="fas fa-vial me-1"></i>Test
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="resetToDefaults()">
+                            <i class="fas fa-undo me-1"></i>Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Email Notifications -->
+                <div class="email-notifications mb-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-envelope me-2"></i>Email Notifications
+                    </h6>
+                    <div class="notification-group">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_new_registration" 
+                                               {% if settings.email_new_registration %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">New User Registrations</label>
+                                    </div>
+                                    <small class="text-muted">Get notified when new users register on the platform</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_commission_earned" 
+                                               {% if settings.email_commission_earned %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Commission Earned</label>
+                                    </div>
+                                    <small class="text-muted">Notify when commissions are earned by resellers</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_payout_requests" 
+                                               {% if settings.email_payout_requests %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Payout Requests</label>
+                                    </div>
+                                    <small class="text-muted">Alert when new payout requests are submitted</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_system_alerts" 
+                                               {% if settings.email_system_alerts %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">System Alerts</label>
+                                    </div>
+                                    <small class="text-muted">Important system notifications and alerts</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_payment_failures" 
+                                               {% if settings.email_payment_failures %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Payment Failures</label>
+                                    </div>
+                                    <small class="text-muted">Alert when payment processing fails</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_plan_changes" 
+                                               {% if settings.email_plan_changes %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Plan Changes</label>
+                                    </div>
+                                    <small class="text-muted">Notify about subscription plan upgrades/downgrades</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SMS Notifications -->
+                <div class="sms-notifications mb-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-sms me-2"></i>SMS Notifications
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Primary Phone Number</label>
+                            <input type="tel" class="form-control" name="primary_phone" 
+                                   value="{{ settings.primary_phone|default:'' }}" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Secondary Phone Number</label>
+                            <input type="tel" class="form-control" name="secondary_phone" 
+                                   value="{{ settings.secondary_phone|default:'' }}" placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                    
+                    <div class="notification-group mt-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="sms_critical_alerts" 
+                                               {% if settings.sms_critical_alerts %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Critical System Alerts</label>
+                                    </div>
+                                    <small class="text-muted">High-priority system issues requiring immediate attention</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="sms_security_alerts" 
+                                               {% if settings.sms_security_alerts %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Security Alerts</label>
+                                    </div>
+                                    <small class="text-muted">Suspicious login attempts and security breaches</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="sms_high_value_transactions" 
+                                               {% if settings.sms_high_value_transactions %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">High-Value Transactions</label>
+                                    </div>
+                                    <small class="text-muted">Transactions above specified threshold</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <label class="form-label small">SMS Alert Threshold ($)</label>
+                                    <input type="number" class="form-control form-control-sm" name="sms_threshold" 
+                                           step="0.01" min="0" value="{{ settings.sms_threshold|default:'1000' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- In-App Notifications -->
+                <div class="inapp-notifications mb-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-desktop me-2"></i>In-App Notifications
+                    </h6>
+                    <div class="notification-group">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="inapp_real_time" 
+                                               {% if settings.inapp_real_time %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Real-time Notifications</label>
+                                    </div>
+                                    <small class="text-muted">Live updates for dashboard activities</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="inapp_browser_notifications" 
+                                               {% if settings.inapp_browser_notifications %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Browser Push Notifications</label>
+                                    </div>
+                                    <small class="text-muted">Push notifications even when tab is not active</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="inapp_sound_alerts" 
+                                               {% if settings.inapp_sound_alerts %}checked{% endif %}>
+                                        <label class="form-check-label fw-medium">Sound Alerts</label>
+                                    </div>
+                                    <small class="text-muted">Audio notifications for important events</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="notification-item">
+                                    <label class="form-label small">Notification Position</label>
+                                    <select class="form-select form-select-sm" name="notification_position">
+                                        <option value="top-right" {% if settings.notification_position == 'top-right' %}selected{% endif %}>Top Right</option>
+                                        <option value="top-left" {% if settings.notification_position == 'top-left' %}selected{% endif %}>Top Left</option>
+                                        <option value="bottom-right" {% if settings.notification_position == 'bottom-right' %}selected{% endif %}>Bottom Right</option>
+                                        <option value="bottom-left" {% if settings.notification_position == 'bottom-left' %}selected{% endif %}>Bottom Left</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Frequency -->
+                <div class="notification-frequency mb-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-clock me-2"></i>Notification Frequency
+                    </h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Email Digest Frequency</label>
+                            <select class="form-select" name="email_digest_frequency">
+                                <option value="immediate" {% if settings.email_digest_frequency == 'immediate' %}selected{% endif %}>Immediate</option>
+                                <option value="hourly" {% if settings.email_digest_frequency == 'hourly' %}selected{% endif %}>Hourly</option>
+                                <option value="daily" {% if settings.email_digest_frequency == 'daily' %}selected{% endif %}>Daily</option>
+                                <option value="weekly" {% if settings.email_digest_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Quiet Hours Start</label>
+                            <input type="time" class="form-control" name="quiet_hours_start" 
+                                   value="{{ settings.quiet_hours_start|default:'22:00' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Quiet Hours End</label>
+                            <input type="time" class="form-control" name="quiet_hours_end" 
+                                   value="{{ settings.quiet_hours_end|default:'08:00' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Recipients -->
+                <div class="notification-recipients">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-users me-2"></i>Additional Recipients
+                    </h6>
+                    <div id="recipientsList">
+                        {% for recipient in settings.additional_recipients %}
+                        <div class="recipient-item mb-2">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm" name="recipient_name[]" 
+                                           placeholder="Name" value="{{ recipient.name }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="email" class="form-control form-control-sm" name="recipient_email[]" 
+                                           placeholder="Email" value="{{ recipient.email }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select form-select-sm" name="recipient_type[]">
+                                        <option value="all" {% if recipient.type == 'all' %}selected{% endif %}>All Notifications</option>
+                                        <option value="critical" {% if recipient.type == 'critical' %}selected{% endif %}>Critical Only</option>
+                                        <option value="financial" {% if recipient.type == 'financial' %}selected{% endif %}>Financial Only</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRecipient(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRecipient()">
+                        <i class="fas fa-plus me-1"></i>Add Recipient
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="notification-info">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Last updated: {{ settings.updated_at|default:'Never' }}
+                        </small>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Test Notifications Modal -->
+<div class="modal fade" id="testNotificationsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Test Notifications</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Notification Type</label>
+                    <select class="form-select" id="testNotificationType">
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="inapp">In-App</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Test Message</label>
+                    <textarea class="form-control" id="testMessage" rows="3" 
+                              placeholder="Enter test message content...">This is a test notification from the admin panel.</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendTestNotification()">Send Test</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-settings-form .card { border-radius: 10px; }
+.notification-item { padding: 0.75rem; background: rgba(var(--bs-light-rgb), 0.3); border-radius: 6px; margin-bottom: 0.5rem; }
+.notification-group { border-left: 3px solid var(--bs-primary); padding-left: 1rem; }
+.recipient-item { padding: 0.5rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize notification settings
+    requestNotificationPermission();
+    
+    // Auto-save functionality
+    const form = document.getElementById('notificationSettingsForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('change', autoSave);
+    });
+});
+
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+function testNotifications() {
+    new bootstrap.Modal(document.getElementById('testNotificationsModal')).show();
+}
+
+function sendTestNotification() {
+    const type = document.getElementById('testNotificationType').value;
+    const message = document.getElementById('testMessage').value;
+    
+    if (!message.trim()) {
+        alert('Please enter a test message');
+        return;
+    }
+    
+    const loadingBtn = event.target;
+    loadingBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+    loadingBtn.disabled = true;
+    
+    // Simulate sending test notification
+    setTimeout(() => {
+        if (type === 'inapp' && 'Notification' in window && Notification.permission === 'granted') {
+            new Notification('Test Notification', {
+                body: message,
+                icon: '/static/img/logo.png'
+            });
+        }
+        
+        loadingBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Test';
+        loadingBtn.disabled = false;
+        alert(`Test ${type} notification sent successfully!`);
+        bootstrap.Modal.getInstance(document.getElementById('testNotificationsModal')).hide();
+    }, 2000);
+}
+
+function addRecipient() {
+    const recipientsList = document.getElementById('recipientsList');
+    const recipientHTML = `
+        <div class="recipient-item mb-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" class="form-control form-control-sm" name="recipient_name[]" placeholder="Name">
+                </div>
+                <div class="col-md-4">
+                    <input type="email" class="form-control form-control-sm" name="recipient_email[]" placeholder="Email">
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-sm" name="recipient_type[]">
+                        <option value="all">All Notifications</option>
+                        <option value="critical">Critical Only</option>
+                        <option value="financial">Financial Only</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRecipient(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    recipientsList.insertAdjacentHTML('beforeend', recipientHTML);
+}
+
+function removeRecipient(button) {
+    button.closest('.recipient-item').remove();
+}
+
+function resetToDefaults() {
+    if (confirm('Reset all notification settings to default values?')) {
+        const form = document.getElementById('notificationSettingsForm');
+        form.reset();
+        
+        // Set default values
+        document.querySelector('[name="email_digest_frequency"]').value = 'daily';
+        document.querySelector('[name="quiet_hours_start"]').value = '22:00';
+        document.querySelector('[name="quiet_hours_end"]').value = '08:00';
+        document.querySelector('[name="notification_position"]').value = 'top-right';
+        document.querySelector('[name="sms_threshold"]').value = '1000';
+        
+        // Clear additional recipients
+        document.getElementById('recipientsList').innerHTML = '';
+    }
+}
+
+function autoSave() {
+    clearTimeout(window.autoSaveTimer);
+    window.autoSaveTimer = setTimeout(() => {
+        console.log('Auto-saving notification settings...');
+        showAutoSaveIndicator();
+    }, 2000);
+}
+
+function showAutoSaveIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'alert alert-success alert-dismissible position-fixed top-0 end-0 m-3';
+    indicator.style.zIndex = '9999';
+    indicator.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>Settings auto-saved
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(indicator);
+    
+    setTimeout(() => {
+        if (indicator.parentNode) {
+            indicator.remove();
+        }
+    }, 3000);
+}
+</script>

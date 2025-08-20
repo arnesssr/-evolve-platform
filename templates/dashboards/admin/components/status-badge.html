@@ -1,0 +1,26 @@
+<!-- Status Badge Component -->
+<!-- Usage: {% include 'dashboards/admin/components/status-badge.html' with status=item.status type='success' %} -->
+
+{% if status %}
+<span class="badge bg-{{ type|default:'secondary' }} bg-opacity-{{ opacity|default:'100' }} 
+            {% if size %}badge-{{ size }}{% endif %} 
+            {% if pill %}rounded-pill{% endif %}
+            {% if custom_class %}{{ custom_class }}{% endif %}">
+    {% if icon %}
+    <i class="fas {{ icon }} me-1"></i>
+    {% endif %}
+    {{ label|default:status }}
+</span>
+{% endif %}
+
+<!-- Status type mapping for common statuses -->
+{% comment %}
+Usage examples:
+- Active: type='success'
+- Inactive: type='danger'
+- Pending: type='warning'
+- Processing: type='info'
+- Completed: type='success'
+- Failed: type='danger'
+- Suspended: type='secondary'
+{% endcomment %}

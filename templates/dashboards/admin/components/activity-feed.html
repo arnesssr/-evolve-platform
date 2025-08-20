@@ -1,0 +1,85 @@
+<!-- Activity Feed Component -->
+<!-- Usage: {% include 'dashboards/admin/components/activity-feed.html' with activities=activity_list %} -->
+
+<div class="card activity-feed h-100">
+    <div class="card-header bg-white border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-stream me-2 text-primary"></i>{{ title|default:"Recent Activity" }}
+            </h5>
+            {% if show_filter %}
+            <select class="form-select form-select-sm" style="width: auto;" onchange="filterActivities(this.value)">
+                <option value="all">All Activities</option>
+                <option value="users">Users</option>
+                <option value="financial">Financial</option>
+                <option value="system">System</option>
+            </select>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="activity-list" style="max-height: {{ max_height|default:'400' }}px; overflow-y: auto;">
+            {% if activities %}
+                {% for activity in activities %}
+                <div class="activity-item d-flex align-items-start mb-3 pb-3 border-bottom" data-activity-type="{{ activity.type }}">
+                    <div class="activity-icon me-3">
+                        <div class="rounded-circle bg-{{ activity.color|default:'primary' }} bg-opacity-10 p-2">
+                            <i class="fas {{ activity.icon }} text-{{ activity.color|default:'primary' }}"></i>
+                        </div>
+                    </div>
+                    <div class="activity-content flex-grow-1">
+                        <p class="mb-1">{{ activity.message }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>{{ activity.time }}
+                            </small>
+                            {% if activity.user %}
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ activity.user }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% if activity.details %}
+                        <div class="activity-details mt-2">
+                            <small class="text-muted">{{ activity.details }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if activity.action_url %}
+                    <div class="activity-action ms-2">
+                        <a href="{{ activity.action_url }}" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No recent activities</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if show_view_all %}
+    <div class="card-footer bg-light text-center">
+        <a href="{% url 'admin:activity_log' %}" class="text-decoration-none">
+            View All Activities <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function filterActivities(type) {
+    const items = document.querySelectorAll('.activity-item');
+    items.forEach(item => {
+        if (type === 'all' || item.dataset.activityType === type) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+</script>

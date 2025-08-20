@@ -1,0 +1,407 @@
+<!-- Revenue Chart Component -->
+<div class="revenue-chart-card">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 pb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    Revenue Analytics
+                </h6>
+                <div class="chart-controls d-flex align-items-center gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calendar me-1"></i>Last 30 Days
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" data-period="7">Last 7 Days</a></li>
+                            <li><a class="dropdown-item" href="#" data-period="30">Last 30 Days</a></li>
+                            <li><a class="dropdown-item" href="#" data-period="90">Last 90 Days</a></li>
+                            <li><a class="dropdown-item" href="#" data-period="365">Last Year</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="chartType" id="lineChart" checked>
+                        <label class="btn btn-outline-secondary btn-sm" for="lineChart">
+                            <i class="fas fa-chart-line"></i>
+                        </label>
+                        <input type="radio" class="btn-check" name="chartType" id="barChart">
+                        <label class="btn btn-outline-secondary btn-sm" for="barChart">
+                            <i class="fas fa-chart-bar"></i>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Chart Legend -->
+            <div class="chart-legend mb-3">
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <div class="legend-item d-flex align-items-center">
+                            <div class="legend-color bg-primary"></div>
+                            <span class="legend-label">Total Revenue</span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="legend-item d-flex align-items-center">
+                            <div class="legend-color bg-success"></div>
+                            <span class="legend-label">Commissions</span>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="legend-item d-flex align-items-center">
+                            <div class="legend-color bg-warning"></div>
+                            <span class="legend-label">Refunds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart Container -->
+            <div class="chart-container" style="position: relative; height: 300px;">
+                <canvas id="revenueChart"></canvas>
+                <div id="chartLoader" class="chart-loader d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart Summary -->
+            <div class="chart-summary mt-3">
+                <div class="row g-3">
+                    <div class="col-md-3 col-6">
+                        <div class="summary-item text-center">
+                            <div class="summary-value text-primary" id="totalRevenue">
+                                ${{ total_revenue|default:0|floatformat:2 }}
+                            </div>
+                            <div class="summary-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-item text-center">
+                            <div class="summary-value text-success" id="avgRevenue">
+                                ${{ avg_daily_revenue|default:0|floatformat:2 }}
+                            </div>
+                            <div class="summary-label">Avg Daily</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-item text-center">
+                            <div class="summary-value text-info" id="growthRate">
+                                +{{ growth_rate|default:0 }}%
+                            </div>
+                            <div class="summary-label">Growth Rate</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-item text-center">
+                            <div class="summary-value text-warning" id="projectedRevenue">
+                                ${{ projected_revenue|default:0|floatformat:2 }}
+                            </div>
+                            <div class="summary-label">Projected</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.revenue-chart-card .card {
+    border-radius: 10px;
+}
+
+.chart-controls .btn {
+    font-size: 0.875rem;
+}
+
+.legend-item {
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.legend-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.chart-container {
+    position: relative;
+}
+
+.chart-loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.summary-item {
+    padding: 0.75rem;
+    border-radius: 6px;
+    background: rgba(var(--bs-light-rgb), 0.3);
+}
+
+.summary-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-tooltip {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let revenueChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+    
+    // Handle period dropdown
+    document.querySelectorAll('[data-period]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const period = this.getAttribute('data-period');
+            updateChartPeriod(period);
+            
+            const dropdown = this.closest('.dropdown');
+            const button = dropdown.querySelector('.dropdown-toggle');
+            button.innerHTML = `<i class="fas fa-calendar me-1"></i>${this.textContent}`;
+        });
+    });
+    
+    // Handle chart type toggle
+    document.querySelectorAll('input[name="chartType"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.checked) {
+                updateChartType(this.id);
+            }
+        });
+    });
+});
+
+function initializeChart() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    
+    const defaultData = {
+        labels: generateDateLabels(30),
+        datasets: [
+            {
+                label: 'Total Revenue',
+                data: generateSampleData(30, 1000, 5000),
+                borderColor: '#0a2463',
+                backgroundColor: 'rgba(10, 36, 99, 0.1)',
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'Commissions',
+                data: generateSampleData(30, 100, 800),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                fill: false,
+                tension: 0.4
+            },
+            {
+                label: 'Refunds',
+                data: generateSampleData(30, 0, 200),
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                fill: false,
+                tension: 0.4
+            }
+        ]
+    };
+    
+    revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: defaultData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#0a2463',
+                    borderWidth: 1,
+                    cornerRadius: 6,
+                    caretPadding: 10,
+                    callbacks: {
+                        title: function(context) {
+                            return `Date: ${context[0].label}`;
+                        },
+                        label: function(context) {\n                            return `${context.dataset.label}: $${context.parsed.y.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#6c757d',
+                        maxTicksLimit: 7
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(108, 117, 125, 0.1)'
+                    },
+                    ticks: {
+                        color: '#6c757d',
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            elements: {
+                point: {
+                    radius: 4,
+                    hoverRadius: 6
+                },
+                line: {
+                    borderWidth: 2
+                }
+            }
+        }
+    });
+}
+
+function updateChartPeriod(days) {
+    showLoader();
+    
+    fetch(`/admin/api/revenue-data?days=${days}`)
+    .then(response => response.json())
+    .then(data => {
+        revenueChart.data.labels = data.labels;
+        revenueChart.data.datasets[0].data = data.revenue;
+        revenueChart.data.datasets[1].data = data.commissions;
+        revenueChart.data.datasets[2].data = data.refunds;
+        revenueChart.update('active');
+        
+        // Update summary
+        updateSummary(data.summary);
+        hideLoader();
+    })
+    .catch(error => {
+        console.error('Error fetching revenue data:', error);
+        hideLoader();
+        showToast('Error loading chart data', 'error');
+    });
+}
+
+function updateChartType(type) {
+    const chartType = type === 'lineChart' ? 'line' : 'bar';
+    revenueChart.config.type = chartType;
+    
+    // Adjust fill and tension for different chart types
+    revenueChart.data.datasets.forEach((dataset, index) => {
+        if (chartType === 'bar') {
+            dataset.fill = false;
+            dataset.tension = 0;
+        } else {
+            dataset.fill = index === 0; // Only fill the first dataset for line charts
+            dataset.tension = 0.4;
+        }
+    });
+    
+    revenueChart.update('active');
+}
+
+function updateSummary(summary) {
+    document.getElementById('totalRevenue').textContent = `$${summary.total_revenue.toLocaleString()}`;
+    document.getElementById('avgRevenue').textContent = `$${summary.avg_daily.toLocaleString()}`;
+    document.getElementById('growthRate').textContent = `${summary.growth_rate > 0 ? '+' : ''}${summary.growth_rate}%`;
+    document.getElementById('projectedRevenue').textContent = `$${summary.projected.toLocaleString()}`;
+}
+
+function showLoader() {
+    document.getElementById('chartLoader').classList.remove('d-none');
+}
+
+function hideLoader() {
+    document.getElementById('chartLoader').classList.add('d-none');
+}
+
+function generateDateLabels(days) {
+    const labels = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    }
+    
+    return labels;
+}
+
+function generateSampleData(days, min, max) {
+    const data = [];
+    for (let i = 0; i < days; i++) {
+        data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return data;
+}
+
+// Export chart as image
+function exportChart() {
+    const link = document.createElement('a');
+    link.download = 'revenue-chart.png';
+    link.href = revenueChart.toBase64Image();
+    link.click();
+}
+
+// Real-time updates (if WebSocket is available)
+if (typeof io !== 'undefined') {
+    const socket = io('/admin-analytics');
+    
+    socket.on('revenue_update', function(data) {
+        // Update chart with real-time data
+        if (revenueChart) {
+            const lastIndex = revenueChart.data.labels.length - 1;
+            revenueChart.data.datasets[0].data[lastIndex] = data.revenue;
+            revenueChart.data.datasets[1].data[lastIndex] = data.commissions;
+            revenueChart.data.datasets[2].data[lastIndex] = data.refunds;
+            revenueChart.update('none');
+        }
+    });
+}
+</script>

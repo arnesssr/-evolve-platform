@@ -1,0 +1,28 @@
+<!-- Metric Card Component -->
+<!-- Usage: {% include 'dashboards/admin/components/metric-card.html' with title="Total Users" value="1,234" icon="fa-users" color="primary" change="+15.3%" trend="up" %} -->
+
+<div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+    <div class="card metric-card h-100">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="metric-icon bg-{{ color|default:'primary' }} bg-opacity-10 text-{{ color|default:'primary' }} rounded-circle p-3">
+                    <i class="fas {{ icon }} fa-2x"></i>
+                </div>
+                <div class="text-end">
+                    <h6 class="text-muted mb-1">{{ title }}</h6>
+                    <h3 class="mb-0 fw-bold">{{ value }}</h3>
+                    {% if change %}
+                    <small class="text-{{ trend|yesno:'success,danger,muted' }}">
+                        <i class="fas fa-arrow-{{ trend|yesno:'up,down,right' }}"></i> {{ change }}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+            {% if subtitle %}
+            <div class="mt-3">
+                <small class="text-muted">{{ subtitle }}</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

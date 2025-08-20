@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>New Registration - Evolve Platform</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Email container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+        }
+        
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #0a2463 0%, #3e92cc 100%);
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .email-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        /* Content */
+        .email-content {
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        
+        .registration-alert {
+            background-color: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .registration-alert .icon {
+            background-color: #3b82f6;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .registration-alert h2 {
+            color: #1e40af;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .registration-alert p {
+            color: #1e40af;
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        /* User details */
+        .user-details {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .user-details h3 {
+            color: #1f2937;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .user-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .user-type.business {
+            background-color: #dcfdf4;
+            color: #065f46;
+        }
+        
+        .user-type.reseller {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .user-type.admin {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Action buttons */
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            margin: 0 10px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            color: #ffffff;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+        
+        /* Footer */
+        .email-footer {
+            background-color: #f8fafc;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .email-footer p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .email-footer .company-info {
+            color: #9ca3af;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .email-header,
+            .email-content,
+            .email-footer {
+                padding: 20px !important;
+            }
+            
+            .btn {
+                display: block !important;
+                margin: 10px 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>🎉 New Registration Alert</h1>
+            <p>A new user has joined the Evolve Platform</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="email-content">
+            <!-- Registration Alert -->
+            <div class="registration-alert">
+                <div class="icon">👤</div>
+                <h2>New User Registration</h2>
+                <p>A new {{ user_type|default:"user" }} has successfully registered on the platform</p>
+            </div>
+            
+            <!-- User Details -->
+            <div class="user-details">
+                <h3>User Information</h3>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Full Name:</span>
+                    <span class="detail-value">{{ user.full_name|default:"John Smith" }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">Email Address:</span>
+                    <span class="detail-value">{{ user.email|default:"john@example.com" }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">User Type:</span>
+                    <span class="detail-value">
+                        <span class="user-type {{ user_type|default:'business' }}">
+                            {{ user_type|default:"Business" }}
+                        </span>
+                    </span>
+                </div>
+                
+                {% if user.company_name %}
+                <div class="detail-row">
+                    <span class="detail-label">Company:</span>
+                    <span class="detail-value">{{ user.company_name }}</span>
+                </div>
+                {% endif %}
+                
+                {% if user.phone %}
+                <div class="detail-row">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">{{ user.phone }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="detail-row">
+                    <span class="detail-label">Registration Date:</span>
+                    <span class="detail-value">{{ registration_date|default:"October 20, 2024" }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span class="detail-label">IP Address:</span>
+                    <span class="detail-value">{{ user.ip_address|default:"192.168.1.1" }}</span>
+                </div>
+                
+                {% if user.referral_source %}
+                <div class="detail-row">
+                    <span class="detail-label">Referral Source:</span>
+                    <span class="detail-value">{{ user.referral_source }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ admin_url }}/users/{{ user.id }}" class="btn btn-primary">
+                    View User Profile
+                </a>
+                <a href="{{ admin_url }}/dashboard" class="btn btn-secondary">
+                    Go to Dashboard
+                </a>
+            </div>
+            
+            <!-- Next Steps -->
+            <div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 20px; margin-top: 30px;">
+                <h4 style="color: #92400e; margin-bottom: 15px;">📋 Recommended Actions</h4>
+                <ul style="color: #92400e; margin: 0; padding-left: 20px;">
+                    <li style="margin-bottom: 8px;">Review the user's profile and verify their information</li>
+                    {% if user_type == "business" %}
+                    <li style="margin-bottom: 8px;">Send a welcome email with onboarding instructions</li>
+                    <li style="margin-bottom: 8px;">Schedule a demo or consultation call if needed</li>
+                    {% elif user_type == "reseller" %}
+                    <li style="margin-bottom: 8px;">Approve the reseller application if everything looks good</li>
+                    <li style="margin-bottom: 8px;">Send reseller agreement and commission structure details</li>
+                    {% endif %}
+                    <li style="margin-bottom: 8px;">Monitor their activity and engagement</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <p>This is an automated notification from the Evolve Platform admin system.</p>
+            <div class="company-info">
+                <strong>Evolve Platform</strong><br>
+                Your B2B Software Marketplace<br>
+                <a href="mailto:admin@evolveplatform.com" style="color: #6b7280;">admin@evolveplatform.com</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

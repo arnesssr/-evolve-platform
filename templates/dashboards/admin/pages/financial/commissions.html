@@ -1,0 +1,581 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Commission Management{% endblock %}
+
+{% block page_title %}Commission Management{% endblock %}
+{% block page_subtitle %}Manage reseller commissions and payouts{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Commissions</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    {% include 'dashboards/admin/forms/date-range.html' with label="Date Range" compact=True %}
+    <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#bulkPayoutModal">
+        <i class="fas fa-money-bill-wave me-2"></i>Bulk Payout
+    </button>
+    {% include 'dashboards/admin/components/export-button.html' with export_type="commissions" %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approveCommissionModal">
+        <i class="fas fa-check me-2"></i>Approve Selected
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Commission Summary -->
+<div class="row mb-4">
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Commissions" value="$84,750" icon="fa-percentage" color="success" change="+15.3%" trend="up" subtitle="All time total" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Pending Approval" value="$12,450" icon="fa-clock" color="warning" change="+5" trend="up" subtitle="Awaiting review" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="This Month" value="$8,329" icon="fa-calendar" color="primary" change="+12.2%" trend="up" subtitle="Current month" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Active Resellers" value="47" icon="fa-user-tie" color="info" change="+3" trend="up" subtitle="Earning commissions" %}
+</div>
+
+<!-- Commission Status Overview -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="content-card">
+            <h5 class="mb-4">Commission Status Distribution</h5>
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-warning">23</div>
+                        <div class="text-muted">Pending</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-warning" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-success">156</div>
+                        <div class="text-muted">Approved</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-success" style="width: 85%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-primary">134</div>
+                        <div class="text-muted">Paid</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-primary" style="width: 78%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-danger">7</div>
+                        <div class="text-muted">Disputed</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-danger" style="width: 15%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="content-card">
+            <h5 class="mb-4">Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#approveCommissionModal">
+                    <i class="fas fa-check me-2"></i>Approve Pending Commissions
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#processPayoutModal">
+                    <i class="fas fa-money-bill-wave me-2"></i>Process Payouts
+                </button>
+                <button type="button" class="btn btn-outline-info">
+                    <i class="fas fa-file-download me-2"></i>Export Commission Report
+                </button>
+                <button type="button" class="btn btn-outline-warning">
+                    <i class="fas fa-calculator me-2"></i>Recalculate Commissions
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="content-card mb-4">
+    <h5 class="mb-3">Filters</h5>
+    <div class="row">
+        <div class="col-md-2">
+            <label for="statusFilter" class="form-label">Status</label>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="paid">Paid</option>
+                <option value="disputed">Disputed</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="resellerFilter" class="form-label">Reseller</label>
+            <select id="resellerFilter" class="form-select">
+                <option value="">All Resellers</option>
+                <option value="1">John Marketing</option>
+                <option value="2">Sarah Sales</option>
+                <option value="3">Mike Partners</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="amountFilter" class="form-label">Amount Range</label>
+            <select id="amountFilter" class="form-select">
+                <option value="">All Amounts</option>
+                <option value="0-100">$0 - $100</option>
+                <option value="100-500">$100 - $500</option>
+                <option value="500-1000">$500 - $1000</option>
+                <option value="1000+">$1000+</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Date Range</label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="startDate">
+                <input type="date" class="form-control" id="endDate">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">&nbsp;</label>
+            <div class="d-grid">
+                <button type="button" class="btn btn-outline-primary" onclick="applyFilters()">
+                    <i class="fas fa-filter me-2"></i>Apply Filters
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Commission Table -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Commission Records</h5>
+        <div class="d-flex align-items-center gap-3">
+            <small class="text-muted">Showing <span id="tableInfo">0</span> results</small>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+                <label class="form-check-label" for="selectAll">
+                    Select All
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table id="commissionsTable" class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAllTable">
+                        </div>
+                    </th>
+                    <th>Reseller</th>
+                    <th>Business</th>
+                    <th>Sale Details</th>
+                    <th>Commission</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample data -->
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user-tie text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">John Marketing</div>
+                                <small class="text-muted">john@marketingpro.com</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">TechCorp Solutions</div>
+                            <small class="text-muted">Enterprise Plan</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">$2,450 x 12 months</div>
+                            <small class="text-muted">Annual subscription</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-bold text-success">$1,470</div>
+                            <small class="text-muted">5% of $29,400</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">Pending</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div>Oct 15, 2024</div>
+                            <small class="text-muted">5 days ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#approveCommissionModal">
+                                    <i class="fas fa-check me-2"></i>Approve
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewCommissionModal">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#">
+                                    <i class="fas fa-times me-2"></i>Reject
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user-tie text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">Sarah Sales</div>
+                                <small class="text-muted">sarah@salesforce.net</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">HealthCare Plus</div>
+                            <small class="text-muted">Professional Plan</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">$1,200 x 6 months</div>
+                            <small class="text-muted">Semi-annual subscription</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-bold text-success">$360</div>
+                            <small class="text-muted">5% of $7,200</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Approved</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div>Oct 12, 2024</div>
+                            <small class="text-muted">8 days ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#processPayoutModal">
+                                    <i class="fas fa-money-bill-wave me-2"></i>Process Payout
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewCommissionModal">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="3">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user-tie text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">Mike Partners</div>
+                                <small class="text-muted">mike@partners.biz</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Retail Masters Ltd</div>
+                            <small class="text-muted">Basic Plan</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">$500 x 12 months</div>
+                            <small class="text-muted">Annual subscription</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-bold text-success">$300</div>
+                            <small class="text-muted">5% of $6,000</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">Paid</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div>Oct 5, 2024</div>
+                            <small class="text-muted">15 days ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#viewCommissionModal">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><a class="dropdown-item" href="#">
+                                    <i class="fas fa-receipt me-2"></i>Download Receipt
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="mt-3">
+        {% include 'dashboards/admin/components/pagination.html' with current_page=1 total_pages=8 %}
+    </div>
+</div>
+
+<!-- Include Modals -->
+{% include 'dashboards/admin/modals/approve-commission.html' %}
+{% include 'dashboards/admin/modals/process-payout.html' %}
+
+<!-- Custom Modal for Commission Details -->
+<div class="modal fade" id="viewCommissionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Commission Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Reseller Information</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-muted">Name:</td>
+                                <td class="fw-medium">John Marketing</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Email:</td>
+                                <td>john@marketingpro.com</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Commission Rate:</td>
+                                <td>5%</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3">Sale Information</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-muted">Business:</td>
+                                <td class="fw-medium">TechCorp Solutions</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Plan:</td>
+                                <td>Enterprise Plan</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Sale Amount:</td>
+                                <td class="fw-bold text-success">$29,400</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="fw-bold mb-3">Commission Calculation</h6>
+                        <div class="bg-light p-3 rounded">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Sale Amount:</span>
+                                <span class="fw-bold">$29,400</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Commission Rate:</span>
+                                <span>5%</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold">Commission Amount:</span>
+                                <span class="fw-bold text-success">$1,470</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Approve Commission</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Payout Modal -->
+<div class="modal fade" id="bulkPayoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Payout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Process multiple commission payouts at once.
+                </div>
+                
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Select Status</label>
+                        <select class="form-select">
+                            <option>Approved commissions only</option>
+                            <option>Pending commissions (will auto-approve)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Date Range</label>
+                        <div class="input-group">
+                            <input type="date" class="form-control">
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Minimum Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" value="50" min="0">
+                        </div>
+                        <small class="text-muted">Only process payouts above this amount</small>
+                    </div>
+                </form>
+                
+                <div class="bg-light p-3 rounded">
+                    <div class="d-flex justify-content-between">
+                        <span>Estimated Payouts:</span>
+                        <span class="fw-bold">23 commissions</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Total Amount:</span>
+                        <span class="fw-bold text-success">$12,450</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success">Process Payouts</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable
+    const table = $('#commissionsTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        order: [[6, 'desc']], // Sort by date
+        columnDefs: [
+            { orderable: false, targets: [0, 7] }, // Disable sorting for checkbox and actions
+            { searchable: false, targets: [0, 7] }
+        ]
+    });
+
+    // Select all functionality
+    document.getElementById('selectAllTable').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+
+    // Individual checkbox change
+    document.querySelectorAll('tbody input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+        const bulkButtons = document.querySelectorAll('[data-bulk-action]');
+        
+        bulkButtons.forEach(btn => {
+            btn.disabled = checkedBoxes.length === 0;
+        });
+    }
+
+    // Filter functionality
+    function applyFilters() {
+        // In a real implementation, this would make an AJAX call to filter the data
+        showToast('Filters applied successfully', 'success');
+        table.draw();
+    }
+
+    // Make applyFilters globally available
+    window.applyFilters = applyFilters;
+});
+</script>
+{% endblock %}

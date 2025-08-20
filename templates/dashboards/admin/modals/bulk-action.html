@@ -1,0 +1,473 @@
+<!-- Bulk Action Modal Component -->
+<div class="modal fade" id="bulkActionModal" tabindex="-1" aria-labelledby="bulkActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="bulkActionModalLabel">
+                    <i class="fas fa-tasks me-2"></i>Bulk Actions
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Selection Summary -->
+                <div class="selection-summary mb-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong id="selectedCount">0</strong> items selected for bulk action
+                    </div>
+                </div>
+                
+                <!-- Action Selection -->
+                <div class="action-selection mb-4">
+                    <label class="form-label fw-bold">Select Action</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="activate" value="activate" onchange="updateActionFields()">
+                                <label class="form-check-label" for="activate">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Activate</strong><br>
+                                    <small class="text-muted">Activate selected items</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="deactivate" value="deactivate" onchange="updateActionFields()">
+                                <label class="form-check-label" for="deactivate">
+                                    <i class="fas fa-pause-circle text-warning me-2"></i>
+                                    <strong>Deactivate</strong><br>
+                                    <small class="text-muted">Deactivate selected items</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="delete" value="delete" onchange="updateActionFields()">
+                                <label class="form-check-label" for="delete">
+                                    <i class="fas fa-trash text-danger me-2"></i>
+                                    <strong>Delete</strong><br>
+                                    <small class="text-muted">Permanently delete selected items</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="export" value="export" onchange="updateActionFields()">
+                                <label class="form-check-label" for="export">
+                                    <i class="fas fa-download text-primary me-2"></i>
+                                    <strong>Export</strong><br>
+                                    <small class="text-muted">Export selected items</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="updateCategory" value="updateCategory" onchange="updateActionFields()">
+                                <label class="form-check-label" for="updateCategory">
+                                    <i class="fas fa-tags text-info me-2"></i>
+                                    <strong>Update Category</strong><br>
+                                    <small class="text-muted">Change category for selected items</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check action-option">
+                                <input class="form-check-input" type="radio" name="bulkAction" id="sendNotification" value="sendNotification" onchange="updateActionFields()">
+                                <label class="form-check-label" for="sendNotification">
+                                    <i class="fas fa-envelope text-secondary me-2"></i>
+                                    <strong>Send Notification</strong><br>
+                                    <small class="text-muted">Send notification to users</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export Options -->
+                <div id="exportOptions" class="action-fields mb-4" style="display: none;">
+                    <h6 class="text-muted border-bottom pb-2">Export Options</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Export Format</label>
+                            <select class="form-select" id="exportFormat">
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="pdf">PDF</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Include Fields</label>
+                            <select class="form-select" id="includeFields">
+                                <option value="all">All Fields</option>
+                                <option value="basic">Basic Info Only</option>
+                                <option value="custom">Custom Selection</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Category Update Options -->
+                <div id="categoryOptions" class="action-fields mb-4" style="display: none;">
+                    <h6 class="text-muted border-bottom pb-2">Category Update</h6>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">New Category</label>
+                            <select class="form-select" id="newCategory">
+                                <option value="">Select new category...</option>
+                                <option value="basic">Basic</option>
+                                <option value="premium">Premium</option>
+                                <option value="enterprise">Enterprise</option>
+                                <option value="trial">Trial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Options -->
+                <div id="notificationOptions" class="action-fields mb-4" style="display: none;">
+                    <h6 class="text-muted border-bottom pb-2">Notification Details</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="notificationSubject" placeholder="Enter notification subject...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" id="notificationMessage" rows="4" placeholder="Enter notification message..."></textarea>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sendEmail" checked>
+                        <label class="form-check-label" for="sendEmail">Send via Email</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sendInApp">
+                        <label class="form-check-label" for="sendInApp">Send In-App Notification</label>
+                    </div>
+                </div>
+                
+                <!-- Delete Confirmation -->
+                <div id="deleteOptions" class="action-fields mb-4" style="display: none;">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> This action cannot be undone. All selected items will be permanently deleted.
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDelete">
+                        <label class="form-check-label" for="confirmDelete">
+                            I understand that this action is permanent and cannot be undone
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Selected Items Preview -->
+                <div class="selected-items mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Selected Items Preview</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedItemsTable">
+                                <!-- Selected items will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar (hidden initially) -->
+                <div id="progressSection" class="mb-4" style="display: none;">
+                    <h6 class="text-muted">Processing...</h6>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="bulkProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            Processing <span id="currentItem">0</span> of <span id="totalItems">0</span> items...
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="executeBulkAction()" id="executeBtn" disabled>
+                    <i class="fas fa-play me-1"></i>Execute Action
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.action-option {
+    padding: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.action-option:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.action-option input:checked ~ label {
+    color: #007bff;
+}
+</style>
+
+<script>
+let selectedItems = [];
+let bulkActionType = '';
+
+function showBulkActionModal(items) {
+    selectedItems = items;
+    
+    // Update selection summary
+    document.getElementById('selectedCount').textContent = items.length;
+    
+    // Populate selected items table
+    populateSelectedItems(items);
+    
+    // Reset form
+    resetBulkActionForm();
+    
+    const modal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
+    modal.show();
+}
+
+function populateSelectedItems(items) {
+    const tbody = document.getElementById('selectedItemsTable');
+    let html = '';
+    
+    items.slice(0, 10).forEach(item => {
+        html += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.name}</td>
+                <td>${item.type || 'User'}</td>
+                <td><span class="badge bg-${item.status === 'active' ? 'success' : 'secondary'}">${item.status}</span></td>
+            </tr>
+        `;
+    });
+    
+    if (items.length > 10) {
+        html += `
+            <tr class="table-secondary">
+                <td colspan="4"><em>... and ${items.length - 10} more items</em></td>
+            </tr>
+        `;
+    }
+    
+    tbody.innerHTML = html;
+}
+
+function resetBulkActionForm() {
+    // Reset radio buttons
+    document.querySelectorAll('input[name="bulkAction"]').forEach(radio => {
+        radio.checked = false;
+    });
+    
+    // Hide all action fields
+    document.querySelectorAll('.action-fields').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    // Reset form fields
+    document.getElementById('exportFormat').value = 'csv';
+    document.getElementById('includeFields').value = 'all';
+    document.getElementById('newCategory').value = '';
+    document.getElementById('notificationSubject').value = '';
+    document.getElementById('notificationMessage').value = '';
+    document.getElementById('sendEmail').checked = true;
+    document.getElementById('sendInApp').checked = false;
+    document.getElementById('confirmDelete').checked = false;
+    
+    // Hide progress section
+    document.getElementById('progressSection').style.display = 'none';
+    
+    // Disable execute button
+    document.getElementById('executeBtn').disabled = true;
+}
+
+function updateActionFields() {
+    const selectedAction = document.querySelector('input[name="bulkAction"]:checked');
+    if (!selectedAction) return;
+    
+    bulkActionType = selectedAction.value;
+    
+    // Hide all action fields first
+    document.querySelectorAll('.action-fields').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    // Show relevant action fields
+    switch (bulkActionType) {
+        case 'export':
+            document.getElementById('exportOptions').style.display = 'block';
+            break;
+        case 'updateCategory':
+            document.getElementById('categoryOptions').style.display = 'block';
+            break;
+        case 'sendNotification':
+            document.getElementById('notificationOptions').style.display = 'block';
+            break;
+        case 'delete':
+            document.getElementById('deleteOptions').style.display = 'block';
+            break;
+    }
+    
+    // Enable execute button
+    document.getElementById('executeBtn').disabled = false;
+    
+    // Update execute button text and style
+    const executeBtn = document.getElementById('executeBtn');
+    switch (bulkActionType) {
+        case 'activate':
+            executeBtn.innerHTML = '<i class="fas fa-check me-1"></i>Activate Selected';
+            executeBtn.className = 'btn btn-success';
+            break;
+        case 'deactivate':
+            executeBtn.innerHTML = '<i class="fas fa-pause me-1"></i>Deactivate Selected';
+            executeBtn.className = 'btn btn-warning';
+            break;
+        case 'delete':
+            executeBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Delete Selected';
+            executeBtn.className = 'btn btn-danger';
+            break;
+        case 'export':
+            executeBtn.innerHTML = '<i class="fas fa-download me-1"></i>Export Selected';
+            executeBtn.className = 'btn btn-primary';
+            break;
+        case 'updateCategory':
+            executeBtn.innerHTML = '<i class="fas fa-tags me-1"></i>Update Category';
+            executeBtn.className = 'btn btn-info';
+            break;
+        case 'sendNotification':
+            executeBtn.innerHTML = '<i class="fas fa-envelope me-1"></i>Send Notification';
+            executeBtn.className = 'btn btn-primary';
+            break;
+        default:
+            executeBtn.innerHTML = '<i class="fas fa-play me-1"></i>Execute Action';
+            executeBtn.className = 'btn btn-primary';
+    }
+}
+
+function executeBulkAction() {
+    // Validate action-specific requirements
+    if (!validateActionRequirements()) {
+        return;
+    }
+    
+    // Confirm action
+    if (!confirmBulkAction()) {
+        return;
+    }
+    
+    // Show progress section
+    document.getElementById('progressSection').style.display = 'block';
+    document.getElementById('totalItems').textContent = selectedItems.length;
+    
+    // Disable execute button
+    const executeBtn = document.getElementById('executeBtn');
+    executeBtn.disabled = true;
+    
+    // Simulate bulk processing
+    processBulkAction();
+}
+
+function validateActionRequirements() {
+    switch (bulkActionType) {
+        case 'updateCategory':
+            const newCategory = document.getElementById('newCategory').value;
+            if (!newCategory) {
+                alert('Please select a new category');
+                return false;
+            }
+            break;
+        case 'sendNotification':
+            const subject = document.getElementById('notificationSubject').value;
+            const message = document.getElementById('notificationMessage').value;
+            if (!subject || !message) {
+                alert('Please enter both subject and message for the notification');
+                return false;
+            }
+            break;
+        case 'delete':
+            const confirmDelete = document.getElementById('confirmDelete').checked;
+            if (!confirmDelete) {
+                alert('Please confirm that you understand this action cannot be undone');
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+function confirmBulkAction() {
+    const actionNames = {
+        'activate': 'activate',
+        'deactivate': 'deactivate',
+        'delete': 'permanently delete',
+        'export': 'export',
+        'updateCategory': 'update category for',
+        'sendNotification': 'send notification to'
+    };
+    
+    const actionName = actionNames[bulkActionType] || 'process';
+    const confirmMessage = `Are you sure you want to ${actionName} ${selectedItems.length} selected items?`;
+    
+    return confirm(confirmMessage);
+}
+
+function processBulkAction() {
+    let processed = 0;
+    const total = selectedItems.length;
+    
+    const interval = setInterval(() => {
+        processed++;
+        
+        // Update progress
+        const progress = (processed / total) * 100;
+        document.getElementById('bulkProgress').style.width = progress + '%';
+        document.getElementById('currentItem').textContent = processed;
+        
+        if (processed >= total) {
+            clearInterval(interval);
+            completeBulkAction();
+        }
+    }, 100); // Process items quickly for demo
+}
+
+function completeBulkAction() {
+    setTimeout(() => {
+        const actionMessages = {
+            'activate': 'activated',
+            'deactivate': 'deactivated',
+            'delete': 'deleted',
+            'export': 'exported',
+            'updateCategory': 'updated',
+            'sendNotification': 'notified'
+        };
+        
+        const actionMessage = actionMessages[bulkActionType] || 'processed';
+        alert(`Successfully ${actionMessage} ${selectedItems.length} items!`);
+        
+        bootstrap.Modal.getInstance(document.getElementById('bulkActionModal')).hide();
+        
+        // Trigger refresh of the list
+        if (typeof refreshItemList === 'function') {
+            refreshItemList();
+        }
+    }, 500);
+}
+</script>

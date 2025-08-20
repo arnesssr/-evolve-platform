@@ -1,0 +1,509 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Product Management{% endblock %}
+
+{% block page_title %}Product Management{% endblock %}
+{% block page_subtitle %}Manage platform products and services{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Product Management</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-primary" onclick="exportProducts()">
+        <i class="fas fa-download me-2"></i>Export
+    </button>
+    <a href="{% url 'admin:products_form' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Product
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ total_products|default:"847" }}</div>
+            <div class="metric-label">Total Products</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +12 this month
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ active_products|default:"742" }}</div>
+            <div class="metric-label">Active Products</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +8 this week
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ total_categories|default:"28" }}</div>
+            <div class="metric-label">Categories</div>
+            <div class="metric-change neutral">
+                <i class="fas fa-minus"></i> No change
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">${{ avg_commission|default:"45.50" }}</div>
+            <div class="metric-label">Avg Commission</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +2.3%
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="content-card mb-4">
+    <div class="row align-items-end">
+        <div class="col-md-3">
+            <label for="searchProducts" class="form-label">Search Products</label>
+            <input type="text" class="form-control" id="searchProducts" placeholder="Search by name, vendor...">
+        </div>
+        <div class="col-md-2">
+            <label for="categoryFilter" class="form-label">Category</label>
+            <select class="form-select" id="categoryFilter">
+                <option value="">All Categories</option>
+                <option value="software">Software</option>
+                <option value="marketing">Marketing</option>
+                <option value="design">Design</option>
+                <option value="business">Business Tools</option>
+                <option value="education">Education</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="statusFilter" class="form-label">Status</label>
+            <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending Review</option>
+                <option value="suspended">Suspended</option>
+                <option value="draft">Draft</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="vendorFilter" class="form-label">Vendor</label>
+            <select class="form-select" id="vendorFilter">
+                <option value="">All Vendors</option>
+                <option value="vendor1">TechCorp Solutions</option>
+                <option value="vendor2">Digital Marketing Pro</option>
+                <option value="vendor3">Creative Studio</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="commissionFilter" class="form-label">Commission</label>
+            <select class="form-select" id="commissionFilter">
+                <option value="">All Ranges</option>
+                <option value="low">$0 - $25</option>
+                <option value="medium">$25 - $50</option>
+                <option value="high">$50+</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Products Table -->
+<div class="content-card">
+    <div class="table-responsive">
+        <table class="table table-hover" id="productsTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" class="form-check-input" id="selectAll">
+                    </th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Vendor</th>
+                    <th>Commission</th>
+                    <th>Sales</th>
+                    <th>Status</th>
+                    <th>Added</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input row-select">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'images/products/crm-pro.png' %}" alt="CRM Pro" 
+                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
+                            <div>
+                                <div class="fw-semibold">CRM Pro Suite</div>
+                                <small class="text-muted">Customer relationship management</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-primary">Software</span></td>
+                    <td>TechCorp Solutions</td>
+                    <td class="fw-semibold text-success">$85.00</td>
+                    <td>1,247</td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>Dec 15, 2023</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=1">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewProduct(1)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="toggleProductStatus(1, 'suspend')">
+                                    <i class="fas fa-pause me-2"></i>Suspend
+                                </a></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(1)">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input row-select">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'images/products/email-marketing.png' %}" alt="Email Marketing Tool" 
+                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
+                            <div>
+                                <div class="fw-semibold">Email Marketing Master</div>
+                                <small class="text-muted">Advanced email automation</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-info">Marketing</span></td>
+                    <td>Digital Marketing Pro</td>
+                    <td class="fw-semibold text-success">$65.00</td>
+                    <td>892</td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>Dec 12, 2023</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=2">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewProduct(2)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="toggleProductStatus(2, 'suspend')">
+                                    <i class="fas fa-pause me-2"></i>Suspend
+                                </a></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(2)">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input row-select">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'images/products/design-suite.png' %}" alt="Design Suite" 
+                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
+                            <div>
+                                <div class="fw-semibold">Creative Design Suite</div>
+                                <small class="text-muted">Professional design tools</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-warning">Design</span></td>
+                    <td>Creative Studio</td>
+                    <td class="fw-semibold text-success">$120.00</td>
+                    <td>456</td>
+                    <td><span class="status-badge pending">Pending Review</span></td>
+                    <td>Dec 10, 2023</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=3">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewProduct(3)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-success" href="#" onclick="toggleProductStatus(3, 'approve')">
+                                    <i class="fas fa-check me-2"></i>Approve
+                                </a></li>
+                                <li><a class="dropdown-item text-warning" href="#" onclick="toggleProductStatus(3, 'reject')">
+                                    <i class="fas fa-times me-2"></i>Reject
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input row-select">
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'images/products/accounting.png' %}" alt="Accounting Software" 
+                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
+                            <div>
+                                <div class="fw-semibold">Business Accounting Pro</div>
+                                <small class="text-muted">Complete accounting solution</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-success">Business Tools</span></td>
+                    <td>FinTech Solutions</td>
+                    <td class="fw-semibold text-success">$95.00</td>
+                    <td>678</td>
+                    <td><span class="status-badge suspended">Suspended</span></td>
+                    <td>Dec 8, 2023</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                    data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'admin:products_form' %}?id=4">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewProduct(4)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-success" href="#" onclick="toggleProductStatus(4, 'activate')">
+                                    <i class="fas fa-play me-2"></i>Activate
+                                </a></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(4)">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                </a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted">
+            Showing 1-4 of 847 products
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link">1</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">2</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">3</a>
+                </li>
+                <li class="page-item">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">42</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Bulk Actions (hidden by default) -->
+<div id="bulkActions" class="position-fixed bottom-0 start-50 translate-middle-x bg-dark text-white p-3 rounded-top" style="display: none; z-index: 1050;">
+    <div class="d-flex align-items-center gap-3">
+        <span id="selectedCount">0 products selected</span>
+        <button class="btn btn-sm btn-outline-light" onclick="bulkApprove()">
+            <i class="fas fa-check me-1"></i>Approve
+        </button>
+        <button class="btn btn-sm btn-outline-warning" onclick="bulkSuspend()">
+            <i class="fas fa-pause me-1"></i>Suspend
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="bulkDelete()">
+            <i class="fas fa-trash me-1"></i>Delete
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="clearSelection()">
+            <i class="fas fa-times me-1"></i>Clear
+        </button>
+    </div>
+</div>
+
+<!-- Product Details Modal -->
+{% include 'dashboards/admin/modals/product-details.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const rowCheckboxes = document.querySelectorAll('.row-select');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    // Select all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+    
+    // Individual row selection
+    rowCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+    
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.row-select:checked');
+        const count = checkedBoxes.length;
+        
+        if (count > 0) {
+            selectedCount.textContent = `${count} product${count > 1 ? 's' : ''} selected`;
+            bulkActions.style.display = 'block';
+        } else {
+            bulkActions.style.display = 'none';
+        }
+        
+        // Update select all checkbox state
+        selectAllCheckbox.indeterminate = count > 0 && count < rowCheckboxes.length;
+        selectAllCheckbox.checked = count === rowCheckboxes.length;
+    }
+    
+    // Search functionality
+    document.getElementById('searchProducts').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        // In a real application, this would trigger an API call
+        console.log('Searching for:', searchTerm);
+    });
+    
+    // Filter functionality
+    ['categoryFilter', 'statusFilter', 'vendorFilter', 'commissionFilter'].forEach(filterId => {
+        document.getElementById(filterId).addEventListener('change', function() {
+            // In a real application, this would trigger filtering
+            console.log(`${filterId} changed to:`, this.value);
+        });
+    });
+});
+
+function clearFilters() {
+    document.getElementById('searchProducts').value = '';
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('vendorFilter').value = '';
+    document.getElementById('commissionFilter').value = '';
+    // Trigger filter update
+    console.log('Filters cleared');
+}
+
+function clearSelection() {
+    document.querySelectorAll('.row-select').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    document.getElementById('selectAll').checked = false;
+    document.getElementById('bulkActions').style.display = 'none';
+}
+
+function viewProduct(productId) {
+    // Show product details modal
+    const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+    // In a real application, load product data via AJAX
+    modal.show();
+}
+
+function toggleProductStatus(productId, action) {
+    const actions = {
+        'approve': 'approved',
+        'suspend': 'suspended',
+        'activate': 'activated',
+        'reject': 'rejected'
+    };
+    
+    if (confirm(`Are you sure you want to ${action} this product?`)) {
+        showToast(`Product ${actions[action]} successfully!`, 'success');
+        // In a real application, make an API call to update the status
+    }
+}
+
+function deleteProduct(productId) {
+    if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+        showToast('Product deleted successfully!', 'success');
+        // In a real application, make an API call to delete the product
+    }
+}
+
+function bulkApprove() {
+    const selectedProducts = document.querySelectorAll('.row-select:checked').length;
+    if (confirm(`Are you sure you want to approve ${selectedProducts} product(s)?`)) {
+        showToast(`${selectedProducts} product(s) approved successfully!`, 'success');
+        clearSelection();
+    }
+}
+
+function bulkSuspend() {
+    const selectedProducts = document.querySelectorAll('.row-select:checked').length;
+    if (confirm(`Are you sure you want to suspend ${selectedProducts} product(s)?`)) {
+        showToast(`${selectedProducts} product(s) suspended successfully!`, 'warning');
+        clearSelection();
+    }
+}
+
+function bulkDelete() {
+    const selectedProducts = document.querySelectorAll('.row-select:checked').length;
+    if (confirm(`Are you sure you want to delete ${selectedProducts} product(s)? This action cannot be undone.`)) {
+        showToast(`${selectedProducts} product(s) deleted successfully!`, 'success');
+        clearSelection();
+    }
+}
+
+function exportProducts() {
+    showToast('Exporting products...', 'info');
+    // In a real application, this would trigger a download
+    setTimeout(() => {
+        showToast('Products exported successfully!', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,587 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}{% if plan.id %}Edit{% else %}Add{% endif %} Plan{% endblock %}
+
+{% block page_title %}{% if plan.id %}Edit Plan{% else %}Add New Plan{% endif %}{% endblock %}
+{% block page_subtitle %}{% if plan.id %}Update subscription plan details{% else %}Create a new subscription plan{% endif %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:plans_list' %}">Plan Management</a></li>
+    <li class="breadcrumb-item active">{% if plan.id %}Edit{% else %}Add{% endif %} Plan</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <a href="{% url 'admin:plans_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to List
+    </a>
+    <button type="button" class="btn btn-outline-primary" onclick="saveAsDraft()">
+        <i class="fas fa-save me-2"></i>Save as Draft
+    </button>
+    <button type="submit" form="planForm" class="btn btn-primary">
+        <i class="fas fa-check me-2"></i>{% if plan.id %}Update{% else %}Create{% endif %} Plan
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<form id="planForm" method="post">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Basic Information -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Basic Information</h5>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="planName" class="form-label">Plan Name *</label>
+                        <input type="text" class="form-control" id="planName" name="name" 
+                               value="{{ plan.name|default:'' }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="planCode" class="form-label">Plan Code</label>
+                        <input type="text" class="form-control" id="planCode" name="code" 
+                               value="{{ plan.code|default:'' }}" placeholder="AUTO-GENERATED">
+                        <small class="text-muted">Unique identifier for API usage</small>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="planDescription" class="form-label">Description *</label>
+                    <textarea class="form-control" id="planDescription" name="description" 
+                              rows="3" required>{{ plan.description|default:'' }}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="planTagline" class="form-label">Tagline</label>
+                    <input type="text" class="form-control" id="planTagline" name="tagline" 
+                           value="{{ plan.tagline|default:'' }}" 
+                           placeholder="e.g., Best for growing businesses">
+                    <small class="text-muted">Short promotional text displayed with the plan</small>
+                </div>
+            </div>
+            
+            <!-- Pricing -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Pricing</h5>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="planPrice" class="form-label">Price *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="planPrice" name="price" 
+                                   value="{{ plan.price|default:'' }}" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="billingInterval" class="form-label">Billing Interval *</label>
+                        <select class="form-select" id="billingInterval" name="billing_interval" required>
+                            <option value="">Select Interval</option>
+                            <option value="monthly" {% if plan.billing_interval == 'monthly' %}selected{% endif %}>Monthly</option>
+                            <option value="yearly" {% if plan.billing_interval == 'yearly' %}selected{% endif %}>Yearly</option>
+                            <option value="lifetime" {% if plan.billing_interval == 'lifetime' %}selected{% endif %}>Lifetime</option>
+                            <option value="trial" {% if plan.billing_interval == 'trial' %}selected{% endif %}>Trial</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="trialDays" class="form-label">Trial Period (days)</label>
+                        <input type="number" class="form-control" id="trialDays" name="trial_days" 
+                               value="{{ plan.trial_days|default:'' }}" min="0">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="setupFee" class="form-label">Setup Fee</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="setupFee" name="setup_fee" 
+                                   value="{{ plan.setup_fee|default:'0.00' }}" step="0.01" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="currency" class="form-label">Currency</label>
+                        <select class="form-select" id="currency" name="currency">
+                            <option value="USD" {% if plan.currency == 'USD' %}selected{% endif %}>USD - US Dollar</option>
+                            <option value="EUR" {% if plan.currency == 'EUR' %}selected{% endif %}>EUR - Euro</option>
+                            <option value="GBP" {% if plan.currency == 'GBP' %}selected{% endif %}>GBP - British Pound</option>
+                            <option value="CAD" {% if plan.currency == 'CAD' %}selected{% endif %}>CAD - Canadian Dollar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Features & Limits</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="maxProducts" class="form-label">Max Products</label>
+                        <input type="number" class="form-control" id="maxProducts" name="max_products" 
+                               value="{{ plan.max_products|default:'' }}" min="0" 
+                               placeholder="0 for unlimited">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="maxUsers" class="form-label">Max Users</label>
+                        <input type="number" class="form-control" id="maxUsers" name="max_users" 
+                               value="{{ plan.max_users|default:'' }}" min="1">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="maxStorage" class="form-label">Storage (GB)</label>
+                        <input type="number" class="form-control" id="maxStorage" name="max_storage" 
+                               value="{{ plan.max_storage|default:'' }}" min="0" 
+                               placeholder="0 for unlimited">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="maxApiCalls" class="form-label">API Calls/Month</label>
+                        <input type="number" class="form-control" id="maxApiCalls" name="max_api_calls" 
+                               value="{{ plan.max_api_calls|default:'' }}" min="0" 
+                               placeholder="0 for unlimited">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Included Features</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureAnalytics" 
+                                       name="features" value="analytics"
+                                       {% if 'analytics' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureAnalytics">
+                                    Advanced Analytics
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureSupport" 
+                                       name="features" value="priority_support"
+                                       {% if 'priority_support' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureSupport">
+                                    Priority Support
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureBranding" 
+                                       name="features" value="custom_branding"
+                                       {% if 'custom_branding' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureBranding">
+                                    Custom Branding
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureAPI" 
+                                       name="features" value="api_access"
+                                       {% if 'api_access' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureAPI">
+                                    API Access
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureIntegrations" 
+                                       name="features" value="integrations"
+                                       {% if 'integrations' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureIntegrations">
+                                    Third-party Integrations
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureReports" 
+                                       name="features" value="advanced_reports"
+                                       {% if 'advanced_reports' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureReports">
+                                    Advanced Reports
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureSSO" 
+                                       name="features" value="sso"
+                                       {% if 'sso' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureSSO">
+                                    Single Sign-On (SSO)
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="featureBackup" 
+                                       name="features" value="automated_backup"
+                                       {% if 'automated_backup' in plan.features %}checked{% endif %}>
+                                <label class="form-check-label" for="featureBackup">
+                                    Automated Backup
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="customFeatures" class="form-label">Custom Features</label>
+                    <textarea class="form-control" id="customFeatures" name="custom_features" 
+                              rows="3" placeholder="List additional features, one per line">{{ plan.custom_features|default:'' }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Restrictions -->
+            <div class="content-card">
+                <h5 class="mb-4">Restrictions & Rules</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Access Restrictions</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="restrictDownloads" 
+                                   name="restrictions" value="no_downloads"
+                                   {% if 'no_downloads' in plan.restrictions %}checked{% endif %}>
+                            <label class="form-check-label" for="restrictDownloads">
+                                Restrict Downloads
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="restrictExports" 
+                                   name="restrictions" value="no_exports"
+                                   {% if 'no_exports' in plan.restrictions %}checked{% endif %}>
+                            <label class="form-check-label" for="restrictExports">
+                                Restrict Data Exports
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="restrictAPI" 
+                                   name="restrictions" value="limited_api"
+                                   {% if 'limited_api' in plan.restrictions %}checked{% endif %}>
+                            <label class="form-check-label" for="restrictAPI">
+                                Limited API Access
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="cancellationPolicy" class="form-label">Cancellation Policy</label>
+                        <select class="form-select" id="cancellationPolicy" name="cancellation_policy">
+                            <option value="immediate" {% if plan.cancellation_policy == 'immediate' %}selected{% endif %}>Immediate</option>
+                            <option value="end_of_period" {% if plan.cancellation_policy == 'end_of_period' %}selected{% endif %}>End of Period</option>
+                            <option value="30_days_notice" {% if plan.cancellation_policy == '30_days_notice' %}selected{% endif %}>30 Days Notice</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="termsConditions" class="form-label">Terms & Conditions</label>
+                    <textarea class="form-control" id="termsConditions" name="terms_conditions" 
+                              rows="4" placeholder="Specific terms for this plan">{{ plan.terms_conditions|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Plan Preview -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">Plan Preview</h6>
+                
+                <div class="plan-preview" id="planPreview">
+                    <div class="preview-header text-center mb-3">
+                        <h5 class="preview-name">Plan Name</h5>
+                        <p class="preview-tagline text-muted">Plan tagline</p>
+                        <div class="preview-price">
+                            <span class="price-amount">$0</span>
+                            <span class="price-period">/month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-features">
+                        <ul class="list-unstyled" id="previewFeaturesList">
+                            <li><i class="fas fa-check text-success me-2"></i>Select features to see preview</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status & Visibility -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">Status & Visibility</h6>
+                
+                <div class="mb-3">
+                    <label for="planStatus" class="form-label">Status</label>
+                    <select class="form-select" id="planStatus" name="status">
+                        <option value="draft" {% if plan.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="active" {% if plan.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="archived" {% if plan.status == 'archived' %}selected{% endif %}>Archived</option>
+                    </select>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="isFeatured" name="is_featured" 
+                           {% if plan.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                        Featured Plan
+                    </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="isPopular" name="is_popular" 
+                           {% if plan.is_popular %}checked{% endif %}>
+                    <label class="form-check-label" for="isPopular">
+                        Mark as Popular
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="allowSignup" name="allow_signup" 
+                           {% if plan.allow_signup or not plan.id %}checked{% endif %}>
+                    <label class="form-check-label" for="allowSignup">
+                        Allow New Signups
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Display Order -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">Display Settings</h6>
+                
+                <div class="mb-3">
+                    <label for="sortOrder" class="form-label">Sort Order</label>
+                    <input type="number" class="form-control" id="sortOrder" name="sort_order" 
+                           value="{{ plan.sort_order|default:'0' }}" min="0">
+                    <small class="text-muted">Lower numbers appear first</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="planColor" class="form-label">Plan Color</label>
+                    <input type="color" class="form-control form-control-color" id="planColor" 
+                           name="color" value="{{ plan.color|default:'#0d6efd' }}">
+                </div>
+            </div>
+            
+            <!-- Analytics -->
+            {% if plan.id %}
+            <div class="content-card">
+                <h6 class="fw-bold mb-3">Plan Analytics</h6>
+                
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td class="text-muted">Subscribers:</td>
+                        <td class="fw-semibold">{{ plan.subscriber_count|default:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Monthly Revenue:</td>
+                        <td class="fw-semibold">${{ plan.monthly_revenue|default:"0.00" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Churn Rate:</td>
+                        <td class="fw-semibold">{{ plan.churn_rate|default:"0.0" }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Avg. Lifetime:</td>
+                        <td class="fw-semibold">{{ plan.avg_lifetime|default:"0" }} months</td>
+                    </tr>
+                </table>
+                
+                <div class="mt-3">
+                    <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-chart-line me-2"></i>View Detailed Analytics
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.plan-preview {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.preview-price {
+    margin: 1rem 0;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.price-period {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.preview-features ul li {
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('planForm');
+    const nameInput = document.getElementById('planName');
+    const codeInput = document.getElementById('planCode');
+    const priceInput = document.getElementById('planPrice');
+    const billingInput = document.getElementById('billingInterval');
+    const taglineInput = document.getElementById('planTagline');
+    const featureCheckboxes = document.querySelectorAll('input[name="features"]');
+    
+    // Auto-generate plan code from name
+    nameInput.addEventListener('input', function() {
+        if (!codeInput.value || codeInput.dataset.autoGenerated === 'true') {
+            const code = this.value
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '');
+            codeInput.value = code;
+            codeInput.dataset.autoGenerated = 'true';
+        }
+        updatePreview();
+    });
+    
+    // Manual code editing
+    codeInput.addEventListener('input', function() {
+        this.dataset.autoGenerated = 'false';
+    });
+    
+    // Update preview when inputs change
+    [priceInput, billingInput, taglineInput].forEach(input => {
+        input.addEventListener('input', updatePreview);
+    });
+    
+    featureCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updatePreview);
+    });
+    
+    function updatePreview() {
+        const name = nameInput.value || 'Plan Name';
+        const tagline = taglineInput.value || 'Plan tagline';
+        const price = priceInput.value || '0';
+        const billing = billingInput.value || 'month';
+        
+        // Update preview content
+        document.querySelector('.preview-name').textContent = name;
+        document.querySelector('.preview-tagline').textContent = tagline;
+        document.querySelector('.price-amount').textContent = `$${price}`;
+        
+        let period = '';
+        switch(billing) {
+            case 'monthly': period = '/month'; break;
+            case 'yearly': period = '/year'; break;
+            case 'lifetime': period = 'lifetime'; break;
+            case 'trial': period = '/trial'; break;
+            default: period = `/${billing}`;
+        }
+        document.querySelector('.price-period').textContent = period;
+        
+        // Update features list
+        const featuresList = document.getElementById('previewFeaturesList');
+        const checkedFeatures = Array.from(featureCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.nextElementSibling.textContent.trim());
+        
+        if (checkedFeatures.length > 0) {
+            featuresList.innerHTML = checkedFeatures
+                .map(feature => `<li><i class="fas fa-check text-success me-2"></i>${feature}</li>`)
+                .join('');
+        } else {
+            featuresList.innerHTML = '<li><i class="fas fa-check text-success me-2"></i>Select features to see preview</li>';
+        }
+    }
+    
+    // Form validation and submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic validation
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            showToast('Please fill in all required fields.', 'error');
+            return;
+        }
+        
+        // Check if at least one feature is selected
+        const hasFeatures = Array.from(featureCheckboxes).some(cb => cb.checked);
+        if (!hasFeatures) {
+            showToast('Please select at least one feature for this plan.', 'warning');
+            return;
+        }
+        
+        // In a real application, submit the form data
+        showToast('Plan {% if plan.id %}updated{% else %}created{% endif %} successfully!', 'success');
+        
+        setTimeout(() => {
+            window.location.href = "{% url 'admin:plans_list' %}";
+        }, 1500);
+    });
+    
+    // Initial preview update
+    updatePreview();
+});
+
+function saveAsDraft() {
+    const statusSelect = document.getElementById('planStatus');
+    statusSelect.value = 'draft';
+    
+    showToast('Plan saved as draft!', 'success');
+    // In a real application, submit the form with draft status
+}
+
+// Billing interval change handler
+document.getElementById('billingInterval').addEventListener('change', function() {
+    const trialDaysField = document.getElementById('trialDays');
+    const trialDaysContainer = trialDaysField.closest('.col-md-4');
+    
+    if (this.value === 'trial') {
+        trialDaysContainer.style.display = 'block';
+        trialDaysField.required = true;
+    } else {
+        trialDaysContainer.style.display = 'block'; // Always show for flexibility
+        trialDaysField.required = false;
+    }
+});
+
+// Price calculation helper
+document.getElementById('planPrice').addEventListener('input', function() {
+    const price = parseFloat(this.value) || 0;
+    const billing = document.getElementById('billingInterval').value;
+    
+    if (billing === 'yearly' && price > 0) {
+        const monthlyEquivalent = (price / 12).toFixed(2);
+        // You could show this as a helper text
+        console.log(`Monthly equivalent: $${monthlyEquivalent}`);
+    }
+});
+</script>
+{% endblock %}

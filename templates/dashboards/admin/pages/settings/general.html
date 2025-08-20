@@ -1,0 +1,826 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}General Settings{% endblock %}
+
+{% block page_title %}General Settings{% endblock %}
+{% block page_subtitle %}Configure platform-wide settings and preferences{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Settings</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" id="resetSettingsBtn">
+        <i class="fas fa-undo me-2"></i>Reset to Default
+    </button>
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#backupModal">
+        <i class="fas fa-download me-2"></i>Export Settings
+    </button>
+    <button type="button" class="btn btn-primary" id="saveSettingsBtn">
+        <i class="fas fa-save me-2"></i>Save Changes
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Settings Navigation -->
+    <div class="col-lg-3">
+        <div class="content-card">
+            <div class="list-group list-group-flush">
+                <a href="#platform" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
+                    <i class="fas fa-cog me-2"></i>Platform Settings
+                </a>
+                <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-shield-alt me-2"></i>Security
+                </a>
+                <a href="#email" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-envelope me-2"></i>Email Settings
+                </a>
+                <a href="#notifications" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-bell me-2"></i>Notifications
+                </a>
+                <a href="#payments" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-credit-card me-2"></i>Payment Settings
+                </a>
+                <a href="#api" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-code me-2"></i>API Configuration
+                </a>
+                <a href="#maintenance" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-wrench me-2"></i>Maintenance
+                </a>
+                <a href="#integrations" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-plug me-2"></i>Integrations
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Content -->
+    <div class="col-lg-9">
+        <div class="content-card">
+            <div class="tab-content">
+                <!-- Platform Settings -->
+                <div class="tab-pane fade show active" id="platform" role="tabpanel">
+                    <h5 class="mb-4">Platform Settings</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="platformName" class="form-label">Platform Name</label>
+                            <input type="text" id="platformName" class="form-control" value="Evolve Platform">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="platformUrl" class="form-label">Platform URL</label>
+                            <input type="url" id="platformUrl" class="form-control" value="https://evolve-platform.com">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="supportEmail" class="form-label">Support Email</label>
+                            <input type="email" id="supportEmail" class="form-control" value="support@evolve-platform.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="timezone" class="form-label">Default Timezone</label>
+                            <select id="timezone" class="form-select">
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">Eastern Time</option>
+                                <option value="America/Chicago">Central Time</option>
+                                <option value="America/Denver">Mountain Time</option>
+                                <option value="America/Los_Angeles">Pacific Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="defaultCurrency" class="form-label">Default Currency</label>
+                            <select id="defaultCurrency" class="form-select">
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="CAD">CAD - Canadian Dollar</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="defaultLanguage" class="form-label">Default Language</label>
+                            <select id="defaultLanguage" class="form-select">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Platform Features</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableRegistration" checked>
+                                    <label class="form-check-label" for="enableRegistration">
+                                        Enable User Registration
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableResellers" checked>
+                                    <label class="form-check-label" for="enableResellers">
+                                        Enable Reseller Program
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableCommissions" checked>
+                                    <label class="form-check-label" for="enableCommissions">
+                                        Enable Commission System
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableAnalytics" checked>
+                                    <label class="form-check-label" for="enableAnalytics">
+                                        Enable Analytics Tracking
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableApi" checked>
+                                    <label class="form-check-label" for="enableApi">
+                                        Enable API Access
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                                    <label class="form-check-label" for="maintenanceMode">
+                                        Maintenance Mode
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="maintenanceMessage" class="form-label">Maintenance Message</label>
+                        <textarea id="maintenanceMessage" class="form-control" rows="3" placeholder="Message to display during maintenance...">We are currently performing scheduled maintenance. Please check back soon.</textarea>
+                    </div>
+                </div>
+                
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security" role="tabpanel">
+                    <h5 class="mb-4">Security Settings</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="passwordMinLength" class="form-label">Minimum Password Length</label>
+                            <input type="number" id="passwordMinLength" class="form-control" value="8" min="6" max="20">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sessionTimeout" class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" id="sessionTimeout" class="form-control" value="30" min="5" max="480">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Password Requirements</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="requireUppercase" checked>
+                                    <label class="form-check-label" for="requireUppercase">
+                                        Require Uppercase Letters
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="requireLowercase" checked>
+                                    <label class="form-check-label" for="requireLowercase">
+                                        Require Lowercase Letters
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="requireNumbers" checked>
+                                    <label class="form-check-label" for="requireNumbers">
+                                        Require Numbers
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="requireSpecialChars" checked>
+                                    <label class="form-check-label" for="requireSpecialChars">
+                                        Require Special Characters
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableTwoFactor">
+                                    <label class="form-check-label" for="enableTwoFactor">
+                                        Enable Two-Factor Authentication
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableLoginAttempts" checked>
+                                    <label class="form-check-label" for="enableLoginAttempts">
+                                        Enable Login Attempt Limiting
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="maxLoginAttempts" class="form-label">Max Login Attempts</label>
+                            <input type="number" id="maxLoginAttempts" class="form-control" value="5" min="3" max="10">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lockoutDuration" class="form-label">Lockout Duration (minutes)</label>
+                            <input type="number" id="lockoutDuration" class="form-control" value="15" min="5" max="120">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email Settings -->
+                <div class="tab-pane fade" id="email" role="tabpanel">
+                    <h5 class="mb-4">Email Configuration</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="smtpHost" class="form-label">SMTP Host</label>
+                            <input type="text" id="smtpHost" class="form-control" placeholder="smtp.example.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="smtpPort" class="form-label">SMTP Port</label>
+                            <input type="number" id="smtpPort" class="form-control" value="587">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="smtpUsername" class="form-label">SMTP Username</label>
+                            <input type="text" id="smtpUsername" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="smtpPassword" class="form-label">SMTP Password</label>
+                            <input type="password" id="smtpPassword" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="fromEmail" class="form-label">From Email</label>
+                            <input type="email" id="fromEmail" class="form-control" value="noreply@evolve-platform.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fromName" class="form-label">From Name</label>
+                            <input type="text" id="fromName" class="form-control" value="Evolve Platform">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="enableSsl" checked>
+                            <label class="form-check-label" for="enableSsl">
+                                Enable SSL/TLS
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="enableEmailVerification" checked>
+                            <label class="form-check-label" for="enableEmailVerification">
+                                Enable Email Verification
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-outline-primary" id="testEmailBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Send Test Email
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notifications" role="tabpanel">
+                    <h5 class="mb-4">Notification Settings</h5>
+                    
+                    <div class="mb-4">
+                        <h6>Admin Notifications</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifyNewRegistration" checked>
+                                    <label class="form-check-label" for="notifyNewRegistration">
+                                        New User Registrations
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifyNewPayment" checked>
+                                    <label class="form-check-label" for="notifyNewPayment">
+                                        New Payments
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifyFailedPayment" checked>
+                                    <label class="form-check-label" for="notifyFailedPayment">
+                                        Failed Payments
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifyHighRevenue">
+                                    <label class="form-check-label" for="notifyHighRevenue">
+                                        High Revenue Milestones
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifySystemErrors" checked>
+                                    <label class="form-check-label" for="notifySystemErrors">
+                                        System Errors
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="notifySecurityAlerts" checked>
+                                    <label class="form-check-label" for="notifySecurityAlerts">
+                                        Security Alerts
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>User Notifications</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userWelcomeEmail" checked>
+                                    <label class="form-check-label" for="userWelcomeEmail">
+                                        Welcome Emails
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userPaymentConfirmation" checked>
+                                    <label class="form-check-label" for="userPaymentConfirmation">
+                                        Payment Confirmations
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userAccountChanges" checked>
+                                    <label class="form-check-label" for="userAccountChanges">
+                                        Account Changes
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userPasswordReset" checked>
+                                    <label class="form-check-label" for="userPasswordReset">
+                                        Password Reset Instructions
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userNewsletters">
+                                    <label class="form-check-label" for="userNewsletters">
+                                        Newsletter & Updates
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="userMarketingEmails">
+                                    <label class="form-check-label" for="userMarketingEmails">
+                                        Marketing Emails
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Settings -->
+                <div class="tab-pane fade" id="payments" role="tabpanel">
+                    <h5 class="mb-4">Payment Configuration</h5>
+                    
+                    <div class="mb-4">
+                        <h6>Payment Gateways</h6>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableStripe" checked>
+                                    <label class="form-check-label" for="enableStripe">
+                                        <i class="fab fa-stripe me-2"></i>Stripe
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enablePaypal" checked>
+                                    <label class="form-check-label" for="enablePaypal">
+                                        <i class="fab fa-paypal me-2"></i>PayPal
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableSquare">
+                                    <label class="form-check-label" for="enableSquare">
+                                        <i class="fas fa-square me-2"></i>Square
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="stripePublicKey" class="form-label">Stripe Public Key</label>
+                            <input type="text" id="stripePublicKey" class="form-control" placeholder="pk_test_...">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="stripeSecretKey" class="form-label">Stripe Secret Key</label>
+                            <input type="password" id="stripeSecretKey" class="form-control" placeholder="sk_test_...">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="paypalClientId" class="form-label">PayPal Client ID</label>
+                            <input type="text" id="paypalClientId" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="paypalClientSecret" class="form-label">PayPal Client Secret</label>
+                            <input type="password" id="paypalClientSecret" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Commission Settings</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="defaultCommissionRate" class="form-label">Default Commission Rate (%)</label>
+                                <input type="number" id="defaultCommissionRate" class="form-control" value="15" min="0" max="100" step="0.1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="minPayoutAmount" class="form-label">Minimum Payout Amount</label>
+                                <input type="number" id="minPayoutAmount" class="form-control" value="50" min="1" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API Configuration -->
+                <div class="tab-pane fade" id="api" role="tabpanel">
+                    <h5 class="mb-4">API Configuration</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableApiAccess" checked>
+                                <label class="form-check-label" for="enableApiAccess">
+                                    Enable API Access
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="requireApiAuth" checked>
+                                <label class="form-check-label" for="requireApiAuth">
+                                    Require API Authentication
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enableRateLimit" checked>
+                                <label class="form-check-label" for="enableRateLimit">
+                                    Enable Rate Limiting
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apiRateLimit" class="form-label">Rate Limit (requests/hour)</label>
+                            <input type="number" id="apiRateLimit" class="form-control" value="1000" min="100" max="10000">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="apiKey" class="form-label">Master API Key</label>
+                        <div class="input-group">
+                            <input type="password" id="apiKey" class="form-control" value="ek_live_51234567890abcdef...">
+                            <button class="btn btn-outline-secondary" type="button" id="regenerateApiKey">
+                                <i class="fas fa-sync"></i> Regenerate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>API Endpoints</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Endpoint</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Rate Limit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>/api/v1/users</td>
+                                        <td><span class="badge bg-success">GET</span></td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>100/hour</td>
+                                    </tr>
+                                    <tr>
+                                        <td>/api/v1/businesses</td>
+                                        <td><span class="badge bg-success">GET</span></td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>200/hour</td>
+                                    </tr>
+                                    <tr>
+                                        <td>/api/v1/transactions</td>
+                                        <td><span class="badge bg-info">POST</span></td>
+                                        <td><span class="badge bg-success">Active</span></td>
+                                        <td>50/hour</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Maintenance -->
+                <div class="tab-pane fade" id="maintenance" role="tabpanel">
+                    <h5 class="mb-4">System Maintenance</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="content-card bg-light">
+                                <h6>Database</h6>
+                                <p class="text-muted">Optimize and clean up database</p>
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-database me-2"></i>Optimize Database
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="content-card bg-light">
+                                <h6>Cache</h6>
+                                <p class="text-muted">Clear application cache</p>
+                                <button class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-trash me-2"></i>Clear Cache
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="content-card bg-light">
+                                <h6>Logs</h6>
+                                <p class="text-muted">Archive old log files</p>
+                                <button class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-archive me-2"></i>Archive Logs
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="content-card bg-light">
+                                <h6>Backup</h6>
+                                <p class="text-muted">Create system backup</p>
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-download me-2"></i>Create Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>System Information</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td>PHP Version</td>
+                                        <td>8.1.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Database Version</td>
+                                        <td>MySQL 8.0.28</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Disk Usage</td>
+                                        <td>
+                                            <div class="progress" style="width: 200px;">
+                                                <div class="progress-bar bg-success" style="width: 35%"></div>
+                                            </div>
+                                            <small class="text-muted">3.5 GB / 10 GB</small>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Last Backup</td>
+                                        <td>March 15, 2024 at 2:00 AM</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Integrations -->
+                <div class="tab-pane fade" id="integrations" role="tabpanel">
+                    <h5 class="mb-4">Third-party Integrations</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fab fa-google fa-2x text-warning me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Google Analytics</h6>
+                                        <small class="text-muted">Track website analytics</small>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableGoogleAnalytics" checked>
+                                    <label class="form-check-label" for="enableGoogleAnalytics">Enable Integration</label>
+                                </div>
+                                <input type="text" class="form-control" placeholder="GA Tracking ID" value="G-XXXXXXXXXX">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fab fa-slack fa-2x text-info me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Slack</h6>
+                                        <small class="text-muted">Team notifications</small>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableSlack">
+                                    <label class="form-check-label" for="enableSlack">Enable Integration</label>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Webhook URL">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fab fa-mailchimp fa-2x text-warning me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Mailchimp</h6>
+                                        <small class="text-muted">Email marketing</small>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableMailchimp">
+                                    <label class="form-check-label" for="enableMailchimp">Enable Integration</label>
+                                </div>
+                                <input type="text" class="form-control" placeholder="API Key">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fas fa-chart-line fa-2x text-success me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Custom Webhook</h6>
+                                        <small class="text-muted">Custom integrations</small>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="enableWebhook">
+                                    <label class="form-check-label" for="enableWebhook">Enable Webhook</label>
+                                </div>
+                                <input type="url" class="form-control" placeholder="Webhook URL">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Handle tab switching
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        // Optional: Save current tab to localStorage
+        localStorage.setItem('activeSettingsTab', e.target.getAttribute('href'));
+    });
+    
+    // Restore active tab from localStorage
+    const activeTab = localStorage.getItem('activeSettingsTab');
+    if (activeTab) {
+        $('a[href="' + activeTab + '"]').tab('show');
+    }
+    
+    // Handle maintenance mode toggle
+    $('#maintenanceMode').change(function() {
+        if ($(this).is(':checked')) {
+            $('#maintenanceMessage').prop('disabled', false);
+            showAlert('warning', 'Maintenance mode will be activated when settings are saved.');
+        } else {
+            $('#maintenanceMessage').prop('disabled', true);
+        }
+    });
+    
+    // Test email functionality
+    $('#testEmailBtn').click(function() {
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Sending...');
+        
+        // Simulate sending test email
+        setTimeout(() => {
+            $(this).prop('disabled', false).html('<i class="fas fa-paper-plane me-2"></i>Send Test Email');
+            showAlert('success', 'Test email sent successfully!');
+        }, 2000);
+    });
+    
+    // API Key regeneration
+    $('#regenerateApiKey').click(function() {
+        if (confirm('Are you sure you want to regenerate the API key? This will invalidate the current key.')) {
+            const newKey = 'ek_live_' + Math.random().toString(36).substr(2, 24) + '...';
+            $('#apiKey').val(newKey);
+            showAlert('success', 'API key regenerated successfully!');
+        }
+    });
+    
+    // Save settings
+    $('#saveSettingsBtn').click(function() {
+        saveSettings();
+    });
+    
+    // Reset settings
+    $('#resetSettingsBtn').click(function() {
+        if (confirm('Are you sure you want to reset all settings to default values?')) {
+            resetSettings();
+        }
+    });
+});
+
+function saveSettings() {
+    $('#saveSettingsBtn').prop('disabled', true)
+                        .html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+    
+    // Simulate saving settings
+    setTimeout(() => {
+        $('#saveSettingsBtn').prop('disabled', false)
+                            .html('<i class="fas fa-save me-2"></i>Save Changes');
+        
+        showAlert('success', 'Settings saved successfully!');
+        
+        // Check if maintenance mode is enabled
+        if ($('#maintenanceMode').is(':checked')) {
+            showAlert('info', 'Maintenance mode is now active. The platform is in maintenance mode.');
+        }
+    }, 1500);
+}
+
+function resetSettings() {
+    // Reset form values to defaults
+    $('#platformName').val('Evolve Platform');
+    $('#platformUrl').val('https://evolve-platform.com');
+    $('#supportEmail').val('support@evolve-platform.com');
+    $('#timezone').val('UTC');
+    $('#defaultCurrency').val('USD');
+    $('#defaultLanguage').val('en');
+    
+    // Reset checkboxes
+    $('#enableRegistration, #enableResellers, #enableCommissions, #enableAnalytics, #enableApi').prop('checked', true);
+    $('#maintenanceMode').prop('checked', false);
+    
+    // Reset security settings
+    $('#passwordMinLength').val('8');
+    $('#sessionTimeout').val('30');
+    $('#requireUppercase, #requireLowercase, #requireNumbers, #requireSpecialChars').prop('checked', true);
+    $('#maxLoginAttempts').val('5');
+    $('#lockoutDuration').val('15');
+    
+    showAlert('info', 'Settings reset to default values.');
+}
+
+function showAlert(type, message) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    // Remove existing alerts
+    $('.alert').remove();
+    
+    // Add new alert at the top
+    $('.content').prepend(alertHtml);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        $('.alert').alert('close');
+    }, 5000);
+}
+</script>
+{% endblock %}

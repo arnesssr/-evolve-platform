@@ -1,0 +1,47 @@
+<!-- Chart Card Component -->
+<!-- Usage: {% include 'dashboards/admin/components/chart-card.html' with title="Revenue Trend" chart_id="revenueChart" height="300" %} -->
+
+<div class="card chart-card h-100">
+    <div class="card-header bg-white border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ title }}</h5>
+            {% if actions %}
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" onclick="exportChart('{{ chart_id }}')">
+                        <i class="fas fa-download me-2"></i>Export as PNG
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="refreshChart('{{ chart_id }}')">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#chartSettingsModal">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        {% if subtitle %}
+        <p class="text-muted mb-3">{{ subtitle }}</p>
+        {% endif %}
+        <div class="chart-container" style="position: relative; height: {{ height|default:'300' }}px;">
+            <canvas id="{{ chart_id }}"></canvas>
+        </div>
+        {% if legend %}
+        <div class="chart-legend mt-3 text-center">
+            {{ legend|safe }}
+        </div>
+        {% endif %}
+    </div>
+    {% if footer %}
+    <div class="card-footer bg-light">
+        <small class="text-muted">{{ footer }}</small>
+    </div>
+    {% endif %}
+</div>

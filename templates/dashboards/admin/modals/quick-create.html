@@ -1,0 +1,602 @@
+<!-- Quick Create Modal Component -->
+<div class="modal fade" id="quickCreateModal" tabindex="-1" aria-labelledby="quickCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="quickCreateModalLabel">
+                    <i class="fas fa-plus-circle me-2"></i>Quick Create
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Creation Type Selection -->
+                <div class="creation-type mb-4">
+                    <label class="form-label fw-bold">What would you like to create?</label>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createUser" value="user" checked onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createUser">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    <strong>User Account</strong><br>
+                                    <small class="text-muted">Create a new user</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createProduct" value="product" onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createProduct">
+                                    <i class="fas fa-box text-success me-2"></i>
+                                    <strong>Product</strong><br>
+                                    <small class="text-muted">Add a new product</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createPlan" value="plan" onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createPlan">
+                                    <i class="fas fa-layer-group text-info me-2"></i>
+                                    <strong>Subscription Plan</strong><br>
+                                    <small class="text-muted">Create pricing plan</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createCommission" value="commission" onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createCommission">
+                                    <i class="fas fa-percentage text-warning me-2"></i>
+                                    <strong>Commission</strong><br>
+                                    <small class="text-muted">Manual commission entry</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createPromo" value="promo" onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createPromo">
+                                    <i class="fas fa-tags text-secondary me-2"></i>
+                                    <strong>Promo Code</strong><br>
+                                    <small class="text-muted">Create discount code</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check creation-option">
+                                <input class="form-check-input" type="radio" name="createType" id="createAnnouncement" value="announcement" onchange="updateCreateForm()">
+                                <label class="form-check-label" for="createAnnouncement">
+                                    <i class="fas fa-bullhorn text-danger me-2"></i>
+                                    <strong>Announcement</strong><br>
+                                    <small class="text-muted">System announcement</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dynamic Form Container -->
+                <div class="creation-form">
+                    <div id="createFormContainer">
+                        <!-- Dynamic form content will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-primary" onclick="saveAsDraft()" id="draftBtn">
+                    <i class="fas fa-save me-1"></i>Save as Draft
+                </button>
+                <button type="button" class="btn btn-success" onclick="createItem()" id="createBtn">
+                    <i class="fas fa-plus me-1"></i>Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.creation-option {
+    padding: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.creation-option:hover {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+.creation-option input:checked ~ label {
+    color: #28a745;
+}
+
+.form-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.form-section h6 {
+    margin-bottom: 1rem;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 0.5rem;
+}
+</style>
+
+<script>
+let currentCreateType = 'user';
+
+function showQuickCreateModal(defaultType = 'user') {
+    currentCreateType = defaultType;
+    
+    // Set the default selection
+    document.getElementById('create' + defaultType.charAt(0).toUpperCase() + defaultType.slice(1)).checked = true;
+    
+    // Update the form
+    updateCreateForm();
+    
+    const modal = new bootstrap.Modal(document.getElementById('quickCreateModal'));
+    modal.show();
+}
+
+function updateCreateForm() {
+    const selectedType = document.querySelector('input[name="createType"]:checked').value;
+    currentCreateType = selectedType;
+    
+    const container = document.getElementById('createFormContainer');
+    const createBtn = document.getElementById('createBtn');
+    
+    // Update create button text
+    createBtn.innerHTML = `<i class="fas fa-plus me-1"></i>Create ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}`;
+    
+    // Generate form based on type
+    switch (selectedType) {
+        case 'user':
+            container.innerHTML = getUserForm();
+            break;
+        case 'product':
+            container.innerHTML = getProductForm();
+            break;
+        case 'plan':
+            container.innerHTML = getPlanForm();
+            break;
+        case 'commission':
+            container.innerHTML = getCommissionForm();
+            break;
+        case 'promo':
+            container.innerHTML = getPromoForm();
+            break;
+        case 'announcement':
+            container.innerHTML = getAnnouncementForm();
+            break;
+    }
+}
+
+function getUserForm() {
+    return `
+        <div class="form-section">
+            <h6>Basic Information</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-control" name="first_name" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" name="last_name" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" name="email" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-control" name="phone">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">User Type *</label>
+                    <select class="form-select" name="user_type" required>
+                        <option value="business">Business User</option>
+                        <option value="reseller">Reseller</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-control" name="company">
+                </div>
+            </div>
+        </div>
+        <div class="form-section">
+            <h6>Account Settings</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="send_welcome_email" checked>
+                        <label class="form-check-label">Send welcome email</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="account_active" checked>
+                        <label class="form-check-label">Account active</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getProductForm() {
+    return `
+        <div class="form-section">
+            <h6>Product Details</h6>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Product Name *</label>
+                    <input type="text" class="form-control" name="product_name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">SKU</label>
+                    <input type="text" class="form-control" name="sku" placeholder="Auto-generated">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="description" rows="3"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" name="category">
+                        <option value="software">Software</option>
+                        <option value="service">Service</option>
+                        <option value="subscription">Subscription</option>
+                        <option value="digital">Digital Product</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Price ($) *</label>
+                    <input type="number" class="form-control" name="price" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Commission Rate (%)</label>
+                    <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100" value="15">
+                </div>
+            </div>
+        </div>
+        <div class="form-section">
+            <h6>Settings</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="active" checked>
+                        <label class="form-check-label">Product active</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="featured">
+                        <label class="form-check-label">Featured product</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getPlanForm() {
+    return `
+        <div class="form-section">
+            <h6>Plan Details</h6>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Plan Name *</label>
+                    <input type="text" class="form-control" name="plan_name" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Plan Type</label>
+                    <select class="form-select" name="plan_type">
+                        <option value="basic">Basic</option>
+                        <option value="professional">Professional</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="description" rows="2"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Monthly Price ($) *</label>
+                    <input type="number" class="form-control" name="monthly_price" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Annual Price ($)</label>
+                    <input type="number" class="form-control" name="annual_price" step="0.01" min="0">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Trial Days</label>
+                    <input type="number" class="form-control" name="trial_days" min="0" value="0">
+                </div>
+            </div>
+        </div>
+        <div class="form-section">
+            <h6>Plan Features</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">User Limit</label>
+                    <input type="number" class="form-control" name="user_limit" min="1" value="10">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Storage (GB)</label>
+                    <input type="number" class="form-control" name="storage_gb" min="1" value="10">
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="api_access">
+                        <label class="form-check-label">API Access</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="priority_support">
+                        <label class="form-check-label">Priority Support</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getCommissionForm() {
+    return `
+        <div class="form-section">
+            <h6>Commission Details</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Reseller *</label>
+                    <select class="form-select" name="reseller_id" required>
+                        <option value="">Select Reseller</option>
+                        <option value="1">John Doe</option>
+                        <option value="2">Jane Smith</option>
+                        <option value="3">Bob Johnson</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Product/Service *</label>
+                    <select class="form-select" name="product_id" required>
+                        <option value="">Select Product</option>
+                        <option value="1">Pro Plan</option>
+                        <option value="2">Basic Plan</option>
+                        <option value="3">Enterprise Plan</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Sale Amount ($) *</label>
+                    <input type="number" class="form-control" name="sale_amount" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Commission Rate (%)</label>
+                    <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100" value="15">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Commission Amount ($)</label>
+                    <input type="number" class="form-control" name="commission_amount" step="0.01" min="0" readonly>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-control" name="notes" rows="2" placeholder="Optional notes about this commission"></textarea>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getPromoForm() {
+    return `
+        <div class="form-section">
+            <h6>Promo Code Details</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Code *</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="promo_code" required>
+                        <button type="button" class="btn btn-outline-secondary" onclick="generatePromoCode()">Generate</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Discount Type</label>
+                    <select class="form-select" name="discount_type">
+                        <option value="percentage">Percentage</option>
+                        <option value="fixed">Fixed Amount</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Discount Value *</label>
+                    <input type="number" class="form-control" name="discount_value" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Usage Limit</label>
+                    <input type="number" class="form-control" name="usage_limit" min="1" placeholder="Unlimited">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Minimum Order ($)</label>
+                    <input type="number" class="form-control" name="minimum_order" step="0.01" min="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Valid From</label>
+                    <input type="date" class="form-control" name="valid_from">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Valid Until</label>
+                    <input type="date" class="form-control" name="valid_until">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-control" name="description" placeholder="Brief description of the offer">
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getAnnouncementForm() {
+    return `
+        <div class="form-section">
+            <h6>Announcement Details</h6>
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Title *</label>
+                    <input type="text" class="form-control" name="title" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Priority</label>
+                    <select class="form-select" name="priority">
+                        <option value="low">Low</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Message *</label>
+                    <textarea class="form-control" name="message" rows="4" required></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Target Audience</label>
+                    <select class="form-select" name="target_audience">
+                        <option value="all">All Users</option>
+                        <option value="businesses">Business Users</option>
+                        <option value="resellers">Resellers</option>
+                        <option value="admins">Administrators</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Display Duration</label>
+                    <select class="form-select" name="display_duration">
+                        <option value="1">1 Day</option>
+                        <option value="7" selected>1 Week</option>
+                        <option value="30">1 Month</option>
+                        <option value="0">Until manually removed</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="send_email">
+                        <label class="form-check-label">Send email notification</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="show_popup" checked>
+                        <label class="form-check-label">Show as popup</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function generatePromoCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.querySelector('[name="promo_code"]').value = result;
+}
+
+function saveAsDraft() {
+    const formData = collectFormData();
+    
+    // Simulate saving as draft
+    alert(`${currentCreateType.charAt(0).toUpperCase() + currentCreateType.slice(1)} saved as draft!`);
+    
+    bootstrap.Modal.getInstance(document.getElementById('quickCreateModal')).hide();
+}
+
+function createItem() {
+    const formData = collectFormData();
+    
+    // Basic validation
+    const requiredFields = document.querySelectorAll('#createFormContainer [required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    if (!isValid) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Simulate creation
+    const createBtn = document.getElementById('createBtn');
+    const originalText = createBtn.innerHTML;
+    createBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+    createBtn.disabled = true;
+    
+    setTimeout(() => {
+        alert(`${currentCreateType.charAt(0).toUpperCase() + currentCreateType.slice(1)} created successfully!`);
+        
+        createBtn.innerHTML = originalText;
+        createBtn.disabled = false;
+        
+        bootstrap.Modal.getInstance(document.getElementById('quickCreateModal')).hide();
+        
+        // Trigger refresh of relevant list
+        if (typeof refreshItemList === 'function') {
+            refreshItemList();
+        }
+    }, 2000);
+}
+
+function collectFormData() {
+    const formData = {};
+    const inputs = document.querySelectorAll('#createFormContainer input, #createFormContainer select, #createFormContainer textarea');
+    
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            formData[input.name] = input.checked;
+        } else {
+            formData[input.name] = input.value;
+        }
+    });
+    
+    return formData;
+}
+
+// Auto-calculate commission amount
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('input', function(e) {
+        if (e.target.name === 'sale_amount' || e.target.name === 'commission_rate') {
+            const saleAmount = parseFloat(document.querySelector('[name="sale_amount"]')?.value || 0);
+            const commissionRate = parseFloat(document.querySelector('[name="commission_rate"]')?.value || 0);
+            const commissionAmountField = document.querySelector('[name="commission_amount"]');
+            
+            if (commissionAmountField && saleAmount && commissionRate) {
+                const commissionAmount = (saleAmount * commissionRate / 100).toFixed(2);
+                commissionAmountField.value = commissionAmount;
+            }
+        }
+    });
+});
+
+// Initialize form on load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCreateForm();
+});
+</script>

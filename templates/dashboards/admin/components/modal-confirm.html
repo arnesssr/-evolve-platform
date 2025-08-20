@@ -1,0 +1,210 @@
+<!-- Modal Confirmation Component -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="confirmModalLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Confirm Action
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-4">
+                    <div class="icon-wrapper mb-3">
+                        <i class="fas fa-question-circle fa-3x text-primary opacity-75"></i>
+                    </div>
+                    <h6 class="mb-3" id="confirmTitle">Are you sure?</h6>
+                    <p class="text-muted mb-0" id="confirmMessage">
+                        This action cannot be undone. Please confirm to continue.
+                    </p>
+                </div>
+                
+                <!-- Additional Info (conditionally shown) -->
+                <div id="confirmDetails" class="alert alert-light d-none">
+                    <small class="text-muted" id="confirmDetailsText"></small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmButton">
+                    <i class="fas fa-check me-1"></i>
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Danger Confirmation Modal (for destructive actions) -->
+<div class="modal fade" id="dangerConfirmModal" tabindex="-1" aria-labelledby="dangerConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold text-danger" id="dangerConfirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Danger Zone
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-4">
+                    <div class="icon-wrapper mb-3">
+                        <i class="fas fa-skull-crossbones fa-3x text-danger opacity-75"></i>
+                    </div>
+                    <h6 class="mb-3 text-danger" id="dangerTitle">Destructive Action</h6>
+                    <p class="text-muted mb-3" id="dangerMessage">
+                        This is a permanent action that cannot be reversed.
+                    </p>
+                    <div class="alert alert-danger">
+                        <small>
+                            <strong>Warning:</strong> This action will permanently delete data and cannot be undone.
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Confirmation Input -->
+                <div class="mb-3">
+                    <label class="form-label small text-muted">
+                        Type <strong>CONFIRM</strong> to proceed:
+                    </label>
+                    <input type="text" class="form-control" id="dangerConfirmInput" placeholder="CONFIRM">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="dangerConfirmButton" disabled>
+                    <i class="fas fa-trash me-1"></i>
+                    Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: none;
+}
+
+.icon-wrapper {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.modal-footer .btn {
+    min-width: 100px;
+}
+
+#dangerConfirmInput {
+    font-family: monospace;
+    text-align: center;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Regular confirmation modal functionality
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmButton = document.getElementById('confirmButton');
+    let confirmCallback = null;
+    
+    // Show confirmation modal
+    window.showConfirmModal = function(options) {
+        const {
+            title = 'Are you sure?',
+            message = 'This action cannot be undone. Please confirm to continue.',
+            details = null,
+            confirmText = 'Confirm',
+            confirmClass = 'btn-primary',
+            callback = null
+        } = options;
+        
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        
+        if (details) {
+            document.getElementById('confirmDetailsText').textContent = details;
+            document.getElementById('confirmDetails').classList.remove('d-none');
+        } else {
+            document.getElementById('confirmDetails').classList.add('d-none');
+        }
+        
+        confirmButton.innerHTML = `<i class="fas fa-check me-1"></i>${confirmText}`;
+        confirmButton.className = `btn ${confirmClass}`;
+        confirmCallback = callback;
+        
+        new bootstrap.Modal(confirmModal).show();
+    };
+    
+    // Handle confirmation
+    confirmButton.addEventListener('click', function() {
+        if (confirmCallback) {
+            confirmCallback();
+        }
+        bootstrap.Modal.getInstance(confirmModal).hide();
+    });
+    
+    // Danger confirmation modal functionality
+    const dangerModal = document.getElementById('dangerConfirmModal');
+    const dangerButton = document.getElementById('dangerConfirmButton');
+    const dangerInput = document.getElementById('dangerConfirmInput');
+    let dangerCallback = null;
+    
+    // Show danger confirmation modal
+    window.showDangerModal = function(options) {
+        const {
+            title = 'Destructive Action',
+            message = 'This is a permanent action that cannot be reversed.',
+            confirmText = 'Delete Permanently',
+            callback = null
+        } = options;
+        
+        document.getElementById('dangerTitle').textContent = title;
+        document.getElementById('dangerMessage').textContent = message;
+        dangerButton.innerHTML = `<i class="fas fa-trash me-1"></i>${confirmText}`;
+        
+        dangerInput.value = '';
+        dangerButton.disabled = true;
+        dangerCallback = callback;
+        
+        new bootstrap.Modal(dangerModal).show();
+    };
+    
+    // Enable danger button when CONFIRM is typed
+    dangerInput.addEventListener('input', function() {
+        dangerButton.disabled = this.value.trim().toUpperCase() !== 'CONFIRM';
+    });
+    
+    // Handle danger confirmation
+    dangerButton.addEventListener('click', function() {
+        if (dangerCallback && dangerInput.value.trim().toUpperCase() === 'CONFIRM') {
+            dangerCallback();
+        }
+        bootstrap.Modal.getInstance(dangerModal).hide();
+    });
+    
+    // Reset forms when modals are hidden
+    [confirmModal, dangerModal].forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function() {
+            confirmCallback = null;
+            dangerCallback = null;
+            dangerInput.value = '';
+            dangerButton.disabled = true;
+        });
+    });
+});
+</script>

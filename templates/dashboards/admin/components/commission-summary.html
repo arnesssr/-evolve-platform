@@ -1,0 +1,211 @@
+<!-- Commission Summary Component -->
+<div class="commission-summary-card">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0 pb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="fas fa-calculator text-primary me-2"></i>
+                    Commission Summary
+                </h6>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-calendar me-1"></i>This Month
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" data-period="today">Today</a></li>
+                        <li><a class="dropdown-item" href="#" data-period="week">This Week</a></li>
+                        <li><a class="dropdown-item" href="#" data-period="month">This Month</a></li>
+                        <li><a class="dropdown-item" href="#" data-period="quarter">This Quarter</a></li>
+                        <li><a class="dropdown-item" href="#" data-period="year">This Year</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <div class="commission-metric text-center">
+                        <div class="metric-icon mb-2">
+                            <i class="fas fa-dollar-sign text-success"></i>
+                        </div>
+                        <div class="metric-value text-success" id="totalCommissions">
+                            ${{ total_commissions|default:0|floatformat:2 }}
+                        </div>
+                        <div class="metric-label">Total Commissions</div>
+                        <div class="metric-change text-success">
+                            <i class="fas fa-arrow-up"></i> 12.5%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="commission-metric text-center">
+                        <div class="metric-icon mb-2">
+                            <i class="fas fa-clock text-warning"></i>
+                        </div>
+                        <div class="metric-value text-warning" id="pendingCommissions">
+                            ${{ pending_commissions|default:0|floatformat:2 }}
+                        </div>
+                        <div class="metric-label">Pending Approval</div>
+                        <div class="metric-change text-muted">
+                            {{ pending_count|default:0 }} items
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="commission-metric text-center">
+                        <div class="metric-icon mb-2">
+                            <i class="fas fa-check-circle text-info"></i>
+                        </div>
+                        <div class="metric-value text-info" id="approvedCommissions">
+                            ${{ approved_commissions|default:0|floatformat:2 }}
+                        </div>
+                        <div class="metric-label">Approved</div>
+                        <div class="metric-change text-info">
+                            <i class="fas fa-arrow-up"></i> 8.2%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="commission-metric text-center">
+                        <div class="metric-icon mb-2">
+                            <i class="fas fa-money-bill-wave text-primary"></i>
+                        </div>
+                        <div class="metric-value text-primary" id="paidCommissions">
+                            ${{ paid_commissions|default:0|floatformat:2 }}
+                        </div>
+                        <div class="metric-label">Paid Out</div>
+                        <div class="metric-change text-primary">
+                            <i class="fas fa-arrow-up"></i> 15.7%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Commission Rate Analysis -->
+            <div class="mt-4">
+                <h6 class="mb-3">Commission Rate Analysis</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="rate-item d-flex justify-content-between align-items-center p-2 rounded">
+                            <div>
+                                <span class="fw-medium">Average Rate</span>
+                                <div class="text-muted small">Across all products</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold text-primary">{{ avg_commission_rate|default:0 }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="rate-item d-flex justify-content-between align-items-center p-2 rounded">
+                            <div>
+                                <span class="fw-medium">Highest Rate</span>
+                                <div class="text-muted small">{{ highest_rate_product|default:'N/A' }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-semibold text-success">{{ highest_commission_rate|default:0 }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.commission-summary-card .card {
+    border-radius: 10px;
+}
+
+.commission-metric {
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(var(--bs-light-rgb), 0.5);
+    transition: all 0.3s ease;
+}
+
+.commission-metric:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.metric-icon i {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.metric-change {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.rate-item {
+    background: rgba(var(--bs-light-rgb), 0.3);
+    border: 1px solid rgba(var(--bs-border-color-rgb), 0.5);
+    transition: all 0.3s ease;
+}
+
+.rate-item:hover {
+    background: rgba(var(--bs-light-rgb), 0.5);
+    border-color: var(--bs-primary);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle period dropdown clicks
+    document.querySelectorAll('[data-period]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const period = this.getAttribute('data-period');
+            loadCommissionData(period);
+            
+            // Update dropdown text
+            const dropdown = this.closest('.dropdown');
+            const button = dropdown.querySelector('.dropdown-toggle');
+            button.innerHTML = `<i class="fas fa-calendar me-1"></i>${this.textContent}`;
+        });
+    });
+});
+
+function loadCommissionData(period) {
+    fetch(`/admin/api/commission-summary?period=${period}`)
+    .then(response => response.json())
+    .then(data => {
+        // Update metrics
+        document.getElementById('totalCommissions').textContent = `$${data.total_commissions.toFixed(2)}`;
+        document.getElementById('pendingCommissions').textContent = `$${data.pending_commissions.toFixed(2)}`;
+        document.getElementById('approvedCommissions').textContent = `$${data.approved_commissions.toFixed(2)}`;
+        document.getElementById('paidCommissions').textContent = `$${data.paid_commissions.toFixed(2)}`;
+        
+        // Add loading animation
+        document.querySelectorAll('.metric-value').forEach(el => {
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.style.opacity = '1';
+            }, 100);
+        });
+    })
+    .catch(error => {
+        console.error('Error loading commission data:', error);
+        showToast('Error loading commission data', 'error');
+    });
+}
+</script>

@@ -1,0 +1,619 @@
+<!-- Plan Features Form Component -->
+<div class="plan-features-form">
+    <form id="planFeaturesForm" method="POST">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="fas fa-layer-group text-primary me-2"></i>
+                    Plan Features Configuration
+                </h6>
+            </div>
+            
+            <div class="card-body">
+                <!-- Basic Plan Info -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Plan Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required 
+                               value="{{ plan.name|default:'' }}" placeholder="e.g., Pro Plan">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Plan Type</label>
+                        <select class="form-select" name="plan_type">
+                            <option value="subscription" {% if plan.plan_type == 'subscription' %}selected{% endif %}>Subscription</option>
+                            <option value="one_time" {% if plan.plan_type == 'one_time' %}selected{% endif %}>One-time Payment</option>
+                            <option value="freemium" {% if plan.plan_type == 'freemium' %}selected{% endif %}>Freemium</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Pricing -->
+                <div class="pricing-section mb-4">
+                    <h6 class="text-muted mb-3">Pricing Configuration</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Price <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="price" step="0.01" required
+                                       value="{{ plan.price|default:'0.00' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Billing Cycle</label>
+                            <select class="form-select" name="billing_cycle">
+                                <option value="monthly" {% if plan.billing_cycle == 'monthly' %}selected{% endif %}>Monthly</option>
+                                <option value="yearly" {% if plan.billing_cycle == 'yearly' %}selected{% endif %}>Yearly</option>
+                                <option value="quarterly" {% if plan.billing_cycle == 'quarterly' %}selected{% endif %}>Quarterly</option>
+                                <option value="one_time" {% if plan.billing_cycle == 'one_time' %}selected{% endif %}>One-time</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Trial Period (days)</label>
+                            <input type="number" class="form-control" name="trial_days" min="0"
+                                   value="{{ plan.trial_days|default:'0' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <div class="features-section mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">Features & Limits</h6>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addFeature()">
+                            <i class="fas fa-plus me-1"></i>Add Feature
+                        </button>
+                    </div>
+                    
+                    <!-- Standard Features -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small">Users Limit</label>
+                            <input type="number" class="form-control form-control-sm" name="users_limit" min="1"
+                                   value="{{ plan.features.users_limit|default:'10' }}">
+                            <div class="form-text">Maximum users</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Storage (GB)</label>
+                            <input type="number" class="form-control form-control-sm" name="storage_limit" min="1"
+                                   value="{{ plan.features.storage_limit|default:'10' }}">
+                            <div class="form-text">Storage space</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">API Calls/Month</label>
+                            <input type="number" class="form-control form-control-sm" name="api_calls_limit"
+                                   value="{{ plan.features.api_calls_limit|default:'10000' }}">
+                            <div class="form-text">API rate limit</div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Support Level</label>
+                            <select class="form-select form-select-sm" name="support_level">
+                                <option value="basic" {% if plan.features.support_level == 'basic' %}selected{% endif %}>Basic</option>
+                                <option value="standard" {% if plan.features.support_level == 'standard' %}selected{% endif %}>Standard</option>
+                                <option value="premium" {% if plan.features.support_level == 'premium' %}selected{% endif %}>Premium</option>
+                                <option value="priority" {% if plan.features.support_level == 'priority' %}selected{% endif %}>Priority</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Boolean Features -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="advanced_analytics" 
+                                       {% if plan.features.advanced_analytics %}checked{% endif %}>
+                                <label class="form-check-label">Advanced Analytics</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="custom_branding" 
+                                       {% if plan.features.custom_branding %}checked{% endif %}>
+                                <label class="form-check-label">Custom Branding</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="priority_support" 
+                                       {% if plan.features.priority_support %}checked{% endif %}>
+                                <label class="form-check-label">Priority Support</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="api_access" 
+                                       {% if plan.features.api_access %}checked{% endif %}>
+                                <label class="form-check-label">API Access</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Features -->
+                    <div id="customFeatures">
+                        {% for feature in plan.custom_features %}
+                        <div class="custom-feature-item mb-2">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="custom_feature_name[]" value="{{ feature.name }}" 
+                                           placeholder="Feature name">
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select form-select-sm" name="custom_feature_type[]">
+                                        <option value="boolean" {% if feature.type == 'boolean' %}selected{% endif %}>Yes/No</option>
+                                        <option value="number" {% if feature.type == 'number' %}selected{% endif %}>Number</option>
+                                        <option value="text" {% if feature.type == 'text' %}selected{% endif %}>Text</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control form-control-sm" 
+                                           name="custom_feature_value[]" value="{{ feature.value }}" 
+                                           placeholder="Value">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFeature(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Commission Settings -->
+                <div class="commission-section mb-4">
+                    <h6 class="text-muted mb-3">Commission Configuration</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Commission Rate (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100"
+                                       value="{{ plan.commission_rate|default:'10.00' }}">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Commission Type</label>
+                            <select class="form-select" name="commission_type">
+                                <option value="percentage" {% if plan.commission_type == 'percentage' %}selected{% endif %}>Percentage</option>
+                                <option value="fixed" {% if plan.commission_type == 'fixed' %}selected{% endif %}>Fixed Amount</option>
+                                <option value="tiered" {% if plan.commission_type == 'tiered' %}selected{% endif %}>Tiered</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Recurring Commission</label>
+                            <select class="form-select" name="recurring_commission">
+                                <option value="first_payment" {% if plan.recurring_commission == 'first_payment' %}selected{% endif %}>First Payment Only</option>
+                                <option value="all_payments" {% if plan.recurring_commission == 'all_payments' %}selected{% endif %}>All Payments</option>
+                                <option value="limited" {% if plan.recurring_commission == 'limited' %}selected{% endif %}>Limited Period</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Visibility & Status -->
+                <div class="visibility-section mb-4">
+                    <h6 class="text-muted mb-3">Visibility & Status</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Status</label>
+                            <select class="form-select" name="status">
+                                <option value="active" {% if plan.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if plan.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                <option value="draft" {% if plan.status == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="deprecated" {% if plan.status == 'deprecated' %}selected{% endif %}>Deprecated</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Visibility</label>
+                            <select class="form-select" name="visibility">
+                                <option value="public" {% if plan.visibility == 'public' %}selected{% endif %}>Public</option>
+                                <option value="private" {% if plan.visibility == 'private' %}selected{% endif %}>Private</option>
+                                <option value="invite_only" {% if plan.visibility == 'invite_only' %}selected{% endif %}>Invite Only</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Sort Order</label>
+                            <input type="number" class="form-control" name="sort_order" min="0"
+                                   value="{{ plan.sort_order|default:'0' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="description-section mb-4">
+                    <label class="form-label fw-medium">Plan Description</label>
+                    <textarea class="form-control" name="description" rows="3" 
+                              placeholder="Describe the plan features and benefits...">{{ plan.description|default:'' }}</textarea>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="saveAsTemplate" name="save_as_template">
+                        <label class="form-check-label text-muted" for="saveAsTemplate">
+                            Save as template for future plans
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="previewPlan()">
+                            <i class="fas fa-eye me-1"></i>Preview
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Plan Preview Modal -->
+<div class="modal fade" id="planPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Plan Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="planPreviewContent">
+                <!-- Preview content will be generated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.plan-features-form .card {
+    border-radius: 10px;
+}
+
+.features-section,
+.commission-section,
+.visibility-section {
+    border-left: 3px solid var(--bs-primary);
+    padding-left: 1rem;
+    background: rgba(var(--bs-primary-rgb), 0.02);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+}
+
+.custom-feature-item {
+    background: rgba(var(--bs-light-rgb), 0.5);
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(10, 36, 99, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.input-group-text {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+}
+
+.feature-preview-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.plan-preview-pricing {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializePlanFeatures();
+});
+
+function initializePlanFeatures() {
+    // Handle commission type changes
+    document.querySelector('[name="commission_type"]').addEventListener('change', function() {
+        toggleCommissionFields(this.value);
+    });
+    
+    // Handle plan type changes
+    document.querySelector('[name="plan_type"]').addEventListener('change', function() {
+        togglePlanTypeFields(this.value);
+    });
+    
+    // Real-time price calculation
+    document.querySelector('[name="price"]').addEventListener('input', updatePriceDisplay);
+    document.querySelector('[name="billing_cycle"]').addEventListener('change', updatePriceDisplay);
+    
+    // Form validation
+    document.getElementById('planFeaturesForm').addEventListener('submit', validateForm);
+}
+
+function addFeature() {
+    const customFeatures = document.getElementById('customFeatures');
+    const featureHTML = `
+        <div class="custom-feature-item mb-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <input type="text" class="form-control form-control-sm" 
+                           name="custom_feature_name[]" placeholder="Feature name">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select form-select-sm" name="custom_feature_type[]">
+                        <option value="boolean">Yes/No</option>
+                        <option value="number">Number</option>
+                        <option value="text">Text</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control form-control-sm" 
+                           name="custom_feature_value[]" placeholder="Value">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFeature(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    customFeatures.insertAdjacentHTML('beforeend', featureHTML);
+}
+
+function removeFeature(button) {
+    button.closest('.custom-feature-item').remove();
+}
+
+function toggleCommissionFields(type) {
+    // Show/hide additional fields based on commission type
+    const additionalFields = document.querySelector('.commission-additional');
+    
+    if (type === 'tiered') {
+        // Show tiered commission setup
+        if (!additionalFields) {
+            const tieredHTML = `
+                <div class="commission-additional mt-3">
+                    <label class="form-label small">Tiered Commission Rules</label>
+                    <div class="tier-rules">
+                        <div class="row g-2 mb-2">
+                            <div class="col-md-4">
+                                <input type="number" class="form-control form-control-sm" 
+                                       name="tier_min[]" placeholder="Min sales">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="number" class="form-control form-control-sm" 
+                                       name="tier_max[]" placeholder="Max sales">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" class="form-control form-control-sm" 
+                                       name="tier_rate[]" placeholder="Rate %">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTier()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.querySelector('.commission-section .row').insertAdjacentHTML('afterend', tieredHTML);
+        }
+    } else if (additionalFields) {
+        additionalFields.remove();
+    }
+}
+
+function togglePlanTypeFields(type) {
+    const billingCycleField = document.querySelector('[name="billing_cycle"]').closest('.col-md-4');
+    const trialField = document.querySelector('[name="trial_days"]').closest('.col-md-4');
+    
+    if (type === 'one_time') {
+        billingCycleField.style.display = 'none';
+        trialField.style.display = 'none';
+    } else {
+        billingCycleField.style.display = 'block';
+        trialField.style.display = 'block';
+    }
+}
+
+function updatePriceDisplay() {
+    const price = parseFloat(document.querySelector('[name="price"]').value) || 0;
+    const cycle = document.querySelector('[name="billing_cycle"]').value;
+    
+    // Update any price display elements
+    const priceDisplays = document.querySelectorAll('.price-display');
+    priceDisplays.forEach(display => {
+        display.textContent = `$${price.toFixed(2)}${cycle !== 'one_time' ? '/' + cycle : ''}`;
+    });
+}
+
+function previewPlan() {
+    const formData = new FormData(document.getElementById('planFeaturesForm'));
+    const planData = {};
+    
+    for (let [key, value] of formData.entries()) {
+        planData[key] = value;
+    }
+    
+    generatePlanPreview(planData);
+    
+    const modal = new bootstrap.Modal(document.getElementById('planPreviewModal'));
+    modal.show();
+}
+
+function generatePlanPreview(planData) {
+    const previewContent = document.getElementById('planPreviewContent');
+    
+    const previewHTML = `
+        <div class="plan-preview-pricing">
+            <h3>${planData.name || 'Plan Name'}</h3>
+            <div class="price-large">
+                $${parseFloat(planData.price || 0).toFixed(2)}
+                ${planData.billing_cycle !== 'one_time' ? '/' + planData.billing_cycle : ''}
+            </div>
+            ${planData.trial_days > 0 ? `<div class="trial-info">${planData.trial_days}-day free trial</div>` : ''}
+        </div>
+        
+        <div class="features-list">
+            <h5>Features Included:</h5>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success me-2"></i>Up to ${planData.users_limit || 10} users</li>
+                <li><i class="fas fa-check text-success me-2"></i>${planData.storage_limit || 10}GB storage</li>
+                <li><i class="fas fa-check text-success me-2"></i>${planData.api_calls_limit || 10000} API calls/month</li>
+                <li><i class="fas fa-check text-success me-2"></i>${planData.support_level || 'Basic'} support</li>
+                ${planData.advanced_analytics ? '<li><i class="fas fa-check text-success me-2"></i>Advanced Analytics</li>' : ''}
+                ${planData.custom_branding ? '<li><i class="fas fa-check text-success me-2"></i>Custom Branding</li>' : ''}
+                ${planData.priority_support ? '<li><i class="fas fa-check text-success me-2"></i>Priority Support</li>' : ''}
+                ${planData.api_access ? '<li><i class="fas fa-check text-success me-2"></i>API Access</li>' : ''}
+            </ul>
+        </div>
+        
+        ${planData.description ? `<div class="plan-description"><h6>Description:</h6><p>${planData.description}</p></div>` : ''}
+        
+        <div class="commission-info">
+            <h6>Commission Information:</h6>
+            <p>Rate: ${planData.commission_rate || 10}% (${planData.commission_type || 'percentage'})</p>
+            <p>Recurring: ${planData.recurring_commission || 'First payment only'}</p>
+        </div>
+    `;
+    
+    previewContent.innerHTML = previewHTML;
+}
+
+function validateForm(event) {
+    const form = event.target;
+    let isValid = true;
+    
+    // Clear previous validation
+    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    // Validate required fields
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        }
+    });
+    
+    // Validate price
+    const price = parseFloat(form.querySelector('[name="price"]').value);
+    if (price < 0) {
+        form.querySelector('[name="price"]').classList.add('is-invalid');
+        isValid = false;
+        showToast('Price cannot be negative', 'error');
+    }
+    
+    // Validate commission rate
+    const commissionRate = parseFloat(form.querySelector('[name="commission_rate"]').value);
+    if (commissionRate < 0 || commissionRate > 100) {
+        form.querySelector('[name="commission_rate"]').classList.add('is-invalid');
+        isValid = false;
+        showToast('Commission rate must be between 0 and 100', 'error');
+    }
+    
+    if (!isValid) {
+        event.preventDefault();
+        showToast('Please fix the validation errors', 'error');
+        return false;
+    }
+    
+    // Add loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Saving...';
+    submitBtn.disabled = true;
+    
+    return true;
+}
+
+// Load plan template
+function loadTemplate(templateId) {
+    fetch(`/admin/api/plan-templates/${templateId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            populateForm(data.template);
+            showToast('Template loaded successfully', 'success');
+        } else {
+            showToast('Error loading template', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading template:', error);
+        showToast('Error loading template', 'error');
+    });
+}
+
+function populateForm(data) {
+    const form = document.getElementById('planFeaturesForm');
+    
+    Object.keys(data).forEach(key => {
+        const input = form.querySelector(`[name="${key}"]`);
+        if (input) {
+            if (input.type === 'checkbox') {
+                input.checked = data[key];
+            } else {
+                input.value = data[key];
+            }
+        }
+    });
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+function enableAutoSave() {
+    const form = document.getElementById('planFeaturesForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(autoSave, 5000); // Auto-save after 5 seconds of inactivity
+        });
+    });
+}
+
+function autoSave() {
+    const formData = new FormData(document.getElementById('planFeaturesForm'));
+    formData.append('auto_save', 'true');
+    
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Draft saved automatically', 'info', 2000);
+        }
+    })
+    .catch(error => console.error('Auto-save error:', error));
+}
+
+// Initialize auto-save
+enableAutoSave();
+</script>

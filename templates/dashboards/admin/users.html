@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Evolve Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #34495e 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .topbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stats-cards {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid;
+        }
+
+        .stats-card.primary { border-left-color: var(--primary-color); }
+        .stats-card.success { border-left-color: var(--success-color); }
+        .stats-card.warning { border-left-color: var(--warning-color); }
+        .stats-card.danger { border-left-color: var(--danger-color); }
+
+        .filters-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.suspended {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .user-type-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .user-type-badge.admin {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .user-type-badge.reseller {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .user-type-badge.business {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            margin: 0 0.125rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bulk-actions {
+            padding: 1rem 1.5rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: none;
+        }
+
+        .bulk-actions.active {
+            display: block;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .notification-badge {
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            min-width: 1.5rem;
+            text-align: center;
+        }
+
+        .user-avatar-dropdown {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-cards {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="sidebar-brand">
+                <i class="fas fa-rocket me-2"></i>Evolve Admin
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-users"></i>Users
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box"></i>Products
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="commissions.html" class="nav-link">
+                    <i class="fas fa-percentage"></i>Commissions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>Reports & Analytics
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>Payouts
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-tags"></i>Promotions
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-bullhorn"></i>Announcements
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>Settings
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="mb-0">User Management</h4>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-link position-relative" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-plus me-2 text-success"></i>New user registered</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>User suspended</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-times me-2 text-danger"></i>User deactivated</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-link d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar-dropdown me-2">JD</div>
+                        <span>John Doe</span>
+                        <i class="fas fa-chevron-down ms-2"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="container-fluid p-4">
+            <!-- Statistics Cards -->
+            <div class="stats-cards">
+                <div class="stats-card primary">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-1">1,247</div>
+                            <div class="text-muted">Total Users</div>
+                        </div>
+                        <i class="fas fa-users fa-2x text-primary opacity-25"></i>
+                    </div>
+                </div>
+                <div class="stats-card success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-1">1,158</div>
+                            <div class="text-muted">Active Users</div>
+                        </div>
+                        <i class="fas fa-user-check fa-2x text-success opacity-25"></i>
+                    </div>
+                </div>
+                <div class="stats-card warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-1">64</div>
+                            <div class="text-muted">Inactive Users</div>
+                        </div>
+                        <i class="fas fa-user-times fa-2x text-warning opacity-25"></i>
+                    </div>
+                </div>
+                <div class="stats-card danger">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="h3 mb-1">25</div>
+                            <div class="text-muted">Suspended</div>
+                        </div>
+                        <i class="fas fa-user-slash fa-2x text-danger opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="search-box">
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search users...">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="typeFilter">
+                            <option value="">All Types</option>
+                            <option value="admin">Admin</option>
+                            <option value="reseller">Reseller</option>
+                            <option value="business">Business</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="dateFilter">
+                            <option value="">All Dates</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                            <i class="fas fa-times me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="users-table-container">
+                <div class="table-header">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0">Users List</h5>
+                        <span class="badge bg-secondary ms-2" id="userCount">1,247 users</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="showQuickCreateModal('user')">
+                            <i class="fas fa-plus me-1"></i>Add User
+                        </button>
+                        <button class="btn btn-primary" onclick="showImportModal()">
+                            <i class="fas fa-upload me-1"></i>Import
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="exportUsers()">
+                            <i class="fas fa-download me-1"></i>Export
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-cog me-1"></i>Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="showBulkActionModal()"><i class="fas fa-tasks me-2"></i>Bulk Actions</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="showModal('generateReportModal')"><i class="fas fa-chart-bar me-2"></i>Generate Report</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Table Settings</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions Bar -->
+                <div class="bulk-actions" id="bulkActions">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><strong id="selectedCount">0</strong> users selected</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success" onclick="bulkActivate()">
+                                <i class="fas fa-check me-1"></i>Activate
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="bulkSuspend()">
+                                <i class="fas fa-pause me-1"></i>Suspend
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="bulkDelete()">
+                                <i class="fas fa-trash me-1"></i>Delete
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
+                                <i class="fas fa-times me-1"></i>Clear Selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th width="50">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Join Date</th>
+                                <th>Last Login</th>
+                                <th>Commission Earned</th>
+                                <th width="120">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        // Sample user data
+        const users = [
+            {
+                id: 1,
+                name: "John Smith",
+                email: "john.smith@example.com",
+                type: "reseller",
+                status: "active",
+                joinDate: "2024-01-15",
+                lastLogin: "2024-03-10",
+                commission: 1250.50,
+                avatar: "JS"
+            },
+            {
+                id: 2,
+                name: "Sarah Johnson",
+                email: "sarah.j@company.com",
+                type: "business",
+                status: "active",
+                joinDate: "2024-02-20",
+                lastLogin: "2024-03-09",
+                commission: 0,
+                avatar: "SJ"
+            },
+            {
+                id: 3,
+                name: "Mike Davis",
+                email: "mike@techcorp.com",
+                type: "reseller",
+                status: "active",
+                joinDate: "2024-01-08",
+                lastLogin: "2024-03-08",
+                commission: 2100.75,
+                avatar: "MD"
+            },
+            {
+                id: 4,
+                name: "Emily Wilson",
+                email: "emily.wilson@startup.io",
+                type: "business",
+                status: "suspended",
+                joinDate: "2024-03-01",
+                lastLogin: "2024-03-05",
+                commission: 0,
+                avatar: "EW"
+            },
+            {
+                id: 5,
+                name: "Admin User",
+                email: "admin@evolve.com",
+                type: "admin",
+                status: "active",
+                joinDate: "2023-12-01",
+                lastLogin: "2024-03-10",
+                commission: 0,
+                avatar: "AU"
+            },
+            // Add more sample users...
+        ];
+
+        let selectedUsers = [];
+        let table;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTable();
+            setupEventListeners();
+        });
+
+        function initializeTable() {
+            populateUsersTable();
+            
+            // Initialize DataTable
+            table = $('#usersTable').DataTable({
+                searching: false,
+                paging: true,
+                info: true,
+                lengthChange: true,
+                pageLength: 25,
+                order: [[1, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [0, 7] }
+                ]
+            });
+        }
+
+        function populateUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = users.map(user => `
+                <tr data-user-id="${user.id}">
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input user-checkbox" type="checkbox" value="${user.id}" onchange="updateSelection()">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar ${getAvatarColor(user.type)} me-3">
+                                ${user.avatar}
+                            </div>
+                            <div>
+                                <div class="fw-bold">${user.name}</div>
+                                <div class="text-muted small">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="user-type-badge ${user.type}">${user.type.charAt(0).toUpperCase() + user.type.slice(1)}</span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${user.status}">${user.status.charAt(0).toUpperCase() + user.status.slice(1)}</span>
+                    </td>
+                    <td>${formatDate(user.joinDate)}</td>
+                    <td>${formatDate(user.lastLogin)}</td>
+                    <td>$${user.commission.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <button class="action-btn btn btn-sm btn-outline-primary" onclick="viewUser(${user.id})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn btn btn-sm btn-outline-success" onclick="editUser(${user.id})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <div class="dropdown">
+                                <button class="action-btn btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" title="More">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="resetPassword(${user.id})"><i class="fas fa-key me-2"></i>Reset Password</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="loginAsUser(${user.id})"><i class="fas fa-sign-in-alt me-2"></i>Login As User</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item ${user.status === 'suspended' ? 'text-success' : 'text-warning'}" href="#" onclick="toggleSuspend(${user.id})">${user.status === 'suspended' ? '<i class="fas fa-play me-2"></i>Activate' : '<i class="fas fa-pause me-2"></i>Suspend'}</a></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser(${user.id})"><i class="fas fa-trash me-2"></i>Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function setupEventListeners() {
+            // Sidebar toggle
+            document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+
+            // Select all checkbox
+            document.getElementById('selectAll').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelection();
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                table.search(this.value).draw();
+            });
+
+            // Filter functionality
+            ['statusFilter', 'typeFilter', 'dateFilter'].forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', applyFilters);
+            });
+        }
+
+        function getAvatarColor(type) {
+            switch(type) {
+                case 'admin': return 'bg-danger';
+                case 'reseller': return 'bg-info';
+                case 'business': return 'bg-success';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+            selectedUsers = Array.from(checkboxes).map(cb => cb.value);
+            
+            document.getElementById('selectedCount').textContent = selectedUsers.length;
+            document.getElementById('bulkActions').classList.toggle('active', selectedUsers.length > 0);
+            
+            // Update select all checkbox
+            const allCheckboxes = document.querySelectorAll('.user-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            if (selectedUsers.length === 0) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = false;
+            } else if (selectedUsers.length === allCheckboxes.length) {
+                selectAllCheckbox.indeterminate = false;
+                selectAllCheckbox.checked = true;
+            } else {
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            updateSelection();
+        }
+
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const dateRange = document.getElementById('dateFilter').value;
+
+            // Apply custom filtering logic here
+            // For now, just using DataTables built-in search
+            let searchTerm = '';
+            if (status) searchTerm += status + ' ';
+            if (type) searchTerm += type + ' ';
+            
+            table.search(searchTerm.trim()).draw();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            table.search('').draw();
+        }
+
+        // User action functions
+        function viewUser(userId) {
+            console.log('View user:', userId);
+            // Implement user view modal
+        }
+
+        function editUser(userId) {
+            console.log('Edit user:', userId);
+            // Show quick create modal in edit mode
+        }
+
+        function resetPassword(userId) {
+            if (confirm('Reset password for this user? They will receive an email with new login instructions.')) {
+                console.log('Reset password for user:', userId);
+                // Implement password reset
+            }
+        }
+
+        function loginAsUser(userId) {
+            if (confirm('Login as this user? This will log you out of your admin account.')) {
+                console.log('Login as user:', userId);
+                // Implement user impersonation
+            }
+        }
+
+        function toggleSuspend(userId) {
+            const user = users.find(u => u.id == userId);
+            const action = user.status === 'suspended' ? 'activate' : 'suspend';
+            
+            if (confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} this user?`)) {
+                console.log(`${action} user:`, userId);
+                // Show suspend user modal for suspension with reason
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Delete this user? This action cannot be undone.')) {
+                console.log('Delete user:', userId);
+                // Implement user deletion
+            }
+        }
+
+        // Bulk action functions
+        function bulkActivate() {
+            if (selectedUsers.length === 0) return;
+            if (confirm(`Activate ${selectedUsers.length} selected users?`)) {
+                console.log('Bulk activate users:', selectedUsers);
+                // Implement bulk activation
+            }
+        }
+
+        function bulkSuspend() {
+            if (selectedUsers.length === 0) return;
+            // Show bulk action modal for suspension reasons
+            console.log('Bulk suspend users:', selectedUsers);
+        }
+
+        function bulkDelete() {
+            if (selectedUsers.length === 0) return;
+            if (confirm(`Delete ${selectedUsers.length} selected users? This action cannot be undone.`)) {
+                console.log('Bulk delete users:', selectedUsers);
+                // Implement bulk deletion
+            }
+        }
+
+        function exportUsers() {
+            console.log('Export users');
+            // Implement user export
+        }
+
+        function showImportModal() {
+            console.log('Show import modal');
+            // Show import modal
+        }
+
+        function showBulkActionModal() {
+            console.log('Show bulk action modal');
+            // Show bulk action modal
+        }
+
+        // Modal helper functions
+        function showModal(modalId) {
+            console.log('Show modal:', modalId);
+        }
+
+        function showQuickCreateModal(type) {
+            console.log('Show quick create modal for:', type);
+        }
+    </script>
+</body>
+</html>

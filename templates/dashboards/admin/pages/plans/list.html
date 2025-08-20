@@ -1,0 +1,721 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Plan Management{% endblock %}
+
+{% block page_title %}Plan Management{% endblock %}
+{% block page_subtitle %}Manage subscription plans and pricing tiers{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Plan Management</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button class="btn btn-outline-primary" onclick="exportPlans()">
+        <i class="fas fa-download me-2"></i>Export
+    </button>
+    <a href="{% url 'admin:plans_form' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Plan
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ total_plans|default:"12" }}</div>
+            <div class="metric-label">Total Plans</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +2 this month
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ active_plans|default:"8" }}</div>
+            <div class="metric-label">Active Plans</div>
+            <div class="metric-change neutral">
+                <i class="fas fa-minus"></i> No change
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ total_subscribers|default:"2,847" }}</div>
+            <div class="metric-label">Total Subscribers</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +156 this week
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card">
+            <div class="metric-value">${{ monthly_revenue|default:"47,285" }}</div>
+            <div class="metric-label">Monthly Revenue</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i> +12.5%
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="content-card mb-4">
+    <div class="row align-items-end">
+        <div class="col-md-4">
+            <label for="searchPlans" class="form-label">Search Plans</label>
+            <input type="text" class="form-control" id="searchPlans" placeholder="Search by name, description...">
+        </div>
+        <div class="col-md-2">
+            <label for="statusFilter" class="form-label">Status</label>
+            <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="typeFilter" class="form-label">Plan Type</label>
+            <select class="form-select" id="typeFilter">
+                <option value="">All Types</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="lifetime">Lifetime</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="priceFilter" class="form-label">Price Range</label>
+            <select class="form-select" id="priceFilter">
+                <option value="">All Prices</option>
+                <option value="free">Free</option>
+                <option value="low">$1 - $50</option>
+                <option value="medium">$51 - $200</option>
+                <option value="high">$200+</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-outline-primary w-100" onclick="refreshPlans()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Plans Grid/Table Toggle -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">All Plans</h6>
+        <div class="btn-group" role="group">
+            <input type="radio" class="btn-check" name="viewMode" id="gridView" checked>
+            <label class="btn btn-outline-secondary btn-sm" for="gridView">
+                <i class="fas fa-th"></i> Grid
+            </label>
+            <input type="radio" class="btn-check" name="viewMode" id="tableView">
+            <label class="btn btn-outline-secondary btn-sm" for="tableView">
+                <i class="fas fa-list"></i> Table
+            </label>
+        </div>
+    </div>
+    
+    <!-- Grid View -->
+    <div id="plansGrid" class="row">
+        <div class="col-md-4 mb-4">
+            <div class="plan-card h-100">
+                <div class="plan-header">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="plan-name mb-0">Starter Plan</h5>
+                        <span class="status-badge active">Active</span>
+                    </div>
+                    <p class="plan-description text-muted mb-3">Perfect for individuals getting started</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$19</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                </div>
+                
+                <div class="plan-features mb-3">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Up to 5 products</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Basic analytics</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Email support</li>
+                        <li><i class="fas fa-times text-muted me-2"></i>Custom branding</li>
+                        <li><i class="fas fa-times text-muted me-2"></i>API access</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value">284</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">$5,396</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">12.3%</div>
+                            <div class="stat-label">Growth</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plan-actions">
+                    <div class="btn-group w-100">
+                        <a href="{% url 'admin:plans_form' %}?id=1" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(1)">
+                            <i class="fas fa-copy me-1"></i>Duplicate
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="viewPlanDetails(1)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewSubscribers(1)">
+                                    <i class="fas fa-users me-2"></i>View Subscribers
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-warning" href="#" onclick="archivePlan(1)">
+                                    <i class="fas fa-archive me-2"></i>Archive
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="plan-card h-100 featured">
+                <div class="plan-badge">Most Popular</div>
+                <div class="plan-header">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="plan-name mb-0">Professional Plan</h5>
+                        <span class="status-badge active">Active</span>
+                    </div>
+                    <p class="plan-description text-muted mb-3">Best for growing businesses</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$49</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                </div>
+                
+                <div class="plan-features mb-3">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Up to 50 products</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Advanced analytics</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Priority support</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Custom branding</li>
+                        <li><i class="fas fa-times text-muted me-2"></i>API access</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">$61,103</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">18.7%</div>
+                            <div class="stat-label">Growth</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plan-actions">
+                    <div class="btn-group w-100">
+                        <a href="{% url 'admin:plans_form' %}?id=2" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(2)">
+                            <i class="fas fa-copy me-1"></i>Duplicate
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="viewPlanDetails(2)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewSubscribers(2)">
+                                    <i class="fas fa-users me-2"></i>View Subscribers
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-warning" href="#" onclick="archivePlan(2)">
+                                    <i class="fas fa-archive me-2"></i>Archive
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="plan-card h-100">
+                <div class="plan-header">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="plan-name mb-0">Enterprise Plan</h5>
+                        <span class="status-badge active">Active</span>
+                    </div>
+                    <p class="plan-description text-muted mb-3">For large organizations</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$199</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                </div>
+                
+                <div class="plan-features mb-3">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Unlimited products</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Enterprise analytics</li>
+                        <li><i class="fas fa-check text-success me-2"></i>24/7 phone support</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Custom branding</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Full API access</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value">89</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">$17,711</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">8.9%</div>
+                            <div class="stat-label">Growth</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plan-actions">
+                    <div class="btn-group w-100">
+                        <a href="{% url 'admin:plans_form' %}?id=3" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="duplicatePlan(3)">
+                            <i class="fas fa-copy me-1"></i>Duplicate
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="viewPlanDetails(3)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="viewSubscribers(3)">
+                                    <i class="fas fa-users me-2"></i>View Subscribers
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-warning" href="#" onclick="archivePlan(3)">
+                                    <i class="fas fa-archive me-2"></i>Archive
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="plan-card h-100">
+                <div class="plan-header">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="plan-name mb-0">Free Trial</h5>
+                        <span class="status-badge draft">Draft</span>
+                    </div>
+                    <p class="plan-description text-muted mb-3">14-day free trial for new users</p>
+                    <div class="plan-price">
+                        <span class="price-amount">$0</span>
+                        <span class="price-period">/trial</span>
+                    </div>
+                </div>
+                
+                <div class="plan-features mb-3">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Up to 3 products</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Basic analytics</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Email support</li>
+                        <li><i class="fas fa-times text-muted me-2"></i>Custom branding</li>
+                        <li><i class="fas fa-times text-muted me-2"></i>API access</li>
+                    </ul>
+                </div>
+                
+                <div class="plan-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Subscribers</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">$0</div>
+                            <div class="stat-label">Revenue</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Growth</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="plan-actions">
+                    <div class="btn-group w-100">
+                        <a href="{% url 'admin:plans_form' %}?id=4" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </a>
+                        <button class="btn btn-outline-success btn-sm" onclick="activatePlan(4)">
+                            <i class="fas fa-play me-1"></i>Activate
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="viewPlanDetails(4)">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="deletePlan(4)">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Table View (hidden by default) -->
+    <div id="plansTable" style="display: none;">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Plan Name</th>
+                        <th>Price</th>
+                        <th>Billing</th>
+                        <th>Subscribers</th>
+                        <th>Revenue</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="fw-semibold">Starter Plan</div>
+                                <small class="text-muted">Perfect for individuals</small>
+                            </div>
+                        </td>
+                        <td class="fw-semibold">$19.00</td>
+                        <td>Monthly</td>
+                        <td>284</td>
+                        <td>$5,396</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>Dec 1, 2023</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'admin:plans_form' %}?id=1" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="duplicatePlan(1)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="fw-semibold">Professional Plan <span class="badge bg-primary ms-2">Popular</span></div>
+                                <small class="text-muted">Best for growing businesses</small>
+                            </div>
+                        </td>
+                        <td class="fw-semibold">$49.00</td>
+                        <td>Monthly</td>
+                        <td>1,247</td>
+                        <td>$61,103</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>Dec 1, 2023</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'admin:plans_form' %}?id=2" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="duplicatePlan(2)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="fw-semibold">Enterprise Plan</div>
+                                <small class="text-muted">For large organizations</small>
+                            </div>
+                        </td>
+                        <td class="fw-semibold">$199.00</td>
+                        <td>Monthly</td>
+                        <td>89</td>
+                        <td>$17,711</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td>Dec 1, 2023</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'admin:plans_form' %}?id=3" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="duplicatePlan(3)">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <div class="fw-semibold">Free Trial</div>
+                                <small class="text-muted">14-day trial for new users</small>
+                            </div>
+                        </td>
+                        <td class="fw-semibold">$0.00</td>
+                        <td>Trial</td>
+                        <td>0</td>
+                        <td>$0</td>
+                        <td><span class="status-badge draft">Draft</span></td>
+                        <td>Dec 15, 2023</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'admin:plans_form' %}?id=4" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-success" onclick="activatePlan(4)">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Plan Details Modal -->
+{% include 'dashboards/admin/modals/plan-details.html' %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.plan-card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    background: #fff;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.plan-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.plan-card.featured {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 20px rgba(13,110,253,0.15);
+}
+
+.plan-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0d6efd;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.plan-name {
+    color: #2c3e50;
+}
+
+.plan-price {
+    margin-bottom: 1rem;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.price-period {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.plan-features ul li {
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.plan-stats {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.stat-value {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gridView = document.getElementById('gridView');
+    const tableView = document.getElementById('tableView');
+    const plansGrid = document.getElementById('plansGrid');
+    const plansTable = document.getElementById('plansTable');
+    
+    // View mode toggle
+    gridView.addEventListener('change', function() {
+        if (this.checked) {
+            plansGrid.style.display = 'block';
+            plansTable.style.display = 'none';
+        }
+    });
+    
+    tableView.addEventListener('change', function() {
+        if (this.checked) {
+            plansGrid.style.display = 'none';
+            plansTable.style.display = 'block';
+        }
+    });
+    
+    // Search functionality
+    document.getElementById('searchPlans').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        // In a real application, this would trigger an API call
+        console.log('Searching for:', searchTerm);
+    });
+    
+    // Filter functionality
+    ['statusFilter', 'typeFilter', 'priceFilter'].forEach(filterId => {
+        document.getElementById(filterId).addEventListener('change', function() {
+            // In a real application, this would trigger filtering
+            console.log(`${filterId} changed to:`, this.value);
+        });
+    });
+});
+
+function clearFilters() {
+    document.getElementById('searchPlans').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('typeFilter').value = '';
+    document.getElementById('priceFilter').value = '';
+    console.log('Filters cleared');
+}
+
+function refreshPlans() {
+    showToast('Refreshing plans...', 'info');
+    // In a real application, this would reload the data
+    setTimeout(() => {
+        showToast('Plans refreshed successfully!', 'success');
+    }, 1000);
+}
+
+function viewPlanDetails(planId) {
+    // Show plan details modal
+    const modal = new bootstrap.Modal(document.getElementById('planDetailsModal'));
+    // In a real application, load plan data via AJAX
+    modal.show();
+}
+
+function viewSubscribers(planId) {
+    window.location.href = `/admin/plans/${planId}/subscribers/`;
+}
+
+function duplicatePlan(planId) {
+    if (confirm('Are you sure you want to duplicate this plan?')) {
+        showToast('Plan duplicated successfully!', 'success');
+        // In a real application, make an API call to duplicate the plan
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    }
+}
+
+function activatePlan(planId) {
+    if (confirm('Are you sure you want to activate this plan?')) {
+        showToast('Plan activated successfully!', 'success');
+        // In a real application, make an API call to activate the plan
+    }
+}
+
+function archivePlan(planId) {
+    if (confirm('Are you sure you want to archive this plan? Existing subscribers will not be affected.')) {
+        showToast('Plan archived successfully!', 'warning');
+        // In a real application, make an API call to archive the plan
+    }
+}
+
+function deletePlan(planId) {
+    if (confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
+        showToast('Plan deleted successfully!', 'success');
+        // In a real application, make an API call to delete the plan
+    }
+}
+
+function exportPlans() {
+    showToast('Exporting plans...', 'info');
+    // In a real application, this would trigger a download
+    setTimeout(() => {
+        showToast('Plans exported successfully!', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

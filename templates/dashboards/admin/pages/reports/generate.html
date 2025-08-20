@@ -1,0 +1,614 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Report Generator{% endblock %}
+
+{% block page_title %}Report Generator{% endblock %}
+{% block page_subtitle %}Generate custom reports and analytics{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Reports</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#scheduledReportsModal">
+        <i class="fas fa-clock me-2"></i>Scheduled Reports
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
+        <i class="fas fa-save me-2"></i>Save Template
+    </button>
+    <button type="button" class="btn btn-primary" id="generateReportBtn">
+        <i class="fas fa-chart-line me-2"></i>Generate Report
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<!-- Quick Report Templates -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="content-card">
+            <h5 class="mb-4">Quick Report Templates</h5>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100 quick-template" data-template="revenue">
+                        <div class="text-center">
+                            <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                            <h6 class="fw-bold">Revenue Report</h6>
+                            <p class="text-muted small mb-0">Comprehensive revenue analysis with trends and breakdowns</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100 quick-template" data-template="commission">
+                        <div class="text-center">
+                            <i class="fas fa-percentage fa-2x text-primary mb-2"></i>
+                            <h6 class="fw-bold">Commission Report</h6>
+                            <p class="text-muted small mb-0">Detailed commission tracking and reseller performance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100 quick-template" data-template="user-activity">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-2x text-info mb-2"></i>
+                            <h6 class="fw-bold">User Activity</h6>
+                            <p class="text-muted small mb-0">User engagement and platform usage analytics</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="border rounded p-3 h-100 quick-template" data-template="financial">
+                        <div class="text-center">
+                            <i class="fas fa-chart-pie fa-2x text-warning mb-2"></i>
+                            <h6 class="fw-bold">Financial Overview</h6>
+                            <p class="text-muted small mb-0">Complete financial summary and key metrics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Configuration -->
+<div class="row">
+    <!-- Report Settings -->
+    <div class="col-lg-8">
+        <div class="content-card">
+            <h5 class="mb-4">Report Configuration</h5>
+            
+            <form id="reportForm">
+                <!-- Report Type -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="reportType" class="form-label">Report Type</label>
+                        <select id="reportType" class="form-select">
+                            <option value="">Select Report Type</option>
+                            <option value="revenue">Revenue Analysis</option>
+                            <option value="commission">Commission Tracking</option>
+                            <option value="user-activity">User Activity</option>
+                            <option value="business-performance">Business Performance</option>
+                            <option value="reseller-performance">Reseller Performance</option>
+                            <option value="financial-summary">Financial Summary</option>
+                            <option value="transaction-details">Transaction Details</option>
+                            <option value="plan-analytics">Plan Analytics</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="reportFormat" class="form-label">Output Format</label>
+                        <select id="reportFormat" class="form-select">
+                            <option value="pdf">PDF Document</option>
+                            <option value="excel">Excel Spreadsheet</option>
+                            <option value="csv">CSV File</option>
+                            <option value="html">HTML Report</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Date Range -->
+                <div class="mb-4">
+                    <label class="form-label">Date Range</label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <select id="datePreset" class="form-select">
+                                <option value="">Custom Range</option>
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="last7days">Last 7 Days</option>
+                                <option value="last30days">Last 30 Days</option>
+                                <option value="thismonth">This Month</option>
+                                <option value="lastmonth">Last Month</option>
+                                <option value="thisquarter">This Quarter</option>
+                                <option value="thisyear">This Year</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="startDate" class="form-control" placeholder="Start Date">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="text" id="endDate" class="form-control" placeholder="End Date">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Filters</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="businessFilter" class="form-label">Business Filter</label>
+                            <select id="businessFilter" class="form-select" multiple>
+                                <option value="all">All Businesses</option>
+                                <option value="1">TechCorp Solutions</option>
+                                <option value="2">HealthCare Plus</option>
+                                <option value="3">Retail Masters Ltd</option>
+                                <option value="4">Manufacturing Co</option>
+                                <option value="5">Education Hub</option>
+                            </select>
+                            <div class="form-text">Hold Ctrl to select multiple</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="resellerFilter" class="form-label">Reseller Filter</label>
+                            <select id="resellerFilter" class="form-select" multiple>
+                                <option value="all">All Resellers</option>
+                                <option value="1">John Marketing</option>
+                                <option value="2">Sarah Sales</option>
+                                <option value="3">Mike Partners</option>
+                                <option value="4">Lisa Growth</option>
+                            </select>
+                            <div class="form-text">Hold Ctrl to select multiple</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="planFilter" class="form-label">Plan Filter</label>
+                            <select id="planFilter" class="form-select" multiple>
+                                <option value="all">All Plans</option>
+                                <option value="enterprise">Enterprise</option>
+                                <option value="professional">Professional</option>
+                                <option value="basic">Basic</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="statusFilter" class="form-label">Status Filter</label>
+                            <select id="statusFilter" class="form-select" multiple>
+                                <option value="all">All Statuses</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="suspended">Suspended</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Options -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Report Options</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeSummary" checked>
+                                <label class="form-check-label" for="includeSummary">
+                                    Include Executive Summary
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeCharts" checked>
+                                <label class="form-check-label" for="includeCharts">
+                                    Include Charts & Graphs
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeDetails">
+                                <label class="form-check-label" for="includeDetails">
+                                    Include Detailed Data
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeComparisons">
+                                <label class="form-check-label" for="includeComparisons">
+                                    Include Period Comparisons
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeTrends" checked>
+                                <label class="form-check-label" for="includeTrends">
+                                    Include Trend Analysis
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeRecommendations">
+                                <label class="form-check-label" for="includeRecommendations">
+                                    Include Recommendations
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeBenchmarks">
+                                <label class="form-check-label" for="includeBenchmarks">
+                                    Include Industry Benchmarks
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="includeAppendix">
+                                <label class="form-check-label" for="includeAppendix">
+                                    Include Data Appendix
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Options -->
+                <div class="mb-4">
+                    <h6 class="fw-bold mb-3">Delivery Options</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="reportName" class="form-label">Report Name</label>
+                            <input type="text" id="reportName" class="form-control" placeholder="Custom Report Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="emailRecipients" class="form-label">Email Recipients (Optional)</label>
+                            <input type="text" id="emailRecipients" class="form-control" placeholder="email@example.com, email2@example.com">
+                            <div class="form-text">Comma-separated email addresses</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule Options -->
+                <div class="mb-4">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="scheduleReport">
+                        <label class="form-check-label fw-bold" for="scheduleReport">
+                            Schedule Recurring Report
+                        </label>
+                    </div>
+                    
+                    <div id="scheduleOptions" class="row d-none">
+                        <div class="col-md-4">
+                            <label for="frequency" class="form-label">Frequency</label>
+                            <select id="frequency" class="form-select">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="scheduleTime" class="form-label">Delivery Time</label>
+                            <input type="time" id="scheduleTime" class="form-control" value="09:00">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="startSchedule" class="form-label">Start Date</label>
+                            <input type="date" id="startSchedule" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Report Preview & History -->
+    <div class="col-lg-4">
+        <!-- Report Preview -->
+        <div class="content-card mb-4">
+            <h5 class="mb-4">Report Preview</h5>
+            
+            <div id="reportPreview" class="text-center text-muted">
+                <i class="fas fa-file-alt fa-3x mb-3"></i>
+                <p>Select report type and options to see preview</p>
+            </div>
+            
+            <div id="reportSummary" class="d-none">
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Report Type:</span>
+                        <span id="previewType" class="fw-bold"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Date Range:</span>
+                        <span id="previewDates" class="fw-bold"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Format:</span>
+                        <span id="previewFormat" class="fw-bold"></span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Estimated Size:</span>
+                        <span id="previewSize" class="fw-bold"></span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Generation Time:</span>
+                        <span id="previewTime" class="fw-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Reports -->
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Recent Reports</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            
+            <div class="list-group list-group-flush">
+                <div class="list-group-item px-0">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-pdf text-danger me-3"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">Revenue Report - March 2024</div>
+                            <small class="text-muted">Generated 2 hours ago</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Download</a></li>
+                                <li><a class="dropdown-item" href="#">Share</a></li>
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-group-item px-0">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-excel text-success me-3"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">Commission Analysis - Q1 2024</div>
+                            <small class="text-muted">Generated yesterday</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Download</a></li>
+                                <li><a class="dropdown-item" href="#">Share</a></li>
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="list-group-item px-0">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-csv text-info me-3"></i>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">User Activity - February</div>
+                            <small class="text-muted">Generated 3 days ago</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Download</a></li>
+                                <li><a class="dropdown-item" href="#">Share</a></li>
+                                <li><a class="dropdown-item" href="#">Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+{% include 'dashboards/admin/modals/generate-report.html' with report_type="custom" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+$(document).ready(function() {
+    // Initialize date pickers
+    flatpickr("#startDate", {
+        dateFormat: "Y-m-d",
+    });
+    
+    flatpickr("#endDate", {
+        dateFormat: "Y-m-d",
+    });
+    
+    // Quick template selection
+    $('.quick-template').click(function() {
+        const template = $(this).data('template');
+        loadTemplate(template);
+        $(this).addClass('border-primary bg-primary bg-opacity-10')
+               .siblings().removeClass('border-primary bg-primary bg-opacity-10');
+    });
+    
+    // Schedule report toggle
+    $('#scheduleReport').change(function() {
+        if ($(this).is(':checked')) {
+            $('#scheduleOptions').removeClass('d-none');
+        } else {
+            $('#scheduleOptions').addClass('d-none');
+        }
+    });
+    
+    // Date preset handling
+    $('#datePreset').change(function() {
+        const preset = $(this).val();
+        if (preset) {
+            const dates = getPresetDates(preset);
+            $('#startDate')[0]._flatpickr.setDate(dates.start);
+            $('#endDate')[0]._flatpickr.setDate(dates.end);
+        }
+    });
+    
+    // Form change handler for preview
+    $('#reportForm input, #reportForm select').change(function() {
+        updateReportPreview();
+    });
+    
+    // Generate report button
+    $('#generateReportBtn').click(function() {
+        generateReport();
+    });
+});
+
+function loadTemplate(template) {
+    // Template configurations
+    const templates = {
+        'revenue': {
+            type: 'revenue',
+            name: 'Revenue Analysis Report',
+            options: ['includeSummary', 'includeCharts', 'includeTrends']
+        },
+        'commission': {
+            type: 'commission',
+            name: 'Commission Tracking Report',
+            options: ['includeSummary', 'includeDetails', 'includeComparisons']
+        },
+        'user-activity': {
+            type: 'user-activity',
+            name: 'User Activity Report',
+            options: ['includeCharts', 'includeTrends', 'includeDetails']
+        },
+        'financial': {
+            type: 'financial-summary',
+            name: 'Financial Overview Report',
+            options: ['includeSummary', 'includeCharts', 'includeComparisons']
+        }
+    };
+    
+    const config = templates[template];
+    if (config) {
+        $('#reportType').val(config.type);
+        $('#reportName').val(config.name);
+        
+        // Reset all checkboxes
+        $('#reportForm input[type="checkbox"]').prop('checked', false);
+        
+        // Check template-specific options
+        config.options.forEach(option => {
+            $('#' + option).prop('checked', true);
+        });
+        
+        updateReportPreview();
+    }
+}
+
+function getPresetDates(preset) {
+    const today = new Date();
+    const dates = { start: null, end: null };
+    
+    switch(preset) {
+        case 'today':
+            dates.start = dates.end = today;
+            break;
+        case 'yesterday':
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            dates.start = dates.end = yesterday;
+            break;
+        case 'last7days':
+            dates.end = today;
+            dates.start = new Date(today);
+            dates.start.setDate(today.getDate() - 6);
+            break;
+        case 'last30days':
+            dates.end = today;
+            dates.start = new Date(today);
+            dates.start.setDate(today.getDate() - 29);
+            break;
+        case 'thismonth':
+            dates.start = new Date(today.getFullYear(), today.getMonth(), 1);
+            dates.end = today;
+            break;
+        case 'lastmonth':
+            dates.start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            dates.end = new Date(today.getFullYear(), today.getMonth(), 0);
+            break;
+    }
+    
+    return dates;
+}
+
+function updateReportPreview() {
+    const reportType = $('#reportType').val();
+    const format = $('#reportFormat').val();
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+    
+    if (reportType) {
+        $('#reportPreview').addClass('d-none');
+        $('#reportSummary').removeClass('d-none');
+        
+        $('#previewType').text(reportType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+        $('#previewFormat').text(format.toUpperCase());
+        $('#previewDates').text(startDate && endDate ? `${startDate} to ${endDate}` : 'Not specified');
+        $('#previewSize').text(estimateSize(reportType, format));
+        $('#previewTime').text(estimateTime(reportType));
+    } else {
+        $('#reportPreview').removeClass('d-none');
+        $('#reportSummary').addClass('d-none');
+    }
+}
+
+function estimateSize(type, format) {
+    // Simple size estimation logic
+    let baseSize = 250; // KB
+    if (format === 'excel') baseSize *= 1.5;
+    if (format === 'pdf') baseSize *= 0.8;
+    if (type.includes('detail')) baseSize *= 2;
+    
+    return baseSize > 1000 ? `${(baseSize/1000).toFixed(1)} MB` : `${Math.round(baseSize)} KB`;
+}
+
+function estimateTime(type) {
+    const times = {
+        'revenue': '15-30 seconds',
+        'commission': '30-45 seconds',
+        'user-activity': '45-60 seconds',
+        'financial-summary': '20-35 seconds',
+        'transaction-details': '60-90 seconds'
+    };
+    return times[type] || '30-45 seconds';
+}
+
+function generateReport() {
+    // Show loading state
+    $('#generateReportBtn').prop('disabled', true)
+                           .html('<i class="fas fa-spinner fa-spin me-2"></i>Generating...');
+    
+    // Simulate report generation
+    setTimeout(() => {
+        $('#generateReportBtn').prop('disabled', false)
+                               .html('<i class="fas fa-chart-line me-2"></i>Generate Report');
+        
+        // Show success message
+        showAlert('success', 'Report generated successfully! Check your downloads.');
+    }, 3000);
+}
+
+function showAlert(type, message) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    $('.content').prepend(alertHtml);
+}
+</script>
+{% endblock %}

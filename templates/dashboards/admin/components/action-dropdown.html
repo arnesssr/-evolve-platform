@@ -1,0 +1,104 @@
+<!-- Action Dropdown Component -->
+<!-- Usage: {% include 'dashboards/admin/components/action-dropdown.html' with actions=action_list %} -->
+
+<div class="dropdown {% if inline %}d-inline-block{% endif %}">
+    <button class="btn btn-{{ size|default:'sm' }} btn-{{ style|default:'light' }} {% if custom_class %}{{ custom_class }}{% endif %}" 
+            type="button" 
+            id="{{ dropdown_id|default:'actionDropdown' }}" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false">
+        {% if icon %}
+        <i class="fas {{ icon }} {% if label %}me-2{% endif %}"></i>
+        {% endif %}
+        {% if label %}
+        {{ label }}
+        {% else %}
+        <i class="fas fa-ellipsis-v"></i>
+        {% endif %}
+        {% if show_caret %}
+        <i class="fas fa-caret-down ms-1"></i>
+        {% endif %}
+    </button>
+    
+    <ul class="dropdown-menu {% if align_end %}dropdown-menu-end{% endif %}" 
+        aria-labelledby="{{ dropdown_id|default:'actionDropdown' }}">
+        
+        {% for action in actions %}
+            {% if action.divider %}
+                <li><hr class="dropdown-divider"></li>
+            {% elif action.header %}
+                <li><h6 class="dropdown-header">{{ action.header }}</h6></li>
+            {% else %}
+                <li>
+                    {% if action.url %}
+                    <a class="dropdown-item {% if action.disabled %}disabled{% endif %} {% if action.danger %}text-danger{% endif %}" 
+                       href="{{ action.url }}"
+                       {% if action.target %}target="{{ action.target }}"{% endif %}
+                       {% if action.data_attrs %}
+                           {% for key, value in action.data_attrs.items %}
+                           data-{{ key }}="{{ value }}"
+                           {% endfor %}
+                       {% endif %}>
+                    {% else %}
+                    <button class="dropdown-item {% if action.disabled %}disabled{% endif %} {% if action.danger %}text-danger{% endif %}" 
+                            type="button"
+                            {% if action.onclick %}onclick="{{ action.onclick }}"{% endif %}
+                            {% if action.data_attrs %}
+                                {% for key, value in action.data_attrs.items %}
+                                data-{{ key }}="{{ value }}"
+                                {% endfor %}
+                            {% endif %}>
+                    {% endif %}
+                        {% if action.icon %}
+                        <i class="fas {{ action.icon }} me-2 {% if action.icon_color %}text-{{ action.icon_color }}{% endif %}"></i>
+                        {% endif %}
+                        {{ action.label }}
+                        {% if action.badge %}
+                        <span class="badge bg-{{ action.badge_type|default:'primary' }} ms-2">{{ action.badge }}</span>
+                        {% endif %}
+                    {% if action.url %}
+                    </a>
+                    {% else %}
+                    </button>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if show_select_all %}
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <button class="dropdown-item" type="button" onclick="selectAllItems()">
+                <i class="fas fa-check-square me-2"></i>Select All
+            </button>
+        </li>
+        <li>
+            <button class="dropdown-item" type="button" onclick="deselectAllItems()">
+                <i class="fas fa-square me-2"></i>Deselect All
+            </button>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+{% if bulk_actions %}
+<script>
+// Bulk action handler
+function executeBulkAction(action) {
+    const selectedItems = document.querySelectorAll('.row-checkbox:checked');
+    if (selectedItems.length === 0) {
+        alert('Please select at least one item.');
+        return;
+    }
+    
+    const ids = Array.from(selectedItems).map(cb => cb.value);
+    
+    if (action === 'delete' && !confirm(`Are you sure you want to delete ${ids.length} items?`)) {
+        return;
+    }
+    
+    // Implement bulk action logic here
+    console.log('Executing bulk action:', action, 'on items:', ids);
+}
+</script>
+{% endif %}

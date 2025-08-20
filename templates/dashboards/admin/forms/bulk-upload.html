@@ -1,0 +1,573 @@
+<!-- Bulk Upload Form Component -->
+<div class="bulk-upload-form">
+    <form id="bulkUploadForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-upload text-primary me-2"></i>
+                        Bulk Data Upload
+                    </h6>
+                    <div class="upload-actions">
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="downloadTemplate()">
+                            <i class="fas fa-download me-1"></i>Download Template
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="viewHistory()">
+                            <i class="fas fa-history me-1"></i>Upload History
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Upload Type Selection -->
+                <div class="upload-type mb-4">
+                    <h6 class="text-muted mb-3">Select Data Type</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="users" id="uploadUsers" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadUsers">
+                                    <i class="fas fa-users text-primary me-2"></i>
+                                    <strong>Users</strong><br>
+                                    <small class="text-muted">Import user accounts and profiles</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="products" id="uploadProducts" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadProducts">
+                                    <i class="fas fa-box text-success me-2"></i>
+                                    <strong>Products</strong><br>
+                                    <small class="text-muted">Import product catalog</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="commissions" id="uploadCommissions" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadCommissions">
+                                    <i class="fas fa-percentage text-warning me-2"></i>
+                                    <strong>Commissions</strong><br>
+                                    <small class="text-muted">Import commission data</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="transactions" id="uploadTransactions" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadTransactions">
+                                    <i class="fas fa-receipt text-info me-2"></i>
+                                    <strong>Transactions</strong><br>
+                                    <small class="text-muted">Import transaction records</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="plans" id="uploadPlans" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadPlans">
+                                    <i class="fas fa-layer-group text-purple me-2"></i>
+                                    <strong>Plans</strong><br>
+                                    <small class="text-muted">Import subscription plans</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="upload_type" value="settings" id="uploadSettings" onchange="updateUploadOptions()">
+                                <label class="form-check-label" for="uploadSettings">
+                                    <i class="fas fa-cogs text-secondary me-2"></i>
+                                    <strong>Settings</strong><br>
+                                    <small class="text-muted">Import configuration data</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- File Upload Area -->
+                <div class="file-upload mb-4">
+                    <h6 class="text-muted mb-3">Upload File</h6>
+                    <div class="upload-zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+                        <div class="upload-content text-center">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h6>Drag & Drop your file here</h6>
+                            <p class="text-muted">or <a href="#" onclick="document.getElementById('fileInput').click()">browse to choose file</a></p>
+                            <input type="file" id="fileInput" name="upload_file" accept=".csv,.xlsx,.xls" style="display: none;" onchange="fileSelected(this)">
+                            <small class="text-muted">Supported formats: CSV, Excel (.xlsx, .xls) | Max size: 10MB</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected File Info -->
+                    <div id="fileInfo" class="file-info mt-3" style="display: none;">
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                            <div class="file-details">
+                                <i class="fas fa-file-excel text-success me-2"></i>
+                                <span id="fileName"></span>
+                                <small class="text-muted ms-2">(<span id="fileSize"></span>)</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Options -->
+                <div class="upload-options mb-4" id="uploadOptions" style="display: none;">
+                    <h6 class="text-muted mb-3">Upload Options</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Import Mode</label>
+                            <select class="form-select" name="import_mode">
+                                <option value="create">Create new records only</option>
+                                <option value="update">Update existing records only</option>
+                                <option value="upsert">Create new and update existing</option>
+                                <option value="replace">Replace all existing data</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Duplicate Handling</label>
+                            <select class="form-select" name="duplicate_handling">
+                                <option value="skip">Skip duplicates</option>
+                                <option value="overwrite">Overwrite duplicates</option>
+                                <option value="create_new">Create new with suffix</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="validate_before_import" checked>
+                                <label class="form-check-label">Validate data before import</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="send_notifications">
+                                <label class="form-check-label">Send import notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column Mapping -->
+                <div class="column-mapping mb-4" id="columnMapping" style="display: none;">
+                    <h6 class="text-muted mb-3">Column Mapping</h6>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Map your file columns to database fields. Required fields are marked with <span class="text-danger">*</span>
+                    </div>
+                    <div id="mappingTable">
+                        <!-- Column mapping table will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Data Preview -->
+                <div class="data-preview" id="dataPreview" style="display: none;">
+                    <h6 class="text-muted mb-3">Data Preview</h6>
+                    <div class="preview-info mb-2">
+                        <small class="text-muted">
+                            Showing first 5 rows of <span id="totalRows">0</span> total rows
+                        </small>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered" id="previewTable">
+                            <!-- Preview data will be populated here -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="upload-info">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            All uploads are validated and logged for security
+                        </small>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="validateData()" id="validateBtn" disabled>
+                            <i class="fas fa-check-circle me-1"></i>Validate Data
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>
+                            <i class="fas fa-upload me-1"></i>Start Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Upload Progress Modal -->
+<div class="modal fade" id="uploadProgressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Progress</h5>
+            </div>
+            <div class="modal-body">
+                <div class="progress mb-3">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgress" 
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+                <div class="upload-status">
+                    <div class="d-flex justify-content-between">
+                        <span>Status:</span>
+                        <span id="uploadStatus">Preparing...</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Records Processed:</span>
+                        <span id="recordsProcessed">0 / 0</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Errors:</span>
+                        <span id="errorCount" class="text-danger">0</span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <textarea class="form-control" id="uploadLog" rows="6" readonly placeholder="Upload log will appear here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cancelUpload()" id="cancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="closeProgress()" id="closeBtn" style="display: none;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload History Modal -->
+<div class="modal fade" id="uploadHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>File</th>
+                                <th>Records</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- History data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bulk-upload-form .card { border-radius: 10px; }
+.upload-zone { 
+    border: 2px dashed #dee2e6; 
+    border-radius: 8px; 
+    padding: 3rem 2rem; 
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.upload-zone:hover { border-color: var(--bs-primary); background-color: rgba(var(--bs-primary-rgb), 0.02); }
+.upload-zone.drag-over { border-color: var(--bs-success); background-color: rgba(var(--bs-success-rgb), 0.1); }
+.form-check { padding: 1rem; border: 1px solid #dee2e6; border-radius: 6px; margin-bottom: 0.5rem; }
+.form-check:hover { background-color: rgba(var(--bs-primary-rgb), 0.02); }
+.form-check-input:checked ~ .form-check-label { color: var(--bs-primary); }
+.file-info { display: none; }
+.text-purple { color: #6f42c1; }
+</style>
+
+<script>
+let selectedFile = null;
+let uploadType = null;
+
+// Column mapping templates for different data types
+const columnMappings = {
+    users: [
+        { field: 'email', required: true, type: 'email' },
+        { field: 'first_name', required: true, type: 'text' },
+        { field: 'last_name', required: true, type: 'text' },
+        { field: 'phone', required: false, type: 'tel' },
+        { field: 'company', required: false, type: 'text' },
+        { field: 'user_type', required: true, type: 'select', options: ['business', 'reseller', 'admin'] }
+    ],
+    products: [
+        { field: 'name', required: true, type: 'text' },
+        { field: 'sku', required: true, type: 'text' },
+        { field: 'price', required: true, type: 'number' },
+        { field: 'category', required: false, type: 'text' },
+        { field: 'description', required: false, type: 'text' },
+        { field: 'status', required: true, type: 'select', options: ['active', 'inactive'] }
+    ]
+};
+
+function updateUploadOptions() {
+    const checkedRadio = document.querySelector('input[name="upload_type"]:checked');
+    if (checkedRadio) {
+        uploadType = checkedRadio.value;
+        document.getElementById('uploadOptions').style.display = 'block';
+        updateFileValidation();
+    }
+}
+
+function dragOverHandler(ev) {
+    ev.preventDefault();
+    ev.currentTarget.classList.add('drag-over');
+}
+
+function dropHandler(ev) {
+    ev.preventDefault();
+    ev.currentTarget.classList.remove('drag-over');
+    
+    const files = ev.dataTransfer.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+}
+
+function fileSelected(input) {
+    if (input.files.length > 0) {
+        handleFile(input.files[0]);
+    }
+}
+
+function handleFile(file) {
+    // Validate file type
+    const allowedTypes = ['.csv', '.xlsx', '.xls'];
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+    
+    if (!allowedTypes.includes(fileExtension)) {
+        alert('Please select a CSV or Excel file (.csv, .xlsx, .xls)');
+        return;
+    }
+    
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+    }
+    
+    selectedFile = file;
+    
+    // Show file info
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+    document.getElementById('fileInfo').style.display = 'block';
+    
+    // Enable validation button
+    document.getElementById('validateBtn').disabled = false;
+    
+    // Show column mapping if upload type is selected
+    if (uploadType) {
+        showColumnMapping();
+    }
+}
+
+function removeFile() {
+    selectedFile = null;
+    document.getElementById('fileInfo').style.display = 'none';
+    document.getElementById('validateBtn').disabled = true;
+    document.getElementById('uploadBtn').disabled = true;
+    document.getElementById('columnMapping').style.display = 'none';
+    document.getElementById('dataPreview').style.display = 'none';
+}
+
+function formatFileSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+function showColumnMapping() {
+    if (!uploadType || !selectedFile) return;
+    
+    const mapping = columnMappings[uploadType];
+    if (!mapping) return;
+    
+    const mappingTable = document.getElementById('mappingTable');
+    let html = '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Database Field</th><th>Required</th><th>File Column</th></tr></thead><tbody>';
+    
+    mapping.forEach(field => {
+        html += `
+            <tr>
+                <td>${field.field} ${field.required ? '<span class="text-danger">*</span>' : ''}</td>
+                <td>${field.required ? '<i class="fas fa-check text-success"></i>' : '<i class="fas fa-minus text-muted"></i>'}</td>
+                <td>
+                    <select class="form-select form-select-sm" name="mapping_${field.field}">
+                        <option value="">Select column...</option>
+                        <option value="col_1">Column 1</option>
+                        <option value="col_2">Column 2</option>
+                        <option value="col_3">Column 3</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    mappingTable.innerHTML = html;
+    document.getElementById('columnMapping').style.display = 'block';
+}
+
+function validateData() {
+    if (!selectedFile || !uploadType) {
+        alert('Please select upload type and file');
+        return;
+    }
+    
+    const validateBtn = document.getElementById('validateBtn');
+    validateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validating...';
+    validateBtn.disabled = true;
+    
+    // Simulate validation
+    setTimeout(() => {
+        showDataPreview();
+        validateBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i>Validate Data';
+        validateBtn.disabled = false;
+        document.getElementById('uploadBtn').disabled = false;
+    }, 2000);
+}
+
+function showDataPreview() {
+    // Simulate data preview
+    const previewData = [
+        ['john@example.com', 'John', 'Doe', '+1234567890', 'ABC Corp', 'business'],
+        ['jane@example.com', 'Jane', 'Smith', '+1234567891', 'XYZ Inc', 'reseller'],
+        ['admin@example.com', 'Admin', 'User', '+1234567892', 'Platform', 'admin']
+    ];
+    
+    const headers = ['Email', 'First Name', 'Last Name', 'Phone', 'Company', 'User Type'];
+    
+    let html = '<thead><tr>';
+    headers.forEach(header => {
+        html += `<th>${header}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    previewData.forEach(row => {
+        html += '<tr>';
+        row.forEach(cell => {
+            html += `<td>${cell}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody>';
+    
+    document.getElementById('previewTable').innerHTML = html;
+    document.getElementById('totalRows').textContent = previewData.length;
+    document.getElementById('dataPreview').style.display = 'block';
+}
+
+function downloadTemplate() {
+    if (!uploadType) {
+        alert('Please select an upload type first');
+        return;
+    }
+    
+    // Simulate template download
+    const link = document.createElement('a');
+    link.href = `/admin/templates/${uploadType}_template.csv`;
+    link.download = `${uploadType}_template.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function viewHistory() {
+    // Simulate history data
+    const historyData = [
+        { date: '2024-01-15 10:30', type: 'Users', file: 'users_batch_1.csv', records: 150, status: 'completed' },
+        { date: '2024-01-14 14:20', type: 'Products', file: 'products.xlsx', records: 75, status: 'completed' },
+        { date: '2024-01-13 09:15', type: 'Commissions', file: 'commissions.csv', records: 200, status: 'failed' }
+    ];
+    
+    let html = '';
+    historyData.forEach(item => {
+        const statusClass = item.status === 'completed' ? 'success' : 'danger';
+        html += `
+            <tr>
+                <td>${item.date}</td>
+                <td>${item.type}</td>
+                <td>${item.file}</td>
+                <td>${item.records}</td>
+                <td><span class="badge bg-${statusClass}">${item.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="downloadReport('${item.file}')">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('historyTableBody').innerHTML = html;
+    new bootstrap.Modal(document.getElementById('uploadHistoryModal')).show();
+}
+
+// Form submission
+document.getElementById('bulkUploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    startUpload();
+});
+
+function startUpload() {
+    const modal = new bootstrap.Modal(document.getElementById('uploadProgressModal'));
+    modal.show();
+    
+    // Simulate upload progress
+    let progress = 0;
+    const progressBar = document.getElementById('uploadProgress');
+    const status = document.getElementById('uploadStatus');
+    const processed = document.getElementById('recordsProcessed');
+    const log = document.getElementById('uploadLog');
+    
+    const interval = setInterval(() => {
+        progress += Math.random() * 20;
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        status.textContent = progress < 100 ? 'Processing...' : 'Completed';
+        processed.textContent = `${Math.floor(progress * 1.5)} / 150`;
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('closeBtn').style.display = 'block';
+            log.value += '\nUpload completed successfully!';
+        } else {
+            log.value += `\nProcessing record ${Math.floor(progress * 1.5)}...`;
+        }
+        log.scrollTop = log.scrollHeight;
+    }, 500);
+}
+
+function cancelUpload() {
+    bootstrap.Modal.getInstance(document.getElementById('uploadProgressModal')).hide();
+}
+
+function closeProgress() {
+    bootstrap.Modal.getInstance(document.getElementById('uploadProgressModal')).hide();
+    // Reset form
+    document.getElementById('bulkUploadForm').reset();
+    removeFile();
+}
+
+function updateFileValidation() {
+    if (selectedFile && uploadType) {
+        showColumnMapping();
+    }
+}
+</script>

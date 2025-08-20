@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Alert - Evolve Platform</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: #dc3545;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header.warning { background: #ffc107; color: #212529; }
+        .header.info { background: #17a2b8; }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .alert-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .alert-box.warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        .alert-box.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .details-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        .details-table th,
+        .details-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .details-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header {{ alert_type }}">
+            <h1>🚨 System Alert</h1>
+            <p>{{ alert_title }}</p>
+        </div>
+        
+        <div class="content">
+            <h2>Attention Admin Team,</h2>
+            
+            <div class="alert-box {{ alert_type }}">
+                <strong>{{ alert_severity }} Alert:</strong> {{ alert_message }}
+            </div>
+            
+            <h3>📋 Alert Details</h3>
+            <table class="details-table">
+                <tr>
+                    <th>Alert Type</th>
+                    <td>{{ alert_type_full }}</td>
+                </tr>
+                <tr>
+                    <th>Severity</th>
+                    <td>{{ alert_severity }}</td>
+                </tr>
+                <tr>
+                    <th>Timestamp</th>
+                    <td>{{ alert_timestamp }}</td>
+                </tr>
+                <tr>
+                    <th>Component</th>
+                    <td>{{ affected_component }}</td>
+                </tr>
+                <tr>
+                    <th>Error Code</th>
+                    <td>{{ error_code }}</td>
+                </tr>
+            </table>
+            
+            <h3>💡 Recommended Actions</h3>
+            <ul>
+                {% for action in recommended_actions %}
+                <li>{{ action }}</li>
+                {% endfor %}
+            </ul>
+            
+            <div style="text-align: center;">
+                <a href="{{ admin_dashboard_url }}" class="button">View System Status</a>
+            </div>
+            
+            {% if technical_details %}
+            <h3>🔧 Technical Details</h3>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;">{{ technical_details }}</pre>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p><strong>Evolve Platform Monitoring System</strong></p>
+            <p>This alert was generated automatically by the system monitoring service.</p>
+        </div>
+    </div>
+</body>
+</html>

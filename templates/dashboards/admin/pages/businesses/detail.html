@@ -1,0 +1,443 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}{{ business.company_name }} - Business Details{% endblock %}
+
+{% block page_title %}{{ business.company_name|default:"Business Details" }}{% endblock %}
+{% block page_subtitle %}Complete business profile and subscription management{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:businesses_list' %}">Business Customers</a></li>
+    <li class="breadcrumb-item active">{{ business.company_name|default:"Business Details" }}</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+        <i class="fas fa-print me-2"></i>Print
+    </button>
+    <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-cog me-2"></i>Actions
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#suspendUserModal">
+                <i class="fas fa-ban me-2"></i>Suspend Account
+            </a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#processPayoutModal">
+                <i class="fas fa-money-bill-wave me-2"></i>Process Refund
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+                <i class="fas fa-trash me-2"></i>Delete Business
+            </a></li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editBusinessModal">
+        <i class="fas fa-edit me-2"></i>Edit Business
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Business Profile Overview -->
+<div class="row">
+    <!-- Main Business Information -->
+    <div class="col-lg-8">
+        <div class="content-card mb-4">
+            <div class="d-flex align-items-start justify-content-between mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-3">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-building text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="mb-1">{{ business.company_name|default:"TechCorp Solutions" }}</h4>
+                        <p class="text-muted mb-2">{{ business.industry|default:"Technology" }} • {{ business.company_size|default:"50-100 employees" }}</p>
+                        <div class="d-flex align-items-center gap-3">
+                            {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active Account" %}
+                            <span class="badge bg-info">Enterprise Customer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="fw-bold text-success fs-4">${{ business.monthly_revenue|default:"2,450" }}/mo</div>
+                    <small class="text-muted">Monthly Revenue</small>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Company Information</h6>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="text-muted">Registration Number:</td>
+                            <td class="fw-medium">{{ business.registration_number|default:"REG123456789" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tax ID:</td>
+                            <td class="fw-medium">{{ business.tax_id|default:"TAX-987654321" }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Website:</td>
+                            <td><a href="{{ business.website|default:'#' }}" target="_blank" class="text-decoration-none">{{ business.website|default:"www.techcorp.com" }}</a></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Founded:</td>
+                            <td>{{ business.founded_year|default:"2018" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-3">Business Address</h6>
+                    <div class="text-muted">
+                        {{ business.address_line1|default:"123 Business Street" }}<br>
+                        {% if business.address_line2 %}{{ business.address_line2 }}<br>{% endif %}
+                        {{ business.city|default:"Nairobi" }}, {{ business.state|default:"Nairobi County" }} {{ business.postal_code|default:"00100" }}<br>
+                        {{ business.country|default:"Kenya" }}
+                    </div>
+                    
+                    <h6 class="fw-bold mb-2 mt-3">Primary Contact</h6>
+                    <div>
+                        <div class="fw-medium">{{ business.contact_person|default:"John Smith" }}</div>
+                        <div class="text-muted">{{ business.contact_title|default:"Chief Executive Officer" }}</div>
+                        <div class="mt-2">
+                            <i class="fas fa-envelope me-2"></i>{{ business.contact_email|default:"john@techcorp.com" }}<br>
+                            <i class="fas fa-phone me-2"></i>{{ business.contact_phone|default:"+254 700 123 456" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Subscription Details -->
+        <div class="content-card mb-4">
+            <h5 class="mb-4">Current Subscription</h5>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-success rounded p-2">
+                                <i class="fas fa-crown text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ subscription.plan_name|default:"Enterprise Plan" }}</h6>
+                            <small class="text-muted">{{ subscription.billing_cycle|default:"Monthly billing" }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Start Date</small>
+                            <div class="fw-medium">{{ subscription.start_date|default:"Jan 15, 2024" }}</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Next Billing</small>
+                            <div class="fw-medium">{{ subscription.next_billing|default:"Dec 15, 2024" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                    </div>
+                    <small class="text-muted">9 months of 12-month subscription completed</small>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="fw-bold fs-3 text-success">${{ subscription.amount|default:"2,450" }}</div>
+                    <div class="text-muted">per month</div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#manageSubscriptionModal">
+                        <i class="fas fa-cog me-1"></i>Manage
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usage Analytics -->
+        <div class="content-card mb-4">
+            <h5 class="mb-4">Usage Analytics</h5>
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <div class="fw-bold fs-4 text-primary">{{ usage.active_users|default:"24" }}</div>
+                    <small class="text-muted">Active Users</small>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="fw-bold fs-4 text-info">{{ usage.total_logins|default:"1,247" }}</div>
+                    <small class="text-muted">Total Logins</small>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="fw-bold fs-4 text-warning">{{ usage.data_usage|default:"2.4" }}GB</div>
+                    <small class="text-muted">Data Used</small>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <div class="fw-bold fs-4 text-success">{{ usage.api_calls|default:"12,450" }}</div>
+                    <small class="text-muted">API Calls</small>
+                </div>
+            </div>
+            
+            <!-- Usage Chart -->
+            <div class="mt-4">
+                <canvas id="usageChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar Information -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="content-card mb-4">
+            <h6 class="fw-bold mb-3">Quick Actions</h6>
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-envelope me-2"></i>Send Email
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-phone me-2"></i>Schedule Call
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-invoice me-2"></i>Generate Invoice
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Flag Issue
+                </button>
+            </div>
+        </div>
+        
+        <!-- Support Tickets -->
+        <div class="content-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Support Tickets</h6>
+                <span class="badge bg-danger">2 Open</span>
+            </div>
+            
+            <div class="list-group list-group-flush">
+                <div class="list-group-item border-0 px-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Login Issues</h6>
+                            <small class="text-muted">Opened 2 days ago</small>
+                        </div>
+                        <span class="badge bg-warning">High</span>
+                    </div>
+                </div>
+                <div class="list-group-item border-0 px-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">Feature Request</h6>
+                            <small class="text-muted">Opened 1 week ago</small>
+                        </div>
+                        <span class="badge bg-info">Medium</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                View All Tickets
+            </button>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="content-card mb-4">
+            <h6 class="fw-bold mb-3">Recent Activity</h6>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-success"></div>
+                    <div class="timeline-content">
+                        <small class="text-muted">2 hours ago</small>
+                        <div>Payment received for October</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-info"></div>
+                    <div class="timeline-content">
+                        <small class="text-muted">1 day ago</small>
+                        <div>Support ticket resolved</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker bg-warning"></div>
+                    <div class="timeline-content">
+                        <small class="text-muted">3 days ago</small>
+                        <div>Subscription renewed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Account Summary -->
+        <div class="content-card">
+            <h6 class="fw-bold mb-3">Account Summary</h6>
+            <table class="table table-sm table-borderless">
+                <tr>
+                    <td class="text-muted">Account Created:</td>
+                    <td class="fw-medium">{{ business.created_date|default:"Jan 15, 2024" }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Last Login:</td>
+                    <td class="fw-medium">{{ business.last_login|default:"2 hours ago" }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Total Paid:</td>
+                    <td class="fw-medium text-success">${{ business.total_paid|default:"19,600" }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Referral Source:</td>
+                    <td class="fw-medium">{{ business.referral_source|default:"Google Ads" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modals -->
+{% include 'dashboards/admin/modals/suspend-user.html' %}
+{% include 'dashboards/admin/modals/process-payout.html' %}
+{% include 'dashboards/admin/modals/user-details.html' %}
+
+<!-- Custom Modals for Business -->
+<div class="modal fade" id="editBusinessModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Business Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Business edit form would go here -->
+                <form>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" value="{{ business.company_name|default:'TechCorp Solutions' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="industry" class="form-label">Industry</label>
+                            <select class="form-select" id="industry">
+                                <option>Technology</option>
+                                <option>Healthcare</option>
+                                <option>Manufacturing</option>
+                                <option>Retail</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- More form fields would be added here -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manageSubscriptionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage Subscription</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-primary">Upgrade Plan</button>
+                    <button type="button" class="btn btn-outline-info">Change Billing Cycle</button>
+                    <button type="button" class="btn btn-outline-warning">Pause Subscription</button>
+                    <button type="button" class="btn btn-outline-danger">Cancel Subscription</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 20px;
+    bottom: -20px;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.timeline-item:last-child:before {
+    display: none;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 3px solid #e5e7eb;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Usage Chart
+    const ctx = document.getElementById('usageChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [{
+                label: 'Daily Active Users',
+                data: [12, 19, 15, 25, 22, 30, 28, 35, 32, 40],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true,
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

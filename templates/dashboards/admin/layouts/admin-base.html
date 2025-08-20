@@ -1,0 +1,516 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Evolve Platform Admin Dashboard">
+    <meta name="author" content="Evolve Platform">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <title>{% block title %}Admin Dashboard{% endblock %} - Evolve Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{% static 'css/admin-base.css' %}" rel="stylesheet">
+    
+    <!-- Additional CSS -->
+    {% block extra_css %}{% endblock %}
+    
+    <style>
+        :root {
+            --primary-color: #0a2463;
+            --secondary-color: #3e92cc;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 70px;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8f9fa;
+            color: #1f2937;
+        }
+        
+        /* Admin Layout */
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #1e3a8a 100%);
+            color: white;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .admin-sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+        
+        .admin-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .admin-main.expanded {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+        
+        .admin-header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0;
+            height: var(--header-height);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-content {
+            flex: 1;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: #6b7280;
+            margin-bottom: 0;
+        }
+        
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: #9ca3af;
+        }
+        
+        /* Content Cards */
+        .content-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .admin-main {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+        }
+        
+        /* Loading States */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1055;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .admin-sidebar,
+            .admin-header,
+            .no-print {
+                display: none !important;
+            }
+            
+            .admin-main {
+                margin-left: 0 !important;
+            }
+            
+            .admin-content {
+                padding: 0 !important;
+            }
+        }
+    </style>
+    
+    <!-- Additional Head Content -->
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay d-none" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Admin Wrapper -->
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        {% include 'dashboards/admin/layouts/includes/admin-sidebar.html' %}
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Main Content -->
+        <div class="admin-main" id="adminMain">
+            <!-- Header -->
+            {% include 'dashboards/admin/layouts/includes/admin-header.html' %}
+            
+            <!-- Page Content -->
+            <main class="admin-content">
+                <!-- Flash Messages -->
+                {% if messages %}
+                <div class="alert-container mb-3">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-triangle{% elif message.tags == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Page Header -->
+                {% block page_header %}
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                            <p class="page-subtitle">{% block page_subtitle %}Welcome to the admin dashboard{% endblock %}</p>
+                            
+                            <!-- Breadcrumb -->
+                            {% block breadcrumb %}
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+                                    {% block breadcrumb_items %}{% endblock %}
+                                </ol>
+                            </nav>
+                            {% endblock %}
+                        </div>
+                        
+                        <!-- Page Actions -->
+                        <div class="page-actions">
+                            {% block page_actions %}{% endblock %}
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}
+                
+                <!-- Main Content -->
+                {% block content %}
+                <div class="content-card">
+                    <p>Default content - override the content block in your template.</p>
+                </div>
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- CSRF Token -->
+    {% csrf_token %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js (if needed) -->
+    {% block chart_js %}{% endblock %}
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Global Admin Functions
+        const AdminApp = {
+            // Initialize
+            init() {
+                this.initSidebar();
+                this.initToasts();
+                this.initTheme();
+                this.initKeyboardShortcuts();
+            },
+            
+            // Sidebar Management
+            initSidebar() {
+                const sidebar = document.getElementById('adminSidebar');
+                const main = document.getElementById('adminMain');
+                const overlay = document.getElementById('sidebarOverlay');
+                const toggleBtn = document.getElementById('sidebarToggle');
+                
+                // Toggle sidebar
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', () => {
+                        if (window.innerWidth <= 992) {
+                            // Mobile toggle
+                            sidebar.classList.toggle('show');
+                            overlay.classList.toggle('show');
+                        } else {
+                            // Desktop toggle
+                            sidebar.classList.toggle('collapsed');
+                            main.classList.toggle('expanded');
+                            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                        }
+                    });
+                }
+                
+                // Close sidebar on overlay click
+                if (overlay) {
+                    overlay.addEventListener('click', () => {
+                        sidebar.classList.remove('show');
+                        overlay.classList.remove('show');
+                    });
+                }
+                
+                // Restore sidebar state
+                const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                if (isCollapsed && window.innerWidth > 992) {
+                    sidebar.classList.add('collapsed');
+                    main.classList.add('expanded');
+                }
+                
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 992) {
+                        sidebar.classList.remove('show');
+                        overlay.classList.remove('show');
+                    }
+                });
+            },
+            
+            // Toast Notifications
+            initToasts() {
+                window.showToast = (message, type = 'info', duration = 5000) => {
+                    const toastContainer = document.getElementById('toastContainer');
+                    const toastId = 'toast-' + Date.now();
+                    
+                    const toastHtml = `
+                        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <i class="fas fa-${this.getToastIcon(type)} text-${type} me-2"></i>
+                                <strong class="me-auto">${this.getToastTitle(type)}</strong>
+                                <small>now</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                        </div>
+                    `;
+                    
+                    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+                    
+                    const toastElement = document.getElementById(toastId);
+                    const toast = new bootstrap.Toast(toastElement, { delay: duration });
+                    toast.show();
+                    
+                    // Remove from DOM after hiding
+                    toastElement.addEventListener('hidden.bs.toast', () => {
+                        toastElement.remove();
+                    });
+                };
+            },
+            
+            // Theme Management
+            initTheme() {
+                const savedTheme = localStorage.getItem('adminTheme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                window.toggleTheme = () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('adminTheme', newTheme);
+                };
+            },
+            
+            // Keyboard Shortcuts
+            initKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + S to save (prevent default browser save)
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        const saveBtn = document.querySelector('[data-save], .btn-save');
+                        if (saveBtn) saveBtn.click();
+                    }
+                    
+                    // Ctrl/Cmd + K for search
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        const searchInput = document.querySelector('[data-search], .search-input');
+                        if (searchInput) searchInput.focus();
+                    }
+                    
+                    // Escape to close modals
+                    if (e.key === 'Escape') {
+                        const activeModal = document.querySelector('.modal.show');
+                        if (activeModal) {
+                            bootstrap.Modal.getInstance(activeModal)?.hide();
+                        }
+                    }
+                });
+            },
+            
+            // Utility Functions
+            getToastIcon(type) {
+                const icons = {
+                    success: 'check-circle',
+                    error: 'exclamation-triangle',
+                    warning: 'exclamation-circle',
+                    info: 'info-circle'
+                };
+                return icons[type] || 'info-circle';
+            },
+            
+            getToastTitle(type) {
+                const titles = {
+                    success: 'Success',
+                    error: 'Error',
+                    warning: 'Warning',
+                    info: 'Information'
+                };
+                return titles[type] || 'Notification';
+            },
+            
+            // Loading State Management
+            showLoading() {
+                document.getElementById('loadingOverlay').classList.remove('d-none');
+            },
+            
+            hideLoading() {
+                document.getElementById('loadingOverlay').classList.add('d-none');
+            },
+            
+            // Page Navigation
+            navigateTo(url) {
+                this.showLoading();
+                window.location.href = url;
+            }
+        };
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            AdminApp.init();
+        });
+        
+        // Global utility functions
+        window.AdminApp = AdminApp;
+        
+        // CSRF Token helper
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        }
+        
+        // Confirm dialog helper
+        function confirmAction(message, callback) {
+            if (confirm(message)) {
+                callback();
+            }
+        }
+    </script>
+    
+    <!-- Page-specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Analytics (if enabled) -->
+    {% if GOOGLE_ANALYTICS_ID %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ GOOGLE_ANALYTICS_ID }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ GOOGLE_ANALYTICS_ID }}');
+    </script>
+    {% endif %}
+</body>
+</html>

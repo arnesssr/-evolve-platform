@@ -1,0 +1,311 @@
+<!-- Commission Rules Form Component -->
+<div class="commission-rules-form">
+    <form id="commissionRulesForm" method="POST">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="fas fa-percentage text-primary me-2"></i>
+                    Commission Rules Configuration
+                </h6>
+            </div>
+            
+            <div class="card-body">
+                <!-- Basic Commission Settings -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Default Commission Rate (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="default_rate" step="0.01" min="0" max="100"
+                                   value="{{ rules.default_rate|default:'10.00' }}">
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Commission Type</label>
+                        <select class="form-select" name="commission_type">
+                            <option value="percentage" {% if rules.commission_type == 'percentage' %}selected{% endif %}>Percentage</option>
+                            <option value="fixed" {% if rules.commission_type == 'fixed' %}selected{% endif %}>Fixed Amount</option>
+                            <option value="tiered" {% if rules.commission_type == 'tiered' %}selected{% endif %}>Tiered</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">Payment Trigger</label>
+                        <select class="form-select" name="payment_trigger">
+                            <option value="sale" {% if rules.payment_trigger == 'sale' %}selected{% endif %}>On Sale</option>
+                            <option value="payment" {% if rules.payment_trigger == 'payment' %}selected{% endif %}>On Payment</option>
+                            <option value="delivery" {% if rules.payment_trigger == 'delivery' %}selected{% endif %}>On Delivery</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Tiered Commission Rules -->
+                <div id="tieredRules" class="d-none">
+                    <h6 class="text-muted mb-3">Tiered Commission Structure</h6>
+                    <div id="tiersList">
+                        <!-- Tiers will be populated here -->
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTier()">
+                        <i class="fas fa-plus me-1"></i>Add Tier
+                    </button>
+                </div>
+                
+                <!-- Product-Specific Rules -->
+                <div class="product-rules mb-4">
+                    <h6 class="text-muted mb-3">Product-Specific Rules</h6>
+                    <div id="productRules">
+                        {% for rule in rules.product_rules %}
+                        <div class="product-rule-item mb-3">
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-4">
+                                    <select class="form-select" name="product_id[]">
+                                        <option value="">Select Product</option>
+                                        {% for product in products %}
+                                        <option value="{{ product.id }}" {% if rule.product_id == product.id %}selected{% endif %}>
+                                            {{ product.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="product_rate[]" 
+                                               step="0.01" min="0" value="{{ rule.rate }}">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" name="product_rule_type[]">
+                                        <option value="percentage" {% if rule.type == 'percentage' %}selected{% endif %}>Percentage</option>
+                                        <option value="fixed" {% if rule.type == 'fixed' %}selected{% endif %}>Fixed</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeProductRule(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addProductRule()">
+                        <i class="fas fa-plus me-1"></i>Add Product Rule
+                    </button>
+                </div>
+                
+                <!-- Reseller Tier Rules -->
+                <div class="reseller-tiers mb-4">
+                    <h6 class="text-muted mb-3">Reseller Tier Multipliers</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small">Bronze Tier</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="bronze_multiplier" 
+                                       step="0.01" min="0" value="{{ rules.bronze_multiplier|default:'1.0' }}">
+                                <span class="input-group-text">x</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Silver Tier</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="silver_multiplier" 
+                                       step="0.01" min="0" value="{{ rules.silver_multiplier|default:'1.2' }}">
+                                <span class="input-group-text">x</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Gold Tier</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="gold_multiplier" 
+                                       step="0.01" min="0" value="{{ rules.gold_multiplier|default:'1.5' }}">
+                                <span class="input-group-text">x</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small">Platinum Tier</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="platinum_multiplier" 
+                                       step="0.01" min="0" value="{{ rules.platinum_multiplier|default:'2.0' }}">
+                                <span class="input-group-text">x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional Settings -->
+                <div class="additional-settings">
+                    <h6 class="text-muted mb-3">Additional Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="recurring_commissions" 
+                                       {% if rules.recurring_commissions %}checked{% endif %}>
+                                <label class="form-check-label">Enable Recurring Commissions</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="auto_approval" 
+                                       {% if rules.auto_approval %}checked{% endif %}>
+                                <label class="form-check-label">Auto-approve Commissions</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Commission Cap per Sale ($)</label>
+                            <input type="number" class="form-control" name="commission_cap" step="0.01" min="0"
+                                   value="{{ rules.commission_cap|default:'' }}" placeholder="No cap">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Minimum Payout Amount ($)</label>
+                            <input type="number" class="form-control" name="minimum_payout" step="0.01" min="0"
+                                   value="{{ rules.minimum_payout|default:'50.00' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="preview-info">
+                        <small class="text-muted">
+                            <i class="fas fa-calculator me-1"></i>
+                            Preview: $100 sale = $<span id="commissionPreview">10.00</span> commission
+                        </small>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetToDefaults()">
+                            <i class="fas fa-undo me-1"></i>Reset
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Rules
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.commission-rules-form .card { border-radius: 10px; }
+.product-rule-item, .tier-item { background: rgba(var(--bs-light-rgb), 0.5); padding: 1rem; border-radius: 6px; border: 1px solid #dee2e6; }
+.tier-item { margin-bottom: 0.75rem; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const commissionType = document.querySelector('[name="commission_type"]');
+    commissionType.addEventListener('change', toggleCommissionType);
+    
+    document.querySelector('[name="default_rate"]').addEventListener('input', updatePreview);
+    
+    toggleCommissionType();
+    updatePreview();
+});
+
+function toggleCommissionType() {
+    const type = document.querySelector('[name="commission_type"]').value;
+    const tieredRules = document.getElementById('tieredRules');
+    
+    if (type === 'tiered') {
+        tieredRules.classList.remove('d-none');
+        if (document.getElementById('tiersList').children.length === 0) {
+            addTier();
+        }
+    } else {
+        tieredRules.classList.add('d-none');
+    }
+}
+
+function addTier() {
+    const tiersList = document.getElementById('tiersList');
+    const tierHTML = `
+        <div class="tier-item">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label small">Min Sales ($)</label>
+                    <input type="number" class="form-control" name="tier_min[]" step="0.01" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Max Sales ($)</label>
+                    <input type="number" class="form-control" name="tier_max[]" step="0.01" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Commission Rate (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="tier_rate[]" step="0.01" min="0" max="100">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-danger w-100" onclick="removeTier(this)">
+                        <i class="fas fa-trash me-1"></i>Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    tiersList.insertAdjacentHTML('beforeend', tierHTML);
+}
+
+function removeTier(button) {
+    button.closest('.tier-item').remove();
+}
+
+function addProductRule() {
+    const productRules = document.getElementById('productRules');
+    const ruleHTML = `
+        <div class="product-rule-item mb-3">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <select class="form-select" name="product_id[]">
+                        <option value="">Select Product</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}">{{ product.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="number" class="form-control" name="product_rate[]" step="0.01" min="0">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="product_rule_type[]">
+                        <option value="percentage">Percentage</option>
+                        <option value="fixed">Fixed</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeProductRule(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    productRules.insertAdjacentHTML('beforeend', ruleHTML);
+}
+
+function removeProductRule(button) {
+    button.closest('.product-rule-item').remove();
+}
+
+function updatePreview() {
+    const rate = parseFloat(document.querySelector('[name="default_rate"]').value) || 0;
+    const preview = (100 * rate / 100).toFixed(2);
+    document.getElementById('commissionPreview').textContent = preview;
+}
+
+function resetToDefaults() {
+    if (confirm('Reset all commission rules to default values?')) {
+        document.querySelector('[name="default_rate"]').value = '10.00';
+        document.querySelector('[name="commission_type"]').value = 'percentage';
+        updatePreview();
+        toggleCommissionType();
+    }
+}
+</script>

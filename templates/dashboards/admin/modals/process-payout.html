@@ -1,0 +1,458 @@
+<!-- Process Payout Modal Component -->
+<div class="modal fade" id="processPayoutModal" tabindex="-1" aria-labelledby="processPayoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="processPayoutModalLabel">
+                    <i class="fas fa-money-bill-wave me-2"></i>Process Payout
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Payout Summary -->
+                <div class="payout-summary mb-4">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <label class="fw-bold text-muted">Reseller:</label>
+                                        <div id="payoutReseller" class="fs-5">John Doe</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <label class="fw-bold text-muted">Total Amount:</label>
+                                        <div id="payoutAmount" class="fs-4 text-success fw-bold">$1,247.50</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <label class="fw-bold text-muted">Commissions Count:</label>
+                                        <div id="commissionsCount">15 commissions</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="summary-item">
+                                        <label class="fw-bold text-muted">Period:</label>
+                                        <div id="payoutPeriod">Jan 1 - Jan 31, 2024</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Method Selection -->
+                <div class="payment-method mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Payment Method</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" checked onchange="updatePaymentFields()">
+                                <label class="form-check-label" for="bankTransfer">
+                                    <i class="fas fa-university text-primary me-2"></i>
+                                    <strong>Bank Transfer</strong><br>
+                                    <small class="text-muted">Direct deposit to bank account</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" onchange="updatePaymentFields()">
+                                <label class="form-check-label" for="paypal">
+                                    <i class="fab fa-paypal text-info me-2"></i>
+                                    <strong>PayPal</strong><br>
+                                    <small class="text-muted">Send via PayPal</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check payment-option">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="check" value="check" onchange="updatePaymentFields()">
+                                <label class="form-check-label" for="check">
+                                    <i class="fas fa-money-check text-warning me-2"></i>
+                                    <strong>Check</strong><br>
+                                    <small class="text-muted">Mail physical check</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bank Transfer Fields -->
+                <div id="bankTransferFields" class="payment-fields mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Bank Account Details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" id="bankName" value="Chase Bank" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Account Holder</label>
+                            <input type="text" class="form-control" id="accountHolder" value="John Doe" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Account Number</label>
+                            <input type="text" class="form-control" id="accountNumber" value="****1234" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Routing Number</label>
+                            <input type="text" class="form-control" id="routingNumber" value="****5678" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PayPal Fields -->
+                <div id="paypalFields" class="payment-fields mb-4" style="display: none;">
+                    <h6 class="text-muted border-bottom pb-2">PayPal Details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">PayPal Email</label>
+                            <input type="email" class="form-control" id="paypalEmail" value="john.doe@example.com" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Check Fields -->
+                <div id="checkFields" class="payment-fields mb-4" style="display: none;">
+                    <h6 class="text-muted border-bottom pb-2">Mailing Address</h6>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" id="mailingAddress" rows="3" readonly>123 Main St
+Anytown, ST 12345
+United States</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payout Details -->
+                <div class="payout-details mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Payout Details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Processing Fee</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="processingFee" value="5.00" step="0.01" onchange="calculateNetAmount()">
+                            </div>
+                            <small class="form-text text-muted">Standard processing fee</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tax Withholding</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="taxWithholding" value="0.00" step="0.01" onchange="calculateNetAmount()">
+                            </div>
+                            <small class="form-text text-muted">If applicable</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reference Number</label>
+                            <input type="text" class="form-control" id="referenceNumber" value="PAY-2024-001234" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Net Payout Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" id="netAmount" value="1242.50" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule Options -->
+                <div class="schedule-options mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Payment Schedule</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="schedule" id="immediate" value="immediate" checked>
+                                <label class="form-check-label" for="immediate">
+                                    <i class="fas fa-bolt text-warning me-1"></i>
+                                    Process Immediately
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="schedule" id="scheduled" value="scheduled">
+                                <label class="form-check-label" for="scheduled">
+                                    <i class="fas fa-calendar text-info me-1"></i>
+                                    Schedule for Later
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="scheduledDateSection" class="mt-3" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="scheduledDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="scheduledTime" value="09:00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Commission Breakdown -->
+                <div class="commission-breakdown">
+                    <h6 class="text-muted border-bottom pb-2">Commission Breakdown</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Sale ID</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="commissionBreakdown">
+                                <!-- Commission data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Notes -->
+                <div class="payout-notes mt-4">
+                    <h6 class="text-muted border-bottom pb-2">Notes</h6>
+                    <textarea class="form-control" id="payoutNotes" rows="3" placeholder="Add any notes about this payout..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-primary" onclick="generatePayoutReport()">
+                    <i class="fas fa-file-pdf me-1"></i>Generate Report
+                </button>
+                <button type="button" class="btn btn-success" onclick="processPayout()" id="processPayoutBtn">
+                    <i class="fas fa-paper-plane me-1"></i>Process Payout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.payment-option {
+    padding: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.payment-option input:checked ~ label {
+    color: #007bff;
+}
+
+.summary-item {
+    margin-bottom: 0.5rem;
+}
+
+.summary-item label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.payment-fields {
+    display: block;
+}
+</style>
+
+<script>
+let currentPayoutData = null;
+
+function showProcessPayoutModal(payoutData) {
+    currentPayoutData = payoutData;
+    
+    // Populate payout data
+    document.getElementById('payoutReseller').textContent = payoutData.resellerName || 'John Doe';
+    document.getElementById('payoutAmount').textContent = '$' + (payoutData.totalAmount || '1,247.50');
+    document.getElementById('commissionsCount').textContent = (payoutData.commissionsCount || '15') + ' commissions';
+    document.getElementById('payoutPeriod').textContent = payoutData.period || 'Jan 1 - Jan 31, 2024';
+    
+    // Set tomorrow as default scheduled date
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('scheduledDate').value = tomorrow.toISOString().split('T')[0];
+    
+    // Load commission breakdown
+    loadCommissionBreakdown(payoutData.commissions || []);
+    
+    // Calculate initial net amount
+    calculateNetAmount();
+    
+    const modal = new bootstrap.Modal(document.getElementById('processPayoutModal'));
+    modal.show();
+}
+
+function updatePaymentFields() {
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    
+    // Hide all payment fields
+    document.getElementById('bankTransferFields').style.display = 'none';
+    document.getElementById('paypalFields').style.display = 'none';
+    document.getElementById('checkFields').style.display = 'none';
+    
+    // Show selected payment method fields
+    if (selectedMethod === 'bank_transfer') {
+        document.getElementById('bankTransferFields').style.display = 'block';
+    } else if (selectedMethod === 'paypal') {
+        document.getElementById('paypalFields').style.display = 'block';
+    } else if (selectedMethod === 'check') {
+        document.getElementById('checkFields').style.display = 'block';
+    }
+    
+    // Update processing fee based on method
+    let fee = 5.00;
+    if (selectedMethod === 'paypal') fee = 12.50;
+    if (selectedMethod === 'check') fee = 2.00;
+    
+    document.getElementById('processingFee').value = fee.toFixed(2);
+    calculateNetAmount();
+}
+
+function calculateNetAmount() {
+    const grossAmount = parseFloat(currentPayoutData?.totalAmount || '1247.50');
+    const processingFee = parseFloat(document.getElementById('processingFee').value || '0');
+    const taxWithholding = parseFloat(document.getElementById('taxWithholding').value || '0');
+    
+    const netAmount = grossAmount - processingFee - taxWithholding;
+    document.getElementById('netAmount').value = netAmount.toFixed(2);
+}
+
+function loadCommissionBreakdown(commissions) {
+    const tbody = document.getElementById('commissionBreakdown');
+    
+    // Sample commission data if none provided
+    if (commissions.length === 0) {
+        commissions = [
+            { date: '2024-01-20', saleId: 'SALE-001234', product: 'Pro Plan', amount: '$15.50' },
+            { date: '2024-01-19', saleId: 'SALE-001230', product: 'Basic Plan', amount: '$7.35' },
+            { date: '2024-01-18', saleId: 'SALE-001225', product: 'Enterprise', amount: '$29.85' },
+            { date: '2024-01-17', saleId: 'SALE-001220', product: 'Pro Plan', amount: '$15.50' },
+            { date: '2024-01-16', saleId: 'SALE-001215', product: 'Basic Plan', amount: '$7.35' }
+        ];
+    }
+    
+    let html = '';
+    commissions.forEach(commission => {
+        html += `
+            <tr>
+                <td>${commission.date}</td>
+                <td>${commission.saleId}</td>
+                <td>${commission.product}</td>
+                <td>${commission.amount}</td>
+            </tr>
+        `;
+    });
+    
+    // Add "and X more..." row if there are more than 5 commissions
+    if (commissions.length > 5) {
+        html += `
+            <tr class="table-secondary">
+                <td colspan="3"><em>... and ${commissions.length - 5} more commissions</em></td>
+                <td><strong>Total: ${document.getElementById('payoutAmount').textContent}</strong></td>
+            </tr>
+        `;
+    }
+    
+    tbody.innerHTML = html;
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Schedule radio button change
+    document.querySelectorAll('input[name="schedule"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const scheduledSection = document.getElementById('scheduledDateSection');
+            if (this.value === 'scheduled') {
+                scheduledSection.style.display = 'block';
+            } else {
+                scheduledSection.style.display = 'none';
+            }
+        });
+    });
+});
+
+function processPayout() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const schedule = document.querySelector('input[name="schedule"]:checked').value;
+    const netAmount = document.getElementById('netAmount').value;
+    const notes = document.getElementById('payoutNotes').value;
+    
+    let payoutData = {
+        reseller: currentPayoutData.resellerName,
+        amount: netAmount,
+        method: paymentMethod,
+        schedule: schedule,
+        referenceNumber: document.getElementById('referenceNumber').value,
+        notes: notes,
+        processedBy: 'Current Admin',
+        processedAt: new Date().toISOString()
+    };
+    
+    if (schedule === 'scheduled') {
+        const scheduledDate = document.getElementById('scheduledDate').value;
+        const scheduledTime = document.getElementById('scheduledTime').value;
+        
+        if (!scheduledDate) {
+            alert('Please select a scheduled date');
+            return;
+        }
+        
+        payoutData.scheduledDate = scheduledDate;
+        payoutData.scheduledTime = scheduledTime;
+    }
+    
+    // Confirm processing
+    const confirmMessage = schedule === 'immediate' 
+        ? `Process payout of $${netAmount} immediately via ${paymentMethod}?`
+        : `Schedule payout of $${netAmount} for ${payoutData.scheduledDate} via ${paymentMethod}?`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    // Simulate processing
+    const btn = document.getElementById('processPayoutBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        if (schedule === 'immediate') {
+            alert(`Payout of $${netAmount} processed successfully!\nReference: ${payoutData.referenceNumber}`);
+        } else {
+            alert(`Payout of $${netAmount} scheduled for ${payoutData.scheduledDate}!\nReference: ${payoutData.referenceNumber}`);
+        }
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        bootstrap.Modal.getInstance(document.getElementById('processPayoutModal')).hide();
+        
+        // Trigger refresh of payout list
+        if (typeof refreshPayoutList === 'function') {
+            refreshPayoutList();
+        }
+    }, 3000);
+}
+
+function generatePayoutReport() {
+    alert('Generating payout report... You will receive an email when the report is ready.');
+}
+</script>

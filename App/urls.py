@@ -52,6 +52,9 @@ urlpatterns = [
     
     # Include reseller app URLs
     path('reseller/', include('App.reseller.urls')),
+    
+    # Include admin app URLs
+    path('platform/admin/', include('App.admin.urls')),
 
     path('admin-test/', views.admin_test, name='admin-dashboard-test'),
     path('admin/dashboard/', views.admin_dashboard, name='admin-dashboard'),

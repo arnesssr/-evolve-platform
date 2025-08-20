@@ -1,0 +1,604 @@
+<!-- Export Button Component -->
+<div class="export-button-component">
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-download me-2"></i>
+            Export Data
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end export-menu" aria-labelledby="exportDropdown">
+            <li class="dropdown-header">
+                <i class="fas fa-file-export me-2"></i>
+                Choose Export Format
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            
+            <!-- Excel Export -->
+            <li>
+                <a class="dropdown-item export-option" href="#" data-format="excel" data-type="current">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-excel text-success me-3"></i>
+                        <div>
+                            <div class="fw-medium">Excel (.xlsx)</div>
+                            <small class="text-muted">Current view data</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            
+            <!-- CSV Export -->
+            <li>
+                <a class="dropdown-item export-option" href="#" data-format="csv" data-type="current">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-csv text-info me-3"></i>
+                        <div>
+                            <div class="fw-medium">CSV</div>
+                            <small class="text-muted">Comma separated values</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            
+            <!-- PDF Export -->
+            <li>
+                <a class="dropdown-item export-option" href="#" data-format="pdf" data-type="current">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-pdf text-danger me-3"></i>
+                        <div>
+                            <div class="fw-medium">PDF Report</div>
+                            <small class="text-muted">Formatted report</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            
+            <li><hr class="dropdown-divider"></li>
+            
+            <!-- Advanced Export Options -->
+            <li class="dropdown-header">
+                <i class="fas fa-cog me-2"></i>
+                Advanced Options
+            </li>
+            
+            <li>
+                <a class="dropdown-item export-option" href="#" data-format="custom" data-type="custom">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-sliders-h text-warning me-3"></i>
+                        <div>
+                            <div class="fw-medium">Custom Export</div>
+                            <small class="text-muted">Select fields & filters</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            
+            <li>
+                <a class="dropdown-item export-option" href="#" data-format="scheduled" data-type="scheduled">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock text-primary me-3"></i>
+                        <div>
+                            <div class="fw-medium">Schedule Export</div>
+                            <small class="text-muted">Recurring reports</small>
+                        </div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Export Progress Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="fas fa-download text-primary me-2"></i>
+                        Exporting Data
+                    </h5>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="export-progress-container">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h6 class="mb-2" id="exportStatus">Preparing export...</h6>
+                        <p class="text-muted mb-3" id="exportDetails">This may take a few moments</p>
+                        
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" 
+                                 style="width: 0%" 
+                                 id="exportProgressBar">
+                            </div>
+                        </div>
+                        
+                        <div class="export-info">
+                            <small class="text-muted">
+                                <span id="exportedRows">0</span> of <span id="totalRows">0</span> records processed
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <!-- Success State -->
+                    <div class="export-success d-none">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h6 class="text-success mb-2">Export Complete!</h6>
+                        <p class="text-muted mb-3">Your file is ready for download</p>
+                        <button class="btn btn-success" id="downloadBtn">
+                            <i class="fas fa-download me-2"></i>
+                            Download File
+                        </button>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div class="export-error d-none">
+                        <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                        <h6 class="text-danger mb-2">Export Failed</h6>
+                        <p class="text-muted mb-3" id="exportErrorMessage">An error occurred during export</p>
+                        <button class="btn btn-outline-primary" onclick="retryExport()">
+                            <i class="fas fa-redo me-2"></i>
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="cancelExport">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Export Modal -->
+    <div class="modal fade" id="customExportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-sliders-h me-2"></i>
+                        Custom Export Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="customExportForm">
+                        <!-- Export Format -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Export Format</label>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="format" id="customExcel" value="excel" checked>
+                                        <label class="form-check-label" for="customExcel">Excel</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="format" id="customCSV" value="csv">
+                                        <label class="form-check-label" for="customCSV">CSV</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="format" id="customPDF" value="pdf">
+                                        <label class="form-check-label" for="customPDF">PDF</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Date Range -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Date Range</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="date" class="form-control" id="startDate" name="start_date">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control" id="endDate" name="end_date">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fields Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Fields to Include</label>
+                            <div class="row g-2" id="fieldsSelection">
+                                <!-- Fields will be populated dynamically -->
+                            </div>
+                        </div>
+                        
+                        <!-- Filters -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Additional Filters</label>
+                            <div id="additionalFilters">
+                                <!-- Filters will be populated based on data type -->
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="startCustomExport()">
+                        <i class="fas fa-download me-2"></i>
+                        Start Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.export-menu {
+    min-width: 280px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: none;
+}
+
+.export-menu .dropdown-item {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin: 0.25rem 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.export-menu .dropdown-item:hover {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    transform: translateX(2px);
+}
+
+.export-menu .dropdown-header {
+    padding: 0.75rem 1rem 0.5rem;
+    font-weight: 600;
+    color: #0a2463;
+}
+
+.export-progress-container {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.progress {
+    border-radius: 10px;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.progress-bar {
+    border-radius: 10px;
+    background: linear-gradient(90deg, #0a2463, #3e92cc);
+}
+
+.modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.export-button-component .btn-primary {
+    background: linear-gradient(135deg, #0a2463, #3e92cc);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.export-button-component .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(10, 36, 99, 0.3);
+}
+
+#fieldsSelection .form-check {
+    margin-bottom: 0.5rem;
+}
+
+.field-group {
+    background: rgba(var(--bs-light-rgb), 0.5);
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+</style>
+
+<script>
+let currentExportJob = null;
+let exportInterval = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle export option clicks
+    document.querySelectorAll('.export-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const format = this.getAttribute('data-format');
+            const type = this.getAttribute('data-type');
+            
+            if (type === 'custom') {
+                showCustomExportModal();
+            } else if (type === 'scheduled') {
+                showScheduledExportModal();
+            } else {
+                startExport(format, type);
+            }
+        });
+    });
+    
+    // Set default date range to last 30 days
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+    document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+});
+
+function startExport(format, type, customOptions = null) {
+    const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+    modal.show();
+    
+    // Reset modal state
+    showProgressState();
+    
+    const exportData = {
+        format: format,
+        type: type,
+        filters: getCurrentFilters(),
+        ...customOptions
+    };
+    
+    fetch('/admin/api/export/start', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(exportData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentExportJob = data.job_id;
+            pollExportStatus();
+        } else {
+            showErrorState(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Export error:', error);
+        showErrorState('Failed to start export');
+    });
+}
+
+function pollExportStatus() {
+    if (!currentExportJob) return;
+    
+    exportInterval = setInterval(() => {
+        fetch(`/admin/api/export/status/${currentExportJob}`)
+        .then(response => response.json())
+        .then(data => {
+            updateProgress(data.progress);
+            document.getElementById('exportedRows').textContent = data.processed_rows || 0;
+            document.getElementById('totalRows').textContent = data.total_rows || 0;
+            
+            if (data.status === 'completed') {
+                clearInterval(exportInterval);
+                showSuccessState(data.download_url);
+            } else if (data.status === 'failed') {
+                clearInterval(exportInterval);
+                showErrorState(data.error_message);
+            }
+        })
+        .catch(error => {
+            console.error('Status polling error:', error);
+            clearInterval(exportInterval);
+            showErrorState('Connection error');
+        });
+    }, 1000);
+}
+
+function updateProgress(progress) {
+    const progressBar = document.getElementById('exportProgressBar');
+    progressBar.style.width = `${progress}%`;
+    
+    if (progress > 0 && progress < 100) {
+        document.getElementById('exportStatus').textContent = 'Processing data...';
+        document.getElementById('exportDetails').textContent = `${progress}% complete`;
+    }
+}
+
+function showProgressState() {
+    document.querySelector('.export-progress-container').classList.remove('d-none');
+    document.querySelector('.export-success').classList.add('d-none');
+    document.querySelector('.export-error').classList.add('d-none');
+    document.getElementById('cancelExport').style.display = 'inline-block';
+}
+
+function showSuccessState(downloadUrl) {
+    document.querySelector('.export-progress-container').classList.add('d-none');
+    document.querySelector('.export-success').classList.remove('d-none');
+    document.querySelector('.export-error').classList.add('d-none');
+    document.getElementById('cancelExport').style.display = 'none';
+    
+    document.getElementById('downloadBtn').onclick = () => {
+        window.open(downloadUrl, '_blank');
+        bootstrap.Modal.getInstance(document.getElementById('exportModal')).hide();
+    };
+}
+
+function showErrorState(errorMessage) {
+    document.querySelector('.export-progress-container').classList.add('d-none');
+    document.querySelector('.export-success').classList.add('d-none');
+    document.querySelector('.export-error').classList.remove('d-none');
+    document.getElementById('exportErrorMessage').textContent = errorMessage;
+    document.getElementById('cancelExport').textContent = 'Close';
+}
+
+function showCustomExportModal() {
+    // Populate available fields based on current page/data
+    populateFieldsSelection();
+    populateAdditionalFilters();
+    
+    const modal = new bootstrap.Modal(document.getElementById('customExportModal'));
+    modal.show();
+}
+
+function populateFieldsSelection() {
+    const container = document.getElementById('fieldsSelection');
+    const availableFields = getAvailableFields();
+    
+    container.innerHTML = '';
+    
+    Object.keys(availableFields).forEach(group => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'col-12 field-group';
+        groupDiv.innerHTML = `
+            <h6 class="mb-2">${group}</h6>
+            ${availableFields[group].map(field => `
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="field_${field.key}" value="${field.key}" checked>
+                    <label class="form-check-label" for="field_${field.key}">${field.label}</label>
+                </div>
+            `).join('')}
+        `;
+        container.appendChild(groupDiv);
+    });
+}
+
+function populateAdditionalFilters() {
+    const container = document.getElementById('additionalFilters');
+    const currentPage = getCurrentPage();
+    
+    // Add page-specific filters
+    if (currentPage === 'users') {
+        container.innerHTML = `
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label">User Status</label>
+                    <select class="form-select" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="form-label">User Type</label>
+                    <select class="form-select" name="user_type">
+                        <option value="">All Types</option>
+                        <option value="business">Business</option>
+                        <option value="reseller">Reseller</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function startCustomExport() {
+    const form = document.getElementById('customExportForm');
+    const formData = new FormData(form);
+    
+    const customOptions = {
+        start_date: formData.get('start_date'),
+        end_date: formData.get('end_date'),
+        fields: Array.from(form.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
+        filters: Object.fromEntries(formData.entries())
+    };
+    
+    const format = formData.get('format');
+    
+    bootstrap.Modal.getInstance(document.getElementById('customExportModal')).hide();
+    startExport(format, 'custom', customOptions);
+}
+
+function retryExport() {
+    if (currentExportJob) {
+        showProgressState();
+        pollExportStatus();
+    }
+}
+
+function getCurrentFilters() {
+    // Extract current page filters/search parameters
+    const filters = {};
+    
+    // Get search parameters
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput && searchInput.value) {
+        filters.search = searchInput.value;
+    }
+    
+    // Get filter parameters
+    const filterForm = document.querySelector('.search-filter-form');
+    if (filterForm) {
+        const formData = new FormData(filterForm);
+        for (let [key, value] of formData.entries()) {
+            if (value) filters[key] = value;
+        }
+    }
+    
+    return filters;
+}
+
+function getAvailableFields() {
+    // Return available fields based on current page
+    const currentPage = getCurrentPage();
+    
+    const fieldMaps = {
+        users: {
+            'Basic Information': [
+                { key: 'id', label: 'ID' },
+                { key: 'name', label: 'Name' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone', label: 'Phone' }
+            ],
+            'Account Details': [
+                { key: 'status', label: 'Status' },
+                { key: 'user_type', label: 'User Type' },
+                { key: 'date_joined', label: 'Date Joined' },
+                { key: 'last_login', label: 'Last Login' }
+            ],
+            'Financial': [
+                { key: 'total_revenue', label: 'Total Revenue' },
+                { key: 'commission_earned', label: 'Commission Earned' },
+                { key: 'total_transactions', label: 'Total Transactions' }
+            ]
+        }
+    };
+    
+    return fieldMaps[currentPage] || fieldMaps.users;
+}
+
+function getCurrentPage() {
+    // Determine current page based on URL or context
+    const path = window.location.pathname;
+    if (path.includes('/users')) return 'users';
+    if (path.includes('/businesses')) return 'businesses';
+    if (path.includes('/resellers')) return 'resellers';
+    if (path.includes('/financial')) return 'financial';
+    return 'users';
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+
+// Cancel export
+document.getElementById('cancelExport').addEventListener('click', function() {
+    if (currentExportJob && exportInterval) {
+        clearInterval(exportInterval);
+        
+        fetch(`/admin/api/export/cancel/${currentExportJob}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken()
+            }
+        });
+    }
+    
+    currentExportJob = null;
+    exportInterval = null;
+});
+</script>

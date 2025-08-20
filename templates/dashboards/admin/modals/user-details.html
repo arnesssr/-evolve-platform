@@ -1,0 +1,666 @@
+<!-- User Details Modal Component -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="userDetailsModalLabel">
+                    <i class="fas fa-user me-2"></i>User Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="row">
+                    <!-- User Info Column -->
+                    <div class="col-lg-8">
+                        <div class="user-info-tabs">
+                            <ul class="nav nav-tabs" id="userDetailsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                                        <i class="fas fa-user me-1"></i>Profile
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+                                        <i class="fas fa-chart-line me-1"></i>Activity
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="commissions-tab" data-bs-toggle="tab" data-bs-target="#commissions" type="button" role="tab">
+                                        <i class="fas fa-percentage me-1"></i>Commissions
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">
+                                        <i class="fas fa-receipt me-1"></i>Transactions
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">
+                                        <i class="fas fa-sticky-note me-1"></i>Notes
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content mt-3" id="userDetailsTabContent">
+                                <!-- Profile Tab -->
+                                <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                                    <form id="userProfileForm">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">First Name</label>
+                                                <input type="text" class="form-control" name="first_name" id="firstName" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Last Name</label>
+                                                <input type="text" class="form-control" name="last_name" id="lastName" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" class="form-control" name="email" id="userEmail" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Phone</label>
+                                                <input type="tel" class="form-control" name="phone" id="userPhone" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Company</label>
+                                                <input type="text" class="form-control" name="company" id="userCompany" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">User Type</label>
+                                                <select class="form-select" name="user_type" id="userType" disabled>
+                                                    <option value="business">Business</option>
+                                                    <option value="reseller">Reseller</option>
+                                                    <option value="admin">Admin</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Registration Date</label>
+                                                <input type="text" class="form-control" id="registrationDate" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Last Login</label>
+                                                <input type="text" class="form-control" id="lastLogin" readonly>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label">Address</label>
+                                                <textarea class="form-control" name="address" id="userAddress" rows="2" readonly></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-3" id="editProfileActions" style="display: none;">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="cancelEdit()">Cancel</button>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Activity Tab -->
+                                <div class="tab-pane fade" id="activity" role="tabpanel">
+                                    <div class="activity-stats mb-4">
+                                        <div class="row g-3">
+                                            <div class="col-md-3">
+                                                <div class="stat-card bg-primary text-white">
+                                                    <div class="stat-value" id="totalLogins">0</div>
+                                                    <div class="stat-label">Total Logins</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-card bg-success text-white">
+                                                    <div class="stat-value" id="totalSales">$0</div>
+                                                    <div class="stat-label">Total Sales</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-card bg-warning text-white">
+                                                    <div class="stat-value" id="totalCommissions">$0</div>
+                                                    <div class="stat-label">Commissions</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="stat-card bg-info text-white">
+                                                    <div class="stat-value" id="avgSessionTime">0m</div>
+                                                    <div class="stat-label">Avg Session</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="activity-timeline">
+                                        <h6 class="mb-3">Recent Activity</h6>
+                                        <div class="timeline" id="userActivityTimeline">
+                                            <!-- Activity items will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Commissions Tab -->
+                                <div class="tab-pane fade" id="commissions" role="tabpanel">
+                                    <div class="commission-summary mb-4">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h4 class="text-success" id="totalEarned">$0.00</h4>
+                                                        <small class="text-muted">Total Earned</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h4 class="text-warning" id="pendingCommissions">$0.00</h4>
+                                                        <small class="text-muted">Pending</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <h4 class="text-primary" id="paidCommissions">$0.00</h4>
+                                                        <small class="text-muted">Paid Out</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="commission-history">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Sale ID</th>
+                                                        <th>Product</th>
+                                                        <th>Amount</th>
+                                                        <th>Commission</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="commissionHistoryTable">
+                                                    <!-- Commission data will be populated here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Transactions Tab -->
+                                <div class="tab-pane fade" id="transactions" role="tabpanel">
+                                    <div class="transaction-filters mb-3">
+                                        <div class="row g-2">
+                                            <div class="col-md-3">
+                                                <select class="form-select form-select-sm" id="transactionType">
+                                                    <option value="">All Types</option>
+                                                    <option value="purchase">Purchase</option>
+                                                    <option value="refund">Refund</option>
+                                                    <option value="commission">Commission</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-select form-select-sm" id="transactionStatus">
+                                                    <option value="">All Status</option>
+                                                    <option value="completed">Completed</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="failed">Failed</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="exportTransactions()">
+                                                    <i class="fas fa-download me-1"></i>Export
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="transaction-history">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Transaction ID</th>
+                                                        <th>Type</th>
+                                                        <th>Description</th>
+                                                        <th>Amount</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="transactionHistoryTable">
+                                                    <!-- Transaction data will be populated here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Notes Tab -->
+                                <div class="tab-pane fade" id="notes" role="tabpanel">
+                                    <div class="notes-section">
+                                        <div class="add-note mb-3">
+                                            <textarea class="form-control mb-2" id="newNoteText" rows="3" placeholder="Add a note about this user..."></textarea>
+                                            <button class="btn btn-sm btn-primary" onclick="addNote()">
+                                                <i class="fas fa-plus me-1"></i>Add Note
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="notes-list" id="userNotes">
+                                            <!-- Notes will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Status Column -->
+                    <div class="col-lg-4">
+                        <div class="user-status-panel">
+                            <!-- User Avatar & Basic Info -->
+                            <div class="user-avatar-section text-center mb-4">
+                                <div class="user-avatar mx-auto mb-3">
+                                    <img id="userAvatar" src="/static/img/default-avatar.png" alt="User Avatar" class="rounded-circle">
+                                </div>
+                                <h5 id="userDisplayName">Loading...</h5>
+                                <span class="badge" id="userStatusBadge">Active</span>
+                            </div>
+                            
+                            <!-- Quick Actions -->
+                            <div class="quick-actions mb-4">
+                                <h6 class="text-muted mb-2">Quick Actions</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="editProfile()">
+                                        <i class="fas fa-edit me-1"></i>Edit Profile
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="suspendUser()">
+                                        <i class="fas fa-ban me-1"></i>Suspend User
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="impersonateUser()">
+                                        <i class="fas fa-user-secret me-1"></i>Impersonate
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="sendMessage()">
+                                        <i class="fas fa-envelope me-1"></i>Send Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="resetPassword()">
+                                        <i class="fas fa-key me-1"></i>Reset Password
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Account Settings -->
+                            <div class="account-settings">
+                                <h6 class="text-muted mb-2">Account Settings</h6>
+                                <div class="setting-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="emailNotifications">
+                                        <label class="form-check-label small">Email Notifications</label>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="twoFactorAuth">
+                                        <label class="form-check-label small">Two-Factor Auth</label>
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="accountLocked">
+                                        <label class="form-check-label small">Account Locked</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Additional Info -->
+                            <div class="additional-info mt-4">
+                                <h6 class="text-muted mb-2">Additional Information</h6>
+                                <div class="info-item">
+                                    <small class="text-muted">Member Since:</small>
+                                    <div id="memberSince">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <small class="text-muted">Last Activity:</small>
+                                    <div id="lastActivity">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <small class="text-muted">IP Address:</small>
+                                    <div id="lastIpAddress">-</div>
+                                </div>
+                                <div class="info-item">
+                                    <small class="text-muted">Total Value:</small>
+                                    <div id="totalUserValue" class="text-success fw-bold">$0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserChanges()" id="saveUserBtn" style="display: none;">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    background: #f8f9fa;
+    border: 3px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stat-card {
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1rem;
+    border-left: 2px solid #dee2e6;
+    padding-left: 1rem;
+    margin-left: 0.5rem;
+}
+
+.timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #007bff;
+}
+
+.timeline-item:last-child {
+    border-left: none;
+}
+
+.setting-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item {
+    padding: 0.25rem 0;
+}
+
+.user-status-panel {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    height: fit-content;
+}
+</style>
+
+<script>
+let currentUserId = null;
+let isEditMode = false;
+
+function showUserDetails(userId) {
+    currentUserId = userId;
+    
+    // Fetch user data (simulated)
+    const userData = {
+        id: userId,
+        first_name: 'John',
+        last_name: 'Doe',
+        email: 'john.doe@example.com',
+        phone: '+1 (555) 123-4567',
+        company: 'ABC Corporation',
+        user_type: 'business',
+        address: '123 Main St, Anytown, ST 12345',
+        registration_date: '2023-01-15',
+        last_login: '2024-01-20 14:30:00',
+        status: 'active',
+        avatar: '/static/img/avatars/user-' + userId + '.jpg'
+    };
+    
+    populateUserData(userData);
+    loadUserActivity(userId);
+    loadUserCommissions(userId);
+    loadUserTransactions(userId);
+    loadUserNotes(userId);
+    
+    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+    modal.show();
+}
+
+function populateUserData(userData) {
+    document.getElementById('firstName').value = userData.first_name;
+    document.getElementById('lastName').value = userData.last_name;
+    document.getElementById('userEmail').value = userData.email;
+    document.getElementById('userPhone').value = userData.phone;
+    document.getElementById('userCompany').value = userData.company;
+    document.getElementById('userType').value = userData.user_type;
+    document.getElementById('userAddress').value = userData.address;
+    document.getElementById('registrationDate').value = userData.registration_date;
+    document.getElementById('lastLogin').value = userData.last_login;
+    
+    document.getElementById('userDisplayName').textContent = userData.first_name + ' ' + userData.last_name;
+    document.getElementById('userStatusBadge').textContent = userData.status;
+    document.getElementById('userStatusBadge').className = 'badge bg-' + (userData.status === 'active' ? 'success' : 'warning');
+    
+    document.getElementById('memberSince').textContent = userData.registration_date;
+    document.getElementById('lastActivity').textContent = userData.last_login;
+    document.getElementById('lastIpAddress').textContent = '192.168.1.100';
+    document.getElementById('totalUserValue').textContent = '$25,430.50';
+}
+
+function loadUserActivity(userId) {
+    const activities = [
+        { date: '2024-01-20 14:30', action: 'Logged in', details: 'from Chrome on Windows' },
+        { date: '2024-01-20 10:15', action: 'Made purchase', details: 'Pro Plan - $99.00' },
+        { date: '2024-01-19 16:45', action: 'Updated profile', details: 'Changed phone number' },
+        { date: '2024-01-18 09:20', action: 'Earned commission', details: '$15.50 from referral' }
+    ];
+    
+    let html = '';
+    activities.forEach(activity => {
+        html += `
+            <div class="timeline-item">
+                <div class="d-flex justify-content-between">
+                    <strong>${activity.action}</strong>
+                    <small class="text-muted">${activity.date}</small>
+                </div>
+                <div class="text-muted small">${activity.details}</div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('userActivityTimeline').innerHTML = html;
+    
+    // Update stats
+    document.getElementById('totalLogins').textContent = '142';
+    document.getElementById('totalSales').textContent = '$1,250';
+    document.getElementById('totalCommissions').textContent = '$187.50';
+    document.getElementById('avgSessionTime').textContent = '24m';
+}
+
+function loadUserCommissions(userId) {
+    const commissions = [
+        { date: '2024-01-20', saleId: 'S-001234', product: 'Pro Plan', amount: '$99.00', commission: '$15.50', status: 'paid' },
+        { date: '2024-01-18', saleId: 'S-001230', product: 'Basic Plan', amount: '$49.00', commission: '$7.35', status: 'pending' },
+        { date: '2024-01-15', saleId: 'S-001225', product: 'Enterprise Plan', amount: '$199.00', commission: '$29.85', status: 'paid' }
+    ];
+    
+    let html = '';
+    commissions.forEach(comm => {
+        const statusClass = comm.status === 'paid' ? 'success' : 'warning';
+        html += `
+            <tr>
+                <td>${comm.date}</td>
+                <td>${comm.saleId}</td>
+                <td>${comm.product}</td>
+                <td>${comm.amount}</td>
+                <td>${comm.commission}</td>
+                <td><span class="badge bg-${statusClass}">${comm.status}</span></td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('commissionHistoryTable').innerHTML = html;
+    
+    // Update commission summary
+    document.getElementById('totalEarned').textContent = '$52.70';
+    document.getElementById('pendingCommissions').textContent = '$7.35';
+    document.getElementById('paidCommissions').textContent = '$45.35';
+}
+
+function loadUserTransactions(userId) {
+    const transactions = [
+        { date: '2024-01-20', id: 'T-001234', type: 'Purchase', description: 'Pro Plan Subscription', amount: '$99.00', status: 'completed' },
+        { date: '2024-01-18', id: 'T-001230', type: 'Commission', description: 'Referral Bonus', amount: '$15.50', status: 'completed' },
+        { date: '2024-01-15', id: 'T-001225', type: 'Purchase', description: 'Add-on Services', amount: '$29.99', status: 'completed' }
+    ];
+    
+    let html = '';
+    transactions.forEach(trans => {
+        const statusClass = trans.status === 'completed' ? 'success' : 'warning';
+        html += `
+            <tr>
+                <td>${trans.date}</td>
+                <td>${trans.id}</td>
+                <td>${trans.type}</td>
+                <td>${trans.description}</td>
+                <td>${trans.amount}</td>
+                <td><span class="badge bg-${statusClass}">${trans.status}</span></td>
+            </tr>
+        `;
+    });
+    
+    document.getElementById('transactionHistoryTable').innerHTML = html;
+}
+
+function loadUserNotes(userId) {
+    const notes = [
+        { date: '2024-01-19', author: 'Admin', text: 'User requested upgrade to enterprise plan' },
+        { date: '2024-01-15', author: 'Support', text: 'Resolved billing inquiry via phone call' }
+    ];
+    
+    let html = '';
+    notes.forEach(note => {
+        html += `
+            <div class="note-item border-bottom pb-2 mb-2">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">${note.author}</small>
+                    <small class="text-muted">${note.date}</small>
+                </div>
+                <div>${note.text}</div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('userNotes').innerHTML = html;
+}
+
+function editProfile() {
+    isEditMode = true;
+    const formInputs = document.querySelectorAll('#userProfileForm input, #userProfileForm select, #userProfileForm textarea');
+    formInputs.forEach(input => {
+        input.removeAttribute('readonly');
+        input.removeAttribute('disabled');
+    });
+    
+    document.getElementById('editProfileActions').style.display = 'block';
+    document.getElementById('saveUserBtn').style.display = 'inline-block';
+}
+
+function cancelEdit() {
+    isEditMode = false;
+    const formInputs = document.querySelectorAll('#userProfileForm input, #userProfileForm select, #userProfileForm textarea');
+    formInputs.forEach(input => {
+        input.setAttribute('readonly', 'readonly');
+        if (input.tagName === 'SELECT') {
+            input.setAttribute('disabled', 'disabled');
+        }
+    });
+    
+    document.getElementById('editProfileActions').style.display = 'none';
+    document.getElementById('saveUserBtn').style.display = 'none';
+}
+
+function saveUserChanges() {
+    // Simulate saving changes
+    alert('User profile updated successfully!');
+    cancelEdit();
+}
+
+function suspendUser() {
+    if (confirm('Are you sure you want to suspend this user?')) {
+        alert('User suspended successfully!');
+    }
+}
+
+function impersonateUser() {
+    if (confirm('This will log you in as this user. Continue?')) {
+        alert('Impersonation started. You are now logged in as this user.');
+    }
+}
+
+function sendMessage() {
+    const message = prompt('Enter message to send to user:');
+    if (message) {
+        alert('Message sent successfully!');
+    }
+}
+
+function resetPassword() {
+    if (confirm('Send password reset email to user?')) {
+        alert('Password reset email sent!');
+    }
+}
+
+function addNote() {
+    const noteText = document.getElementById('newNoteText').value.trim();
+    if (noteText) {
+        const noteHtml = `
+            <div class="note-item border-bottom pb-2 mb-2">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">You</small>
+                    <small class="text-muted">${new Date().toLocaleDateString()}</small>
+                </div>
+                <div>${noteText}</div>
+            </div>
+        `;
+        document.getElementById('userNotes').insertAdjacentHTML('afterbegin', noteHtml);
+        document.getElementById('newNoteText').value = '';
+    }
+}
+
+function exportTransactions() {
+    alert('Transaction export started. You will receive an email when complete.');
+}
+</script>

@@ -1,0 +1,486 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Transaction Management{% endblock %}
+
+{% block page_title %}Transaction Management{% endblock %}
+{% block page_subtitle %}Monitor and manage all platform transactions{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Transactions</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    {% include 'dashboards/admin/forms/date-range.html' with label="Date Range" compact=True %}
+    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#reconcileModal">
+        <i class="fas fa-balance-scale me-2"></i>Reconcile
+    </button>
+    {% include 'dashboards/admin/components/export-button.html' with export_type="transactions" %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+        <i class="fas fa-chart-line me-2"></i>Generate Report
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Transaction Summary -->
+<div class="row mb-4">
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Volume" value="$1,284,750" icon="fa-exchange-alt" color="success" change="+16.8%" trend="up" subtitle="All time total" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Today's Volume" value="$18,450" icon="fa-calendar-day" color="primary" change="+12.5%" trend="up" subtitle="Today only" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Successful Rate" value="98.2%" icon="fa-check-circle" color="success" change="+0.5%" trend="up" subtitle="Success rate" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Failed Trans." value="23" icon="fa-exclamation-triangle" color="danger" change="-8" trend="down" subtitle="Need attention" %}
+</div>
+
+<!-- Transaction Charts -->
+<div class="row mb-4">
+    <!-- Transaction Volume Chart -->
+    <div class="col-lg-8">
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Transaction Volume Trends</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-period="7days">7 Days</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="30days">30 Days</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="90days">90 Days</button>
+                </div>
+            </div>
+            <canvas id="transactionVolumeChart" height="100"></canvas>
+        </div>
+    </div>
+    
+    <!-- Transaction Types -->
+    <div class="col-lg-4">
+        <div class="content-card">
+            <h5 class="mb-4">Transaction Types</h5>
+            <canvas id="transactionTypesChart" height="200"></canvas>
+            
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Payments</span>
+                    </div>
+                    <span class="fw-bold">68%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Refunds</span>
+                    </div>
+                    <span class="fw-bold">18%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Commissions</span>
+                    </div>
+                    <span class="fw-bold">12%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Adjustments</span>
+                    </div>
+                    <span class="fw-bold">2%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Status Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="content-card">
+            <h5 class="mb-4">Transaction Status Overview</h5>
+            <div class="row">
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-success">1,847</div>
+                        <div class="text-muted">Completed</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-success" style="width: 94%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$1,215,480</div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-info">42</div>
+                        <div class="text-muted">Processing</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-info" style="width: 15%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$42,850</div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-warning">18</div>
+                        <div class="text-muted">Pending</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-warning" style="width: 8%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$18,200</div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-danger">23</div>
+                        <div class="text-muted">Failed</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-danger" style="width: 5%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$8,220</div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-secondary">15</div>
+                        <div class="text-muted">Refunded</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-secondary" style="width: 3%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$12,450</div>
+                    </div>
+                </div>
+                <div class="col-md-2 text-center mb-3">
+                    <div class="border rounded p-3">
+                        <div class="fw-bold fs-3 text-dark">8</div>
+                        <div class="text-muted">Disputed</div>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-dark" style="width: 2%"></div>
+                        </div>
+                        <div class="text-muted small mt-1">$5,830</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="content-card mb-4">
+    <h5 class="mb-3">Filters</h5>
+    <div class="row">
+        <div class="col-md-2">
+            <label for="statusFilter" class="form-label">Status</label>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="completed">Completed</option>
+                <option value="processing">Processing</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+                <option value="disputed">Disputed</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="typeFilter" class="form-label">Type</label>
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="payment">Payment</option>
+                <option value="refund">Refund</option>
+                <option value="commission">Commission</option>
+                <option value="adjustment">Adjustment</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="methodFilter" class="form-label">Payment Method</label>
+            <select id="methodFilter" class="form-select">
+                <option value="">All Methods</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="paypal">PayPal</option>
+                <option value="crypto">Cryptocurrency</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="amountFilter" class="form-label">Amount Range</label>
+            <select id="amountFilter" class="form-select">
+                <option value="">All Amounts</option>
+                <option value="0-100">$0 - $100</option>
+                <option value="100-500">$100 - $500</option>
+                <option value="500-2000">$500 - $2000</option>
+                <option value="2000+">$2000+</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Date Range</label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="startDate">
+                <input type="date" class="form-control" id="endDate">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">&nbsp;</label>
+            <div class="d-grid">
+                <button type="button" class="btn btn-outline-primary" onclick="applyFilters()">
+                    <i class="fas fa-filter me-2"></i>Apply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Table -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Recent Transactions</h5>
+        <div class="d-flex align-items-center gap-3">
+            <small class="text-muted">Showing <span id="tableInfo">0</span> results</small>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selectAll">
+                <label class="form-check-label" for="selectAll">
+                    Select All
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table id="transactionsTable" class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAllTable">
+                        </div>
+                    </th>
+                    <th>Transaction ID</th>
+                    <th>Business/User</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample data -->
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-primary">#TXN-240315-001</div>
+                        <small class="text-muted">Monthly subscription</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-building text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">TechCorp Solutions</div>
+                                <small class="text-muted">Enterprise Plan</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-success bg-opacity-25 text-success">Payment</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-success">$2,450.00</div>
+                        <small class="text-muted">USD</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card text-primary me-2"></i>
+                            <span>Credit Card</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Completed</span>
+                    </td>
+                    <td>
+                        <div>Mar 15, 2024</div>
+                        <small class="text-muted">10:30 AM</small>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,receipt,refund" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-primary">#TXN-240315-002</div>
+                        <small class="text-muted">Commission payout</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">John Marketing</div>
+                                <small class="text-muted">Reseller</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning bg-opacity-25 text-warning">Commission</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-success">$485.00</div>
+                        <small class="text-muted">USD</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fab fa-paypal text-primary me-2"></i>
+                            <span>PayPal</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">Processing</span>
+                    </td>
+                    <td>
+                        <div>Mar 15, 2024</div>
+                        <small class="text-muted">2:15 PM</small>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,track,cancel" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="3">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-primary">#TXN-240314-003</div>
+                        <small class="text-muted">Refund request</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-store text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">Retail Masters Ltd</div>
+                                <small class="text-muted">Professional Plan</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary bg-opacity-25 text-secondary">Refund</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-danger">-$1,200.00</div>
+                        <small class="text-muted">USD</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-university text-info me-2"></i>
+                            <span>Bank Transfer</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">Pending</span>
+                    </td>
+                    <td>
+                        <div>Mar 14, 2024</div>
+                        <small class="text-muted">4:45 PM</small>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,approve,reject" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="4">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-danger">#TXN-240314-004</div>
+                        <small class="text-muted">Payment failed</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-warning rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fas fa-industry text-white"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium">Manufacturing Co</div>
+                                <small class="text-muted">Basic Plan</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-success bg-opacity-25 text-success">Payment</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-muted">$850.00</div>
+                        <small class="text-muted">USD</small>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-credit-card text-danger me-2"></i>
+                            <span>Credit Card</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-danger">Failed</span>
+                    </td>
+                    <td>
+                        <div>Mar 14, 2024</div>
+                        <small class="text-muted">1:20 PM</small>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,retry,contact" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    {% include 'dashboards/admin/components/pagination.html' with current_page=1 total_pages=15 %}
+</div>
+
+<!-- Modals -->
+{% include 'dashboards/admin/modals/generate-report.html' with report_type="transaction" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#transactionsTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        order: [[7, 'desc']], // Sort by date
+        columnDefs: [
+            { orderable: false, targets: [0, 8] } // Disable ordering for checkbox and actions
+        ]
+    });
+    
+    // Handle select all functionality
+    $('#selectAll').change(function() {
+        const isChecked = $(this).is(':checked');
+        $('input[type="checkbox"]').prop('checked', isChecked);
+    });
+});
+
+function applyFilters() {
+    // Implementation for filter functionality
+    console.log('Applying filters...');
+}
+</script>
+{% endblock %}

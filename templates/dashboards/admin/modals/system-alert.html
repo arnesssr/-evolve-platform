@@ -1,0 +1,486 @@
+<!-- System Alert Modal Component -->
+<div class="modal fade" id="systemAlertModal" tabindex="-1" aria-labelledby="systemAlertModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" id="alertHeader">
+                <h5 class="modal-title" id="systemAlertModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2" id="alertIcon"></i>
+                    <span id="alertTitle">System Alert</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="alertCloseBtn"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Alert Content -->
+                <div class="alert-content">
+                    <div class="alert-message" id="alertMessage">
+                        <!-- Alert message will be populated here -->
+                    </div>
+                    
+                    <!-- Alert Details (collapsible) -->
+                    <div class="alert-details mt-3" id="alertDetails" style="display: none;">
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <button class="btn btn-link p-0 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#alertDetailsContent">
+                                        <i class="fas fa-chevron-down me-1"></i>Alert Details
+                                    </button>
+                                </h6>
+                            </div>
+                            <div class="collapse" id="alertDetailsContent">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <strong>Alert ID:</strong>
+                                            <div id="alertId">-</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Timestamp:</strong>
+                                            <div id="alertTimestamp">-</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Source:</strong>
+                                            <div id="alertSource">-</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Priority:</strong>
+                                            <div id="alertPriority">-</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <strong>Technical Details:</strong>
+                                            <div id="alertTechnicalDetails" class="text-muted small">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Items (if any) -->
+                    <div class="alert-actions mt-3" id="alertActions" style="display: none;">
+                        <h6 class="text-muted mb-2">Recommended Actions:</h6>
+                        <ul class="list-group list-group-flush" id="actionsList">
+                            <!-- Action items will be populated here -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Progress Indicator (for ongoing alerts) -->
+                    <div class="alert-progress mt-3" id="alertProgress" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-muted">Progress:</span>
+                            <span class="small text-muted" id="progressText">0%</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- System Status Indicators -->
+                <div class="system-status mt-4" id="systemStatus" style="display: none;">
+                    <h6 class="text-muted mb-3">System Status</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">Database</span>
+                                    <span class="badge bg-success" id="dbStatus">Online</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">API Services</span>
+                                    <span class="badge bg-success" id="apiStatus">Online</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">Payment Gateway</span>
+                                    <span class="badge bg-success" id="paymentStatus">Online</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="status-item">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small">Email Service</span>
+                                    <span class="badge bg-success" id="emailStatus">Online</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer" id="alertFooter">
+                <div class="alert-timestamp">
+                    <small class="text-muted" id="footerTimestamp">-</small>
+                </div>
+                <div class="alert-buttons">
+                    <button type="button" class="btn btn-outline-secondary" id="dismissBtn" onclick="dismissAlert()">
+                        Dismiss
+                    </button>
+                    <button type="button" class="btn btn-primary" id="actionBtn" onclick="takeAction()" style="display: none;">
+                        Take Action
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.status-item {
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.alert-content {
+    min-height: 100px;
+}
+
+.modal-header.bg-danger {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+.modal-header.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+}
+
+.modal-header.bg-info {
+    background-color: #0dcaf0 !important;
+    color: white;
+}
+
+.modal-header.bg-success {
+    background-color: #198754 !important;
+    color: white;
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+</style>
+
+<script>
+let currentAlert = null;
+let alertTimeout = null;
+
+function showSystemAlert(alertData) {
+    currentAlert = alertData;
+    
+    // Set alert styling based on severity
+    setAlertStyling(alertData.severity);
+    
+    // Populate alert content
+    populateAlertContent(alertData);
+    
+    // Show/hide optional sections
+    toggleAlertSections(alertData);
+    
+    // Set auto-dismiss timer if specified
+    if (alertData.autoDismiss) {
+        setAutoDismissTimer(alertData.autoDismiss);
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('systemAlertModal'), {
+        backdrop: alertData.severity === 'critical' ? 'static' : true,
+        keyboard: alertData.severity !== 'critical'
+    });
+    modal.show();
+}
+
+function setAlertStyling(severity) {
+    const header = document.getElementById('alertHeader');
+    const icon = document.getElementById('alertIcon');
+    const closeBtn = document.getElementById('alertCloseBtn');
+    
+    // Reset classes
+    header.className = 'modal-header';
+    icon.className = 'fas me-2';
+    
+    switch (severity) {
+        case 'critical':
+            header.classList.add('bg-danger', 'text-white');
+            icon.classList.add('fa-exclamation-triangle');
+            closeBtn.classList.add('btn-close-white');
+            closeBtn.style.display = 'none'; // Don't allow dismissal of critical alerts
+            break;
+        case 'high':
+            header.classList.add('bg-warning');
+            icon.classList.add('fa-exclamation-circle');
+            break;
+        case 'medium':
+            header.classList.add('bg-info', 'text-white');
+            icon.classList.add('fa-info-circle');
+            closeBtn.classList.add('btn-close-white');
+            break;
+        case 'low':
+            header.classList.add('bg-success', 'text-white');
+            icon.classList.add('fa-check-circle');
+            closeBtn.classList.add('btn-close-white');
+            break;
+        default:
+            icon.classList.add('fa-bell');
+    }
+}
+
+function populateAlertContent(alertData) {
+    // Basic alert info
+    document.getElementById('alertTitle').textContent = alertData.title || 'System Alert';
+    document.getElementById('alertMessage').innerHTML = alertData.message || 'A system event has occurred.';
+    
+    // Alert details
+    if (alertData.showDetails) {
+        document.getElementById('alertId').textContent = alertData.id || generateAlertId();
+        document.getElementById('alertTimestamp').textContent = formatTimestamp(alertData.timestamp || new Date());
+        document.getElementById('alertSource').textContent = alertData.source || 'System';
+        document.getElementById('alertPriority').innerHTML = `<span class="badge bg-${getPriorityColor(alertData.severity)}">${alertData.severity?.toUpperCase() || 'UNKNOWN'}</span>`;
+        document.getElementById('alertTechnicalDetails').textContent = alertData.technicalDetails || 'No additional technical details available.';
+    }
+    
+    // Action items
+    if (alertData.actions && alertData.actions.length > 0) {
+        const actionsList = document.getElementById('actionsList');
+        let actionsHTML = '';
+        alertData.actions.forEach(action => {
+            actionsHTML += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                ${action.description}
+                <button class="btn btn-sm btn-outline-primary" onclick="executeAction('${action.id}')">
+                    ${action.label || 'Execute'}
+                </button>
+            </li>`;
+        });
+        actionsList.innerHTML = actionsHTML;
+    }
+    
+    // Footer timestamp
+    document.getElementById('footerTimestamp').textContent = `Alert received: ${formatTimestamp(alertData.timestamp || new Date())}`;
+    
+    // Action button
+    if (alertData.primaryAction) {
+        const actionBtn = document.getElementById('actionBtn');
+        actionBtn.textContent = alertData.primaryAction.label || 'Take Action';
+        actionBtn.style.display = 'inline-block';
+        actionBtn.onclick = () => executeAction(alertData.primaryAction.id);
+    }
+}
+
+function toggleAlertSections(alertData) {
+    // Show/hide alert details
+    document.getElementById('alertDetails').style.display = alertData.showDetails ? 'block' : 'none';
+    
+    // Show/hide action items
+    document.getElementById('alertActions').style.display = (alertData.actions && alertData.actions.length > 0) ? 'block' : 'none';
+    
+    // Show/hide progress indicator
+    if (alertData.showProgress) {
+        document.getElementById('alertProgress').style.display = 'block';
+        updateProgress(alertData.progress || 0);
+        
+        // Start progress simulation if needed
+        if (alertData.simulateProgress) {
+            simulateProgress();
+        }
+    }
+    
+    // Show/hide system status
+    if (alertData.showSystemStatus) {
+        document.getElementById('systemStatus').style.display = 'block';
+        updateSystemStatus(alertData.systemStatus || {});
+    }
+}
+
+function updateProgress(percentage) {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    
+    progressBar.style.width = percentage + '%';
+    progressText.textContent = Math.round(percentage) + '%';
+    
+    // Update progress bar color based on percentage
+    progressBar.className = 'progress-bar';
+    if (percentage < 30) {
+        progressBar.classList.add('bg-danger');
+    } else if (percentage < 70) {
+        progressBar.classList.add('bg-warning');
+    } else {
+        progressBar.classList.add('bg-success');
+    }
+}
+
+function updateSystemStatus(statusData) {
+    const statusElements = {
+        'dbStatus': statusData.database || 'online',
+        'apiStatus': statusData.api || 'online',
+        'paymentStatus': statusData.payment || 'online',
+        'emailStatus': statusData.email || 'online'
+    };
+    
+    Object.keys(statusElements).forEach(elementId => {
+        const element = document.getElementById(elementId);
+        const status = statusElements[elementId];
+        
+        element.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        element.className = 'badge';
+        
+        switch (status) {
+            case 'online':
+                element.classList.add('bg-success');
+                break;
+            case 'offline':
+                element.classList.add('bg-danger');
+                break;
+            case 'degraded':
+                element.classList.add('bg-warning');
+                break;
+            default:
+                element.classList.add('bg-secondary');
+        }
+    });
+}
+
+function simulateProgress() {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            
+            // Update alert message when complete
+            setTimeout(() => {
+                document.getElementById('alertMessage').innerHTML = '<i class="fas fa-check-circle text-success me-2"></i>Operation completed successfully!';
+                document.getElementById('actionBtn').style.display = 'none';
+            }, 500);
+        }
+        updateProgress(progress);
+    }, 500);
+}
+
+function setAutoDismissTimer(seconds) {
+    alertTimeout = setTimeout(() => {
+        dismissAlert();
+    }, seconds * 1000);
+}
+
+function dismissAlert() {
+    if (alertTimeout) {
+        clearTimeout(alertTimeout);
+    }
+    
+    bootstrap.Modal.getInstance(document.getElementById('systemAlertModal')).hide();
+}
+
+function takeAction() {
+    if (currentAlert && currentAlert.primaryAction) {
+        executeAction(currentAlert.primaryAction.id);
+    }
+}
+
+function executeAction(actionId) {
+    // Simulate action execution
+    switch (actionId) {
+        case 'restart_service':
+            alert('Restarting service... This may take a few minutes.');
+            showSystemAlert({
+                title: 'Service Restart',
+                message: 'Service restart in progress...',
+                severity: 'medium',
+                showProgress: true,
+                simulateProgress: true
+            });
+            break;
+        case 'view_logs':
+            alert('Opening system logs in a new window...');
+            break;
+        case 'contact_support':
+            alert('Opening support ticket form...');
+            break;
+        case 'acknowledge':
+            alert('Alert acknowledged.');
+            dismissAlert();
+            break;
+        default:
+            alert('Action executed: ' + actionId);
+    }
+}
+
+function generateAlertId() {
+    return 'ALT-' + Date.now().toString(36).toUpperCase();
+}
+
+function formatTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+}
+
+function getPriorityColor(severity) {
+    switch (severity) {
+        case 'critical': return 'danger';
+        case 'high': return 'warning';
+        case 'medium': return 'info';
+        case 'low': return 'success';
+        default: return 'secondary';
+    }
+}
+
+// Example alert triggers for testing
+function showCriticalAlert() {
+    showSystemAlert({
+        title: 'Critical System Error',
+        message: '<strong>Database connection lost!</strong><br>The system is unable to connect to the primary database. This may affect all user operations.',
+        severity: 'critical',
+        showDetails: true,
+        showSystemStatus: true,
+        timestamp: new Date(),
+        source: 'Database Monitor',
+        technicalDetails: 'Connection timeout after 30 seconds. Error code: DB_CONN_TIMEOUT_001',
+        systemStatus: {
+            database: 'offline',
+            api: 'degraded',
+            payment: 'online',
+            email: 'online'
+        },
+        actions: [
+            { id: 'restart_service', description: 'Restart database service', label: 'Restart' },
+            { id: 'view_logs', description: 'View system logs', label: 'View Logs' },
+            { id: 'contact_support', description: 'Contact technical support', label: 'Contact Support' }
+        ],
+        primaryAction: { id: 'restart_service', label: 'Restart Service' }
+    });
+}
+
+function showMaintenanceAlert() {
+    showSystemAlert({
+        title: 'Scheduled Maintenance',
+        message: 'System maintenance will begin in 15 minutes. All services will be temporarily unavailable.',
+        severity: 'medium',
+        showDetails: true,
+        autoDismiss: 10,
+        timestamp: new Date(),
+        source: 'Maintenance Scheduler',
+        technicalDetails: 'Scheduled maintenance window: 2:00 AM - 4:00 AM EST',
+        primaryAction: { id: 'acknowledge', label: 'Acknowledge' }
+    });
+}
+
+function showSuccessAlert() {
+    showSystemAlert({
+        title: 'Backup Completed',
+        message: 'Daily system backup completed successfully.',
+        severity: 'low',
+        autoDismiss: 5,
+        timestamp: new Date(),
+        source: 'Backup Service'
+    });
+}
+</script>

@@ -1,0 +1,362 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Business Customers{% endblock %}
+
+{% block page_title %}Business Customers{% endblock %}
+{% block page_subtitle %}Manage business customers and their subscriptions{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Business Customers</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    {% include 'dashboards/admin/components/export-button.html' with export_type="businesses" %}
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
+        <i class="fas fa-tasks me-2"></i>Bulk Actions
+    </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickCreateModal">
+        <i class="fas fa-plus me-2"></i>Add Business
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Business Statistics -->
+<div class="row mb-4">
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Businesses" value="1,847" icon="fa-building" color="primary" change="+8.2%" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Active Subscriptions" value="1,234" icon="fa-credit-card" color="success" change="+5.1%" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Pending Approvals" value="23" icon="fa-clock" color="warning" change="+2" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Monthly Revenue" value="$42,890" icon="fa-dollar-sign" color="info" change="+12.3%" trend="up" %}
+</div>
+
+<!-- Filters Section -->
+<div class="content-card mb-4">
+    <h5 class="mb-3">Filters & Search</h5>
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'dashboards/admin/forms/user-filter.html' with filter_type="business" %}
+        </div>
+        <div class="col-md-3">
+            <label for="subscriptionFilter" class="form-label">Subscription Status</label>
+            <select id="subscriptionFilter" class="form-select">
+                <option value="">All Subscriptions</option>
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+                <option value="trial">Trial</option>
+                <option value="suspended">Suspended</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="industryFilter" class="form-label">Industry</label>
+            <select id="industryFilter" class="form-select">
+                <option value="">All Industries</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="retail">Retail</option>
+                <option value="services">Services</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="education">Education</option>
+                <option value="technology">Technology</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            {% include 'dashboards/admin/forms/date-range.html' with label="Registration Date" %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            {% include 'dashboards/admin/components/search-filter.html' with placeholder="Search businesses by name, email, or company..." %}
+        </div>
+    </div>
+</div>
+
+<!-- Business List Table -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">All Business Customers</h5>
+        <div class="d-flex align-items-center gap-3">
+            <small class="text-muted">Showing <span id="tableInfo">0</span> results</small>
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-outline-secondary active" data-view="table">
+                    <i class="fas fa-table"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-view="grid">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    {% include 'dashboards/admin/components/data-table.html' with table_id="businessesTable" %}
+    
+    <div class="table-responsive">
+        <table id="businessesTable" class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAll">
+                        </div>
+                    </th>
+                    <th>Business</th>
+                    <th>Contact Person</th>
+                    <th>Industry</th>
+                    <th>Subscription</th>
+                    <th>Revenue</th>
+                    <th>Status</th>
+                    <th>Registration</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample data - replace with dynamic content -->
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-building text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">TechCorp Solutions</h6>
+                                <small class="text-muted">techcorp@example.com</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">John Smith</div>
+                            <small class="text-muted">CEO</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">Technology</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Enterprise Plan</div>
+                            <small class="text-success">Active until Dec 2024</small>
+                        </div>
+                    </td>
+                    <td class="fw-bold text-success">$2,450/mo</td>
+                    <td>
+                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
+                    </td>
+                    <td>
+                        <div>
+                            <div>Jan 15, 2024</div>
+                            <small class="text-muted">8 months ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,suspend,delete" entity_type="business" entity_id="1" %}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-store text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Retail Masters Ltd</h6>
+                                <small class="text-muted">contact@retailmasters.com</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Sarah Johnson</div>
+                            <small class="text-muted">Operations Manager</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">Retail</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Professional Plan</div>
+                            <small class="text-warning">Expires in 5 days</small>
+                        </div>
+                    </td>
+                    <td class="fw-bold text-success">$1,200/mo</td>
+                    <td>
+                        {% include 'dashboards/admin/components/status-badge.html' with status="warning" text="Expiring Soon" %}
+                    </td>
+                    <td>
+                        <div>
+                            <div>Mar 8, 2024</div>
+                            <small class="text-muted">5 months ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,renew,suspend" entity_type="business" entity_id="2" %}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="3">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-hospital text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">HealthCare Plus</h6>
+                                <small class="text-muted">admin@healthcareplus.com</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Dr. Michael Brown</div>
+                            <small class="text-muted">Director</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">Healthcare</span>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">Basic Plan</div>
+                            <small class="text-danger">Expired</small>
+                        </div>
+                    </td>
+                    <td class="fw-bold text-muted">$0/mo</td>
+                    <td>
+                        {% include 'dashboards/admin/components/status-badge.html' with status="danger" text="Expired" %}
+                    </td>
+                    <td>
+                        <div>
+                            <div>Dec 1, 2023</div>
+                            <small class="text-muted">8 months ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,contact,reactivate" entity_type="business" entity_id="3" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="mt-3">
+        {% include 'dashboards/admin/components/pagination.html' with current_page=1 total_pages=15 %}
+    </div>
+</div>
+
+<!-- Include Modals -->
+{% include 'dashboards/admin/modals/bulk-action.html' with entity_type="businesses" %}
+{% include 'dashboards/admin/modals/quick-create.html' with create_type="business" %}
+{% include 'dashboards/admin/modals/user-details.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DataTable
+    const table = $('#businessesTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        order: [[7, 'desc']], // Sort by registration date
+        columnDefs: [
+            { orderable: false, targets: [0, 8] }, // Disable sorting for checkbox and actions
+            { searchable: false, targets: [0, 8] }
+        ],
+        dom: 'tr<"d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-2"l<"ms-2"i>>p>',
+        language: {
+            lengthMenu: 'Show _MENU_ entries',
+            info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+            paginate: {
+                previous: '<i class="fas fa-chevron-left"></i>',
+                next: '<i class="fas fa-chevron-right"></i>'
+            }
+        }
+    });
+
+    // Update table info
+    table.on('draw', function() {
+        const info = table.page.info();
+        document.getElementById('tableInfo').textContent = 
+            `${info.start + 1}-${info.end} of ${info.recordsDisplay}`;
+    });
+
+    // Select all checkboxes
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+
+    // Filter functionality
+    ['statusFilter', 'subscriptionFilter', 'industryFilter'].forEach(filterId => {
+        const filter = document.getElementById(filterId);
+        if (filter) {
+            filter.addEventListener('change', function() {
+                applyFilters();
+            });
+        }
+    });
+
+    // Search functionality
+    const searchInput = document.querySelector('[data-search]');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            table.search(this.value).draw();
+        });
+    }
+
+    function applyFilters() {
+        // Custom filter logic would go here
+        // For now, just trigger table redraw
+        table.draw();
+    }
+
+    // View toggle
+    document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const view = this.dataset.view;
+            if (view === 'grid') {
+                // Switch to grid view (implement grid view logic)
+                showToast('Grid view coming soon!', 'info');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

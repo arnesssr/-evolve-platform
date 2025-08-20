@@ -1,0 +1,239 @@
+<!-- User Card Component -->
+<div class="user-card mb-3" data-user-id="{{ user.id }}">
+    <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 pb-2">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar me-3">
+                        {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" alt="{{ user.name }}" class="rounded-circle">
+                        {% else %}
+                        <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-semibold">{{ user.name|default:'Unknown User' }}</h6>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="viewUser('{{ user.id }}')">
+                            <i class="fas fa-eye me-2"></i>View Details</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="editUser('{{ user.id }}')">
+                            <i class="fas fa-edit me-2"></i>Edit User</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if user.is_active %}
+                        <li><a class="dropdown-item text-warning" href="#" onclick="suspendUser('{{ user.id }}')">
+                            <i class="fas fa-pause me-2"></i>Suspend</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item text-success" href="#" onclick="activateUser('{{ user.id }}')">
+                            <i class="fas fa-play me-2"></i>Activate</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteUser('{{ user.id }}')">
+                            <i class="fas fa-trash me-2"></i>Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-2">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="metric-item text-center">
+                        <div class="metric-value">{{ user.total_revenue|default:0|floatformat:0 }}</div>
+                        <div class="metric-label">Revenue</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-item text-center">
+                        <div class="metric-value">{{ user.commission_earned|default:0|floatformat:0 }}</div>
+                        <div class="metric-label">Commission</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge {{ user.status|lower|default:'inactive' }}-badge">
+                        <i class="fas fa-circle fa-xs me-1"></i>
+                        {{ user.status|title|default:'Inactive' }}
+                    </span>
+                    <small class="text-muted">
+                        Joined {{ user.date_joined|date:"M d, Y" }}
+                    </small>
+                </div>
+                
+                {% if user.last_login %}
+                <div class="d-flex align-items-center text-muted">
+                    <i class="fas fa-clock me-2"></i>
+                    <small>Last seen {{ user.last_login|timesince }} ago</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.user-card .card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.user-card:hover .card {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+
+.user-avatar img,
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    background: linear-gradient(135deg, #0a2463, #3e92cc);
+    color: white;
+    font-size: 1rem;
+}
+
+.metric-item .metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0a2463;
+}
+
+.metric-item .metric-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.active-badge {
+    background: rgba(var(--bs-success-rgb), 0.1);
+    color: var(--bs-success);
+    border: 1px solid rgba(var(--bs-success-rgb), 0.2);
+}
+
+.inactive-badge {
+    background: rgba(var(--bs-secondary-rgb), 0.1);
+    color: var(--bs-secondary);
+    border: 1px solid rgba(var(--bs-secondary-rgb), 0.2);
+}
+
+.suspended-badge {
+    background: rgba(var(--bs-warning-rgb), 0.1);
+    color: var(--bs-warning);
+    border: 1px solid rgba(var(--bs-warning-rgb), 0.2);
+}
+
+.pending-badge {
+    background: rgba(var(--bs-info-rgb), 0.1);
+    color: var(--bs-info);
+    border: 1px solid rgba(var(--bs-info-rgb), 0.2);
+}
+</style>
+
+<script>
+function viewUser(userId) {
+    window.location.href = `/admin/users/${userId}/`;
+}
+
+function editUser(userId) {
+    window.location.href = `/admin/users/${userId}/edit/`;
+}
+
+function suspendUser(userId) {
+    showConfirmModal({
+        title: 'Suspend User',
+        message: 'Are you sure you want to suspend this user? They will not be able to access their account.',
+        confirmText: 'Suspend',
+        confirmClass: 'btn-warning',
+        callback: () => {
+            fetch(`/admin/users/${userId}/suspend/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showToast('Error suspending user', 'error');
+                }
+            });
+        }
+    });
+}
+
+function activateUser(userId) {
+    showConfirmModal({
+        title: 'Activate User',
+        message: 'Are you sure you want to activate this user?',
+        confirmText: 'Activate',
+        confirmClass: 'btn-success',
+        callback: () => {
+            fetch(`/admin/users/${userId}/activate/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showToast('Error activating user', 'error');
+                }
+            });
+        }
+    });
+}
+
+function deleteUser(userId) {
+    showDangerModal({
+        title: 'Delete User Permanently',
+        message: 'This will permanently delete the user and all associated data. This action cannot be undone.',
+        confirmText: 'Delete Permanently',
+        callback: () => {
+            fetch(`/admin/users/${userId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const card = document.querySelector(`[data-user-id="${userId}"]`);
+                    if (card) {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.8)';
+                        setTimeout(() => card.remove(), 300);
+                    }
+                    showToast('User deleted successfully', 'success');
+                } else {
+                    showToast('Error deleting user', 'error');
+                }
+            });
+        }
+    });
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+</script>

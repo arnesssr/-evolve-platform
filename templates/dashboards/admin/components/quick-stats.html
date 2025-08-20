@@ -1,0 +1,672 @@
+<!-- Quick Stats Component -->
+<div class="quick-stats-component">
+    <div class="row g-3">
+        <!-- Total Users -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card users-stat">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="stat-content">
+                                <div class="stat-value" id="totalUsers">
+                                    {{ total_users|default:0|floatformat:0 }}
+                                </div>
+                                <div class="stat-label">Total Users</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+{{ user_growth|default:0 }}%</span>
+                                    <small>vs last month</small>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-progress mt-3">
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-primary" style="width: {{ user_progress|default:75 }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ user_progress|default:75 }}% of monthly target</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Total Revenue -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card revenue-stat">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="stat-content">
+                                <div class="stat-value" id="totalRevenue">
+                                    ${{ total_revenue|default:0|floatformat:0 }}
+                                </div>
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+{{ revenue_growth|default:0 }}%</span>
+                                    <small>vs last month</small>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat-progress mt-3">
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-success" style="width: {{ revenue_progress|default:68 }}%"></div>
+                            </div>
+                            <small class="text-muted">${{ monthly_target|default:0|floatformat:0 }} monthly target</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Orders -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card orders-stat">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="stat-content">
+                                <div class="stat-value" id="activeOrders">
+                                    {{ active_orders|default:0 }}
+                                </div>
+                                <div class="stat-label">Active Orders</div>
+                                <div class="stat-change {{ order_change_class|default:'neutral' }}">
+                                    <i class="fas fa-{{ order_change_icon|default:'minus' }}"></i>
+                                    <span>{{ order_change|default:0 }}%</span>
+                                    <small>vs yesterday</small>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="stat-mini-chart mt-3">
+                            <canvas id="ordersChart" width="100" height="30"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Commissions -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card commissions-stat">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="stat-content">
+                                <div class="stat-value" id="pendingCommissions">
+                                    ${{ pending_commissions|default:0|floatformat:0 }}
+                                </div>
+                                <div class="stat-label">Pending Commissions</div>
+                                <div class="stat-meta">
+                                    <span class="badge bg-warning">{{ pending_count|default:0 }} items</span>
+                                    <small class="text-muted ms-2">awaiting approval</small>
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <div class="stat-actions mt-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="reviewCommissions()">
+                                <i class="fas fa-eye me-1"></i>
+                                Review All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional Stats Row -->
+    <div class="row g-3 mt-2">
+        <!-- Conversion Rate -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-info">{{ conversion_rate|default:0 }}%</div>
+                        <div class="mini-stat-label">Conversion Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Avg Order Value -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-success">${{ avg_order_value|default:0 }}</div>
+                        <div class="mini-stat-label">Avg Order Value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Satisfaction -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-warning">{{ satisfaction_score|default:0 }}/5</div>
+                        <div class="mini-stat-label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Support Tickets -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-danger">{{ open_tickets|default:0 }}</div>
+                        <div class="mini-stat-label">Open Tickets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Uptime -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-success">{{ system_uptime|default:99.9 }}%</div>
+                        <div class="mini-stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cache Hit Rate -->
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="mini-stat-card">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mini-stat-value text-info">{{ cache_hit_rate|default:85 }}%</div>
+                        <div class="mini-stat-label">Cache Hit</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Real-time Updates Indicator -->
+    <div class="stats-footer mt-3 d-flex justify-content-between align-items-center">
+        <div class="last-updated">
+            <small class="text-muted">
+                <i class="fas fa-clock me-1"></i>
+                Last updated: <span id="lastUpdated">{{ last_updated|default:'Just now' }}</span>
+            </small>
+        </div>
+        <div class="real-time-indicator">
+            <div class="d-flex align-items-center">
+                <div class="status-dot live me-2"></div>
+                <small class="text-success">Live Updates</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.quick-stats-component .card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.quick-stats-component .card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--card-color, #0a2463), var(--card-color-light, #3e92cc));
+}
+
+.users-stat .card {
+    --card-color: #0a2463;
+    --card-color-light: #3e92cc;
+}
+
+.revenue-stat .card {
+    --card-color: #10b981;
+    --card-color-light: #34d399;
+}
+
+.orders-stat .card {
+    --card-color: #f59e0b;
+    --card-color-light: #fbbf24;
+}
+
+.commissions-stat .card {
+    --card-color: #ef4444;
+    --card-color-light: #f87171;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.stat-change.positive {
+    color: #10b981;
+}
+
+.stat-change.negative {
+    color: #ef4444;
+}
+
+.stat-change.neutral {
+    color: #6b7280;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    background: var(--card-color, #0a2463);
+}
+
+.stat-progress .progress {
+    border-radius: 10px;
+    background-color: rgba(var(--bs-gray-200-rgb), 0.3);
+}
+
+.stat-mini-chart {
+    height: 30px;
+}
+
+.stat-actions .btn {
+    border-radius: 6px;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.mini-stat-card .card {
+    transition: all 0.2s ease;
+}
+
+.mini-stat-card .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.mini-stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.mini-stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stats-footer {
+    padding: 1rem 0;
+    border-top: 1px solid rgba(var(--bs-border-color-rgb), 0.1);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.status-dot.live {
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.stat-meta .badge {
+    font-size: 0.7rem;
+}
+
+/* Loading State */
+.stat-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.stat-loading .stat-value::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let ordersChart = null;
+let updateInterval = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMiniCharts();
+    startRealTimeUpdates();
+    updateLastUpdatedTime();
+    
+    // Update time every minute
+    setInterval(updateLastUpdatedTime, 60000);
+});
+
+function initializeMiniCharts() {
+    const ctx = document.getElementById('ordersChart');
+    if (ctx) {
+        ordersChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: generateHourlyLabels(24),
+                datasets: [{
+                    data: generateSampleData(24, 10, 50),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            title: () => '',
+                            label: (context) => `Orders: ${context.parsed.y}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                },
+                elements: {
+                    line: { borderWidth: 2 },
+                    point: { radius: 0 }
+                }
+            }
+        });
+    }
+}
+
+function startRealTimeUpdates() {
+    // Update stats every 30 seconds
+    updateInterval = setInterval(() => {
+        fetchLatestStats();
+    }, 30000);
+    
+    // WebSocket connection for real-time updates
+    if (typeof io !== 'undefined') {
+        const socket = io('/admin-stats');
+        
+        socket.on('stats_update', function(data) {
+            updateStats(data);
+        });
+        
+        socket.on('connect', function() {
+            console.log('Connected to stats updates');
+        });
+    }
+}
+
+function fetchLatestStats() {
+    // Add loading state
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.classList.add('stat-loading');
+    });
+    
+    fetch('/admin/api/quick-stats')
+    .then(response => response.json())
+    .then(data => {
+        updateStats(data);
+        updateLastUpdatedTime();
+    })
+    .catch(error => {
+        console.error('Error fetching stats:', error);
+    })
+    .finally(() => {
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.classList.remove('stat-loading');
+        });
+    });
+}
+
+function updateStats(data) {
+    // Animate counter updates
+    animateCounter('totalUsers', data.total_users || 0);
+    animateCounter('totalRevenue', data.total_revenue || 0, true);
+    animateCounter('activeOrders', data.active_orders || 0);
+    animateCounter('pendingCommissions', data.pending_commissions || 0, true);
+    
+    // Update progress bars
+    updateProgressBar('.users-stat .progress-bar', data.user_progress || 0);
+    updateProgressBar('.revenue-stat .progress-bar', data.revenue_progress || 0);
+    
+    // Update change indicators
+    updateChangeIndicator('.users-stat .stat-change', data.user_growth || 0);
+    updateChangeIndicator('.revenue-stat .stat-change', data.revenue_growth || 0);
+    updateChangeIndicator('.orders-stat .stat-change', data.order_change || 0);
+    
+    // Update mini stats
+    updateMiniStat('conversion_rate', data.conversion_rate || 0, '%');
+    updateMiniStat('avg_order_value', data.avg_order_value || 0, '$');
+    updateMiniStat('satisfaction_score', data.satisfaction_score || 0, '/5');
+    updateMiniStat('open_tickets', data.open_tickets || 0);
+    updateMiniStat('system_uptime', data.system_uptime || 99.9, '%');
+    updateMiniStat('cache_hit_rate', data.cache_hit_rate || 85, '%');
+    
+    // Update charts
+    if (ordersChart && data.orders_trend) {
+        ordersChart.data.datasets[0].data = data.orders_trend;
+        ordersChart.update('none');
+    }
+}
+
+function animateCounter(elementId, newValue, isCurrency = false) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const currentValue = parseInt(element.textContent.replace(/[$,]/g, '')) || 0;
+    const increment = (newValue - currentValue) / 30; // 30 steps
+    let current = currentValue;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= newValue) || (increment < 0 && current <= newValue)) {
+            current = newValue;
+            clearInterval(timer);
+        }
+        
+        const displayValue = Math.round(current).toLocaleString();
+        element.textContent = isCurrency ? `$${displayValue}` : displayValue;
+    }, 50);
+}
+
+function updateProgressBar(selector, percentage) {
+    const progressBar = document.querySelector(selector);
+    if (progressBar) {
+        progressBar.style.width = `${Math.min(percentage, 100)}%`;
+    }
+}
+
+function updateChangeIndicator(selector, value) {
+    const indicator = document.querySelector(selector);
+    if (!indicator) return;
+    
+    const span = indicator.querySelector('span');
+    const icon = indicator.querySelector('i');
+    
+    if (span) {
+        span.textContent = `${value >= 0 ? '+' : ''}${value}%`;
+    }
+    
+    // Update classes and icon
+    indicator.className = `stat-change ${value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral'}`;
+    
+    if (icon) {
+        icon.className = `fas fa-${value > 0 ? 'arrow-up' : value < 0 ? 'arrow-down' : 'minus'}`;
+    }
+}
+
+function updateMiniStat(type, value, suffix = '') {
+    const elements = document.querySelectorAll('.mini-stat-value');
+    const typeMap = {
+        'conversion_rate': 0,
+        'avg_order_value': 1,
+        'satisfaction_score': 2,
+        'open_tickets': 3,
+        'system_uptime': 4,
+        'cache_hit_rate': 5
+    };
+    
+    const index = typeMap[type];
+    if (elements[index]) {
+        const displayValue = type === 'avg_order_value' ? `$${value}` : `${value}${suffix}`;
+        elements[index].textContent = displayValue;
+    }
+}
+
+function updateLastUpdatedTime() {
+    const element = document.getElementById('lastUpdated');
+    if (element) {
+        element.textContent = new Date().toLocaleTimeString();
+    }
+}
+
+function generateHourlyLabels(hours) {
+    const labels = [];
+    const now = new Date();
+    
+    for (let i = hours - 1; i >= 0; i--) {
+        const hour = new Date(now);
+        hour.setHours(hour.getHours() - i);
+        labels.push(hour.getHours() + ':00');
+    }
+    
+    return labels;
+}
+
+function generateSampleData(count, min, max) {
+    return Array.from({ length: count }, () => 
+        Math.floor(Math.random() * (max - min + 1)) + min
+    );
+}
+
+function reviewCommissions() {
+    window.location.href = '/admin/financial/commissions/?status=pending';
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+});
+
+// Manual refresh button (can be added to UI)
+function refreshStats() {
+    fetchLatestStats();
+}
+
+// Export stats data
+function exportQuickStats() {
+    const statsData = {
+        timestamp: new Date().toISOString(),
+        total_users: document.getElementById('totalUsers').textContent,
+        total_revenue: document.getElementById('totalRevenue').textContent,
+        active_orders: document.getElementById('activeOrders').textContent,
+        pending_commissions: document.getElementById('pendingCommissions').textContent
+    };
+    
+    const blob = new Blob([JSON.stringify(statsData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `quick-stats-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>

@@ -1,0 +1,417 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Revenue Overview{% endblock %}
+
+{% block page_title %}Revenue Overview{% endblock %}
+{% block page_subtitle %}Track and analyze platform revenue performance{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item active">Revenue</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    {% include 'dashboards/admin/forms/date-range.html' with label="Date Range" compact=True %}
+    {% include 'dashboards/admin/components/export-button.html' with export_type="revenue" %}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+        <i class="fas fa-chart-line me-2"></i>Generate Report
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Revenue Metrics -->
+<div class="row mb-4">
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Revenue" value="$284,750" icon="fa-dollar-sign" color="success" change="+12.5%" trend="up" subtitle="All time revenue" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Monthly Revenue" value="$48,329" icon="fa-calendar" color="primary" change="+8.2%" trend="up" subtitle="This month" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Average Revenue" value="$2,847" icon="fa-chart-bar" color="info" change="+5.1%" trend="up" subtitle="Per business/month" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Growth Rate" value="18.5%" icon="fa-trending-up" color="warning" change="+2.3%" trend="up" subtitle="Month over month" %}
+</div>
+
+<!-- Revenue Charts -->
+<div class="row mb-4">
+    <!-- Main Revenue Chart -->
+    <div class="col-lg-8">
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Revenue Trends</h5>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-period="12months">12 Months</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="6months">6 Months</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="3months">3 Months</button>
+                </div>
+            </div>
+            <canvas id="revenueChart" height="100"></canvas>
+        </div>
+    </div>
+    
+    <!-- Revenue by Source -->
+    <div class="col-lg-4">
+        <div class="content-card">
+            <h5 class="mb-4">Revenue by Source</h5>
+            <canvas id="revenueSourceChart" height="200"></canvas>
+            
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Subscriptions</span>
+                    </div>
+                    <span class="fw-bold">65%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Commissions</span>
+                    </div>
+                    <span class="fw-bold">25%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+                        <span class="text-muted">Setup Fees</span>
+                    </div>
+                    <span class="fw-bold">10%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Breakdown -->
+<div class="row mb-4">
+    <!-- Top Revenue Businesses -->
+    <div class="col-lg-6">
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Top Revenue Businesses</h5>
+                <a href="{% url 'admin:businesses_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Business</th>
+                            <th>Plan</th>
+                            <th class="text-end">Monthly</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-building text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">TechCorp Solutions</div>
+                                        <small class="text-muted">Technology</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Enterprise</span>
+                            </td>
+                            <td class="text-end fw-bold text-success">$2,450</td>
+                            <td class="text-end fw-bold">$19,600</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-hospital text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">HealthCare Plus</div>
+                                        <small class="text-muted">Healthcare</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">Professional</span>
+                            </td>
+                            <td class="text-end fw-bold text-success">$1,850</td>
+                            <td class="text-end fw-bold">$14,800</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-store text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">Retail Masters Ltd</div>
+                                        <small class="text-muted">Retail</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">Professional</span>
+                            </td>
+                            <td class="text-end fw-bold text-success">$1,200</td>
+                            <td class="text-end fw-bold">$9,600</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-industry text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">Manufacturing Co</div>
+                                        <small class="text-muted">Manufacturing</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">Basic</span>
+                            </td>
+                            <td class="text-end fw-bold text-success">$850</td>
+                            <td class="text-end fw-bold">$5,950</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue by Plan -->
+    <div class="col-lg-6">
+        <div class="content-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Revenue by Plan</h5>
+                <a href="{% url 'admin:plans_list' %}" class="btn btn-sm btn-outline-primary">Manage Plans</a>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-success">Enterprise</span>
+                            <span class="text-muted small">12 businesses</span>
+                        </div>
+                        <div class="fw-bold fs-4 text-success">$29,400</div>
+                        <small class="text-muted">Monthly recurring</small>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-success" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary">Professional</span>
+                            <span class="text-muted small">28 businesses</span>
+                        </div>
+                        <div class="fw-bold fs-4 text-primary">$33,600</div>
+                        <small class="text-muted">Monthly recurring</small>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-primary" style="width: 52%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-info">Basic</span>
+                            <span class="text-muted small">45 businesses</span>
+                        </div>
+                        <div class="fw-bold fs-4 text-info">$22,500</div>
+                        <small class="text-muted">Monthly recurring</small>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-info" style="width: 35%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="border rounded p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-secondary">Trial</span>
+                            <span class="text-muted small">18 businesses</span>
+                        </div>
+                        <div class="fw-bold fs-4 text-secondary">$0</div>
+                        <small class="text-muted">Free trial period</small>
+                        <div class="progress mt-2" style="height: 4px;">
+                            <div class="progress-bar bg-secondary" style="width: 18%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Forecasting -->
+<div class="row">
+    <div class="col-12">
+        <div class="content-card">
+            <h5 class="mb-4">Revenue Forecast</h5>
+            <div class="row mb-4">
+                <div class="col-md-3 text-center">
+                    <div class="fw-bold fs-4 text-primary">$52,300</div>
+                    <small class="text-muted">Projected Next Month</small>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="fw-bold fs-4 text-info">$158,400</div>
+                    <small class="text-muted">Projected Q4 2024</small>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="fw-bold fs-4 text-success">$642,000</div>
+                    <small class="text-muted">Projected 2024 Total</small>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="fw-bold fs-4 text-warning">22.5%</div>
+                    <small class="text-muted">Expected Growth Rate</small>
+                </div>
+            </div>
+            <canvas id="forecastChart" height="80"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modals -->
+{% include 'dashboards/admin/modals/generate-report.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Revenue Trend Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Revenue',
+                    data: [32000, 35000, 38000, 42000, 41000, 45000, 47000, 44000, 48000, 50000, 48329, 0],
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Target',
+                    data: [30000, 32000, 35000, 38000, 40000, 43000, 45000, 48000, 50000, 52000, 55000, 58000],
+                    borderColor: 'rgba(107, 114, 128, 0.5)',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+            }
+        }
+    });
+
+    // Revenue Source Pie Chart
+    const sourceCtx = document.getElementById('revenueSourceChart').getContext('2d');
+    new Chart(sourceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Subscriptions', 'Commissions', 'Setup Fees'],
+            datasets: [{
+                data: [65, 25, 10],
+                backgroundColor: [
+                    'rgb(10, 36, 99)',
+                    'rgb(16, 185, 129)',
+                    'rgb(245, 158, 11)'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Forecast Chart
+    const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+    new Chart(forecastCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Oct 2024', 'Nov 2024', 'Dec 2024', 'Jan 2025', 'Feb 2025', 'Mar 2025'],
+            datasets: [{
+                label: 'Projected Revenue',
+                data: [48329, 52300, 55800, 58200, 61500, 64200],
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderColor: 'rgb(59, 130, 246)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value / 1000) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Period buttons
+    document.querySelectorAll('[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update chart data based on period
+            const period = this.dataset.period;
+            updateRevenueChart(period);
+        });
+    });
+
+    function updateRevenueChart(period) {
+        // Here you would typically fetch new data from the server
+        // For now, just show a toast
+        showToast(`Updated chart for ${period} period`, 'info');
+    }
+});
+</script>
+{% endblock %}

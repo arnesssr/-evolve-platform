@@ -1,0 +1,417 @@
+<!-- Business Settings Form Component -->
+<div class="business-settings-form">
+    <form id="businessSettingsForm" method="POST">
+        {% csrf_token %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0 fw-semibold">
+                    <i class="fas fa-building text-primary me-2"></i>
+                    Business Settings Configuration
+                </h6>
+            </div>
+            
+            <div class="card-body">
+                <!-- Company Information -->
+                <div class="company-info mb-4">
+                    <h6 class="text-muted mb-3">Company Information</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Company Name</label>
+                            <input type="text" class="form-control" name="company_name" 
+                                   value="{{ settings.company_name|default:'Evolve Platform' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Legal Name</label>
+                            <input type="text" class="form-control" name="legal_name" 
+                                   value="{{ settings.legal_name|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Tax ID / EIN</label>
+                            <input type="text" class="form-control" name="tax_id" 
+                                   value="{{ settings.tax_id|default:'' }}" placeholder="XX-XXXXXXX">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Business Type</label>
+                            <select class="form-select" name="business_type">
+                                <option value="corporation" {% if settings.business_type == 'corporation' %}selected{% endif %}>Corporation</option>
+                                <option value="llc" {% if settings.business_type == 'llc' %}selected{% endif %}>LLC</option>
+                                <option value="partnership" {% if settings.business_type == 'partnership' %}selected{% endif %}>Partnership</option>
+                                <option value="sole_proprietorship" {% if settings.business_type == 'sole_proprietorship' %}selected{% endif %}>Sole Proprietorship</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Industry</label>
+                            <select class="form-select" name="industry">
+                                <option value="technology" {% if settings.industry == 'technology' %}selected{% endif %}>Technology</option>
+                                <option value="finance" {% if settings.industry == 'finance' %}selected{% endif %}>Finance</option>
+                                <option value="healthcare" {% if settings.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+                                <option value="education" {% if settings.industry == 'education' %}selected{% endif %}>Education</option>
+                                <option value="retail" {% if settings.industry == 'retail' %}selected{% endif %}>Retail</option>
+                                <option value="other" {% if settings.industry == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Information -->
+                <div class="contact-info mb-4">
+                    <h6 class="text-muted mb-3">Contact Information</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Primary Email</label>
+                            <input type="email" class="form-control" name="primary_email" 
+                                   value="{{ settings.primary_email|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Support Email</label>
+                            <input type="email" class="form-control" name="support_email" 
+                                   value="{{ settings.support_email|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Primary Phone</label>
+                            <input type="tel" class="form-control" name="primary_phone" 
+                                   value="{{ settings.primary_phone|default:'' }}" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Website URL</label>
+                            <input type="url" class="form-control" name="website_url" 
+                                   value="{{ settings.website_url|default:'' }}" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Address -->
+                <div class="business-address mb-4">
+                    <h6 class="text-muted mb-3">Business Address</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Street Address</label>
+                            <input type="text" class="form-control" name="street_address" 
+                                   value="{{ settings.street_address|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">City</label>
+                            <input type="text" class="form-control" name="city" 
+                                   value="{{ settings.city|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">State/Province</label>
+                            <input type="text" class="form-control" name="state" 
+                                   value="{{ settings.state|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-medium">ZIP/Postal Code</label>
+                            <input type="text" class="form-control" name="postal_code" 
+                                   value="{{ settings.postal_code|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Country</label>
+                            <select class="form-select" name="country">
+                                <option value="US" {% if settings.country == 'US' %}selected{% endif %}>United States</option>
+                                <option value="CA" {% if settings.country == 'CA' %}selected{% endif %}>Canada</option>
+                                <option value="GB" {% if settings.country == 'GB' %}selected{% endif %}>United Kingdom</option>
+                                <option value="AU" {% if settings.country == 'AU' %}selected{% endif %}>Australia</option>
+                                <option value="DE" {% if settings.country == 'DE' %}selected{% endif %}>Germany</option>
+                                <option value="FR" {% if settings.country == 'FR' %}selected{% endif %}>France</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Timezone</label>
+                            <select class="form-select" name="timezone">
+                                <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time (ET)</option>
+                                <option value="America/Chicago" {% if settings.timezone == 'America/Chicago' %}selected{% endif %}>Central Time (CT)</option>
+                                <option value="America/Denver" {% if settings.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time (MT)</option>
+                                <option value="America/Los_Angeles" {% if settings.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time (PT)</option>
+                                <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>GMT</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Platform Settings -->
+                <div class="platform-settings mb-4">
+                    <h6 class="text-muted mb-3">Platform Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Default Currency</label>
+                            <select class="form-select" name="default_currency">
+                                <option value="USD" {% if settings.default_currency == 'USD' %}selected{% endif %}>USD ($)</option>
+                                <option value="EUR" {% if settings.default_currency == 'EUR' %}selected{% endif %}>EUR (€)</option>
+                                <option value="GBP" {% if settings.default_currency == 'GBP' %}selected{% endif %}>GBP (£)</option>
+                                <option value="CAD" {% if settings.default_currency == 'CAD' %}selected{% endif %}>CAD ($)</option>
+                                <option value="AUD" {% if settings.default_currency == 'AUD' %}selected{% endif %}>AUD ($)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Date Format</label>
+                            <select class="form-select" name="date_format">
+                                <option value="MM/DD/YYYY" {% if settings.date_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY</option>
+                                <option value="DD/MM/YYYY" {% if settings.date_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY</option>
+                                <option value="YYYY-MM-DD" {% if settings.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Number Format</label>
+                            <select class="form-select" name="number_format">
+                                <option value="1,234.56" {% if settings.number_format == '1,234.56' %}selected{% endif %}>1,234.56</option>
+                                <option value="1.234,56" {% if settings.number_format == '1.234,56' %}selected{% endif %}>1.234,56</option>
+                                <option value="1 234.56" {% if settings.number_format == '1 234.56' %}selected{% endif %}>1 234.56</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Business Features -->
+                <div class="business-features mb-4">
+                    <h6 class="text-muted mb-3">Business Features</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_multi_currency" 
+                                       {% if settings.enable_multi_currency %}checked{% endif %}>
+                                <label class="form-check-label">Enable Multi-Currency Support</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_tax_calculation" 
+                                       {% if settings.enable_tax_calculation %}checked{% endif %}>
+                                <label class="form-check-label">Enable Tax Calculation</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_invoicing" 
+                                       {% if settings.enable_invoicing %}checked{% endif %}>
+                                <label class="form-check-label">Enable Automated Invoicing</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_reports" 
+                                       {% if settings.enable_reports %}checked{% endif %}>
+                                <label class="form-check-label">Enable Advanced Reporting</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_api_access" 
+                                       {% if settings.enable_api_access %}checked{% endif %}>
+                                <label class="form-check-label">Enable API Access</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="enable_webhooks" 
+                                       {% if settings.enable_webhooks %}checked{% endif %}>
+                                <label class="form-check-label">Enable Webhooks</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Compliance & Security -->
+                <div class="compliance-security mb-4">
+                    <h6 class="text-muted mb-3">Compliance & Security</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="gdpr_compliance" 
+                                       {% if settings.gdpr_compliance %}checked{% endif %}>
+                                <label class="form-check-label">GDPR Compliance</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="ccpa_compliance" 
+                                       {% if settings.ccpa_compliance %}checked{% endif %}>
+                                <label class="form-check-label">CCPA Compliance</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="two_factor_required" 
+                                       {% if settings.two_factor_required %}checked{% endif %}>
+                                <label class="form-check-label">Require 2FA for Admins</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Data Retention Period (days)</label>
+                            <input type="number" class="form-control" name="data_retention_days" 
+                                   min="30" max="2555" value="{{ settings.data_retention_days|default:'365' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Session Timeout (minutes)</label>
+                            <input type="number" class="form-control" name="session_timeout" 
+                                   min="5" max="1440" value="{{ settings.session_timeout|default:'60' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Brand Settings -->
+                <div class="brand-settings">
+                    <h6 class="text-muted mb-3">Brand Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Company Logo URL</label>
+                            <input type="url" class="form-control" name="logo_url" 
+                                   value="{{ settings.logo_url|default:'' }}" placeholder="https://...">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Favicon URL</label>
+                            <input type="url" class="form-control" name="favicon_url" 
+                                   value="{{ settings.favicon_url|default:'' }}" placeholder="https://...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Primary Brand Color</label>
+                            <input type="color" class="form-control form-control-color" name="primary_color" 
+                                   value="{{ settings.primary_color|default:'#007bff' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Secondary Brand Color</label>
+                            <input type="color" class="form-control form-control-color" name="secondary_color" 
+                                   value="{{ settings.secondary_color|default:'#6c757d' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Accent Color</label>
+                            <input type="color" class="form-control form-control-color" name="accent_color" 
+                                   value="{{ settings.accent_color|default:'#28a745' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="settings-info">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Changes are audited and logged for security
+                        </small>
+                    </div>
+                    <div class="actions">
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetToDefaults()">
+                            <i class="fas fa-undo me-1"></i>Reset
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.business-settings-form .card { border-radius: 10px; }
+.form-check-label { font-weight: 500; }
+.brand-settings .form-control-color { width: 100%; height: 38px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('businessSettingsForm');
+    form.addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+        }
+    });
+    
+    // Auto-save functionality
+    const formInputs = form.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('change', autoSave);
+    });
+});
+
+function validateForm() {
+    const requiredFields = ['company_name', 'primary_email'];
+    let isValid = true;
+    
+    requiredFields.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+    
+    // Validate email format
+    const emailFields = ['primary_email', 'support_email'];
+    emailFields.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field.value && !isValidEmail(field.value)) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        }
+    });
+    
+    return isValid;
+}
+
+function isValidEmail(email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+}
+
+function autoSave() {
+    clearTimeout(window.autoSaveTimer);
+    window.autoSaveTimer = setTimeout(() => {
+        const formData = new FormData(document.getElementById('businessSettingsForm'));
+        console.log('Auto-saving business settings...', Object.fromEntries(formData));
+        
+        // Show auto-save indicator
+        showAutoSaveIndicator();
+    }, 2000);
+}
+
+function showAutoSaveIndicator() {
+    const indicator = document.createElement('div');
+    indicator.className = 'alert alert-success alert-dismissible position-fixed top-0 end-0 m-3';
+    indicator.style.zIndex = '9999';
+    indicator.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>Settings auto-saved
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(indicator);
+    
+    setTimeout(() => {
+        if (indicator.parentNode) {
+            indicator.remove();
+        }
+    }, 3000);
+}
+
+function resetToDefaults() {
+    if (confirm('Reset all settings to default values? This action cannot be undone.')) {
+        // Reset form to default values
+        const form = document.getElementById('businessSettingsForm');
+        form.reset();
+        
+        // Set specific default values
+        document.querySelector('[name="default_currency"]').value = 'USD';
+        document.querySelector('[name="date_format"]').value = 'MM/DD/YYYY';
+        document.querySelector('[name="number_format"]').value = '1,234.56';
+        document.querySelector('[name="timezone"]').value = 'America/New_York';
+        document.querySelector('[name="data_retention_days"]').value = '365';
+        document.querySelector('[name="session_timeout"]').value = '60';
+        document.querySelector('[name="primary_color"]').value = '#007bff';
+        document.querySelector('[name="secondary_color"]').value = '#6c757d';
+        document.querySelector('[name="accent_color"]').value = '#28a745';
+    }
+}
+
+// Preview color changes in real-time
+document.querySelector('[name="primary_color"]').addEventListener('input', function() {
+    document.documentElement.style.setProperty('--bs-primary', this.value);
+});
+
+document.querySelector('[name="secondary_color"]').addEventListener('input', function() {
+    document.documentElement.style.setProperty('--bs-secondary', this.value);
+});
+</script>

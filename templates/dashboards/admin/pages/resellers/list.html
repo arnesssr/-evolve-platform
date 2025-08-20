@@ -1,0 +1,235 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}Resellers{% endblock %}
+
+{% block page_title %}Resellers{% endblock %}
+{% block page_subtitle %}Manage reseller partners and their performance{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Resellers</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    {% include 'dashboards/admin/components/export-button.html' with export_type="resellers" %}
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
+        <i class="fas fa-tasks me-2"></i>Bulk Actions
+    </button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickCreateModal">
+        <i class="fas fa-plus me-2"></i>Add Reseller
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Reseller Statistics -->
+<div class="row mb-4">
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Resellers" value="47" icon="fa-user-tie" color="primary" change="+3" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Active Resellers" value="38" icon="fa-check-circle" color="success" change="+2" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Commission" value="$84,750" icon="fa-percentage" color="info" change="+15.3%" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Top Performer" value="John Marketing" icon="fa-trophy" color="warning" change="$8,450" trend="up" %}
+</div>
+
+<!-- Filters Section -->
+<div class="content-card mb-4">
+    <h5 class="mb-3">Filters & Search</h5>
+    <div class="row">
+        <div class="col-md-3">
+            {% include 'dashboards/admin/forms/user-filter.html' with filter_type="reseller" %}
+        </div>
+        <div class="col-md-3">
+            <label for="performanceFilter" class="form-label">Performance</label>
+            <select id="performanceFilter" class="form-select">
+                <option value="">All Performance</option>
+                <option value="top">Top Performers</option>
+                <option value="good">Good Performance</option>
+                <option value="average">Average Performance</option>
+                <option value="poor">Needs Improvement</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="commissionFilter" class="form-label">Commission Tier</label>
+            <select id="commissionFilter" class="form-select">
+                <option value="">All Tiers</option>
+                <option value="premium">Premium (10%)</option>
+                <option value="standard">Standard (5%)</option>
+                <option value="basic">Basic (3%)</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            {% include 'dashboards/admin/forms/date-range.html' with label="Registration Date" %}
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            {% include 'dashboards/admin/components/search-filter.html' with placeholder="Search resellers by name, email, or company..." %}
+        </div>
+    </div>
+</div>
+
+<!-- Resellers Table -->
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">All Resellers</h5>
+        <div class="d-flex align-items-center gap-3">
+            <small class="text-muted">Showing <span id="tableInfo">0</span> results</small>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table id="resellersTable" class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="selectAll">
+                        </div>
+                    </th>
+                    <th>Reseller</th>
+                    <th>Performance</th>
+                    <th>Commission Tier</th>
+                    <th>Total Earnings</th>
+                    <th>Sales Count</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user-tie text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">John Marketing</h6>
+                                <small class="text-muted">john@marketingpro.com</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium text-success">Excellent</div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-success" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">Premium (10%)</span>
+                    </td>
+                    <td class="fw-bold text-success">$8,450</td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">23 sales</div>
+                            <small class="text-muted">This month: 4</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
+                    </td>
+                    <td>
+                        <div>
+                            <div>Jan 15, 2024</div>
+                            <small class="text-muted">10 months ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,suspend,delete" entity_type="reseller" entity_id="1" %}
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="2">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user-tie text-white"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Sarah Sales</h6>
+                                <small class="text-muted">sarah@salesforce.net</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div class="fw-medium text-primary">Good</div>
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar bg-primary" style="width: 78%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary">Standard (5%)</span>
+                    </td>
+                    <td class="fw-bold text-success">$5,230</td>
+                    <td>
+                        <div>
+                            <div class="fw-medium">18 sales</div>
+                            <small class="text-muted">This month: 3</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
+                    </td>
+                    <td>
+                        <div>
+                            <div>Mar 8, 2024</div>
+                            <small class="text-muted">7 months ago</small>
+                        </div>
+                    </td>
+                    <td>
+                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,upgrade,message" entity_type="reseller" entity_id="2" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-3">
+        {% include 'dashboards/admin/components/pagination.html' with current_page=1 total_pages=5 %}
+    </div>
+</div>
+
+{% include 'dashboards/admin/modals/bulk-action.html' with entity_type="resellers" %}
+{% include 'dashboards/admin/modals/quick-create.html' with create_type="reseller" %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = $('#resellersTable').DataTable({
+        responsive: true,
+        pageLength: 25,
+        order: [[7, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: [0, 8] },
+            { searchable: false, targets: [0, 8] }
+        ]
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,378 @@
+<!-- Approve Commission Modal Component -->
+<div class="modal fade" id="approveCommissionModal" tabindex="-1" aria-labelledby="approveCommissionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="approveCommissionModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>Approve Commission
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Commission Details -->
+                <div class="commission-details mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Commission ID:</label>
+                                <div id="commissionId">COM-001234</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Sale ID:</label>
+                                <div id="saleId">SALE-001234</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Reseller:</label>
+                                <div id="resellerName">John Doe</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Product:</label>
+                                <div id="productName">Pro Plan</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Sale Amount:</label>
+                                <div id="saleAmount" class="text-success fw-bold">$99.00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Commission Rate:</label>
+                                <div id="commissionRate">15%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Commission Amount:</label>
+                                <div id="commissionAmount" class="text-warning fw-bold">$14.85</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Sale Date:</label>
+                                <div id="saleDate">2024-01-20</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Information -->
+                <div class="customer-info mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Customer Information</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Customer:</label>
+                                <div id="customerName">ABC Corporation</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Email:</label>
+                                <div id="customerEmail">customer@abc.com</div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="detail-item">
+                                <label class="fw-bold text-muted">Transaction Details:</label>
+                                <div id="transactionDetails" class="bg-light p-2 rounded">
+                                    Pro Plan subscription - Annual billing - Transaction ID: TXN-987654
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Verification Checklist -->
+                <div class="verification-checklist mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Verification Checklist</h6>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="verifyCustomer" onchange="updateApprovalStatus()">
+                        <label class="form-check-label" for="verifyCustomer">
+                            Customer payment confirmed and processed
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="verifyReseller" onchange="updateApprovalStatus()">
+                        <label class="form-check-label" for="verifyReseller">
+                            Reseller eligibility verified
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="verifyCommission" onchange="updateApprovalStatus()">
+                        <label class="form-check-label" for="verifyCommission">
+                            Commission calculation verified
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="verifyPolicy" onchange="updateApprovalStatus()">
+                        <label class="form-check-label" for="verifyPolicy">
+                            Complies with commission policy
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Approval Options -->
+                <div class="approval-options mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Approval Decision</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalDecision" id="approveFullAmount" value="approve" checked>
+                                <label class="form-check-label" for="approveFullAmount">
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Approve Full Amount ($<span id="fullAmount">14.85</span>)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approvalDecision" id="approvePartial" value="partial">
+                                <label class="form-check-label" for="approvePartial">
+                                    <i class="fas fa-edit text-warning me-1"></i>
+                                    Approve Partial Amount
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Partial Amount Input -->
+                    <div id="partialAmountSection" class="mt-3" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Approved Amount ($)</label>
+                                <input type="number" class="form-control" id="partialAmount" step="0.01" min="0" max="14.85">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Reason for Partial Approval</label>
+                                <input type="text" class="form-control" id="partialReason" placeholder="Enter reason...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reject Option -->
+                    <div class="mt-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="approvalDecision" id="rejectCommission" value="reject">
+                            <label class="form-check-label" for="rejectCommission">
+                                <i class="fas fa-times-circle text-danger me-1"></i>
+                                Reject Commission
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Rejection Reason -->
+                    <div id="rejectionReasonSection" class="mt-3" style="display: none;">
+                        <label class="form-label">Rejection Reason</label>
+                        <select class="form-select mb-2" id="rejectionReason">
+                            <option value="">Select reason...</option>
+                            <option value="payment_not_confirmed">Payment not confirmed</option>
+                            <option value="customer_refund">Customer requested refund</option>
+                            <option value="policy_violation">Policy violation</option>
+                            <option value="fraudulent_activity">Fraudulent activity</option>
+                            <option value="calculation_error">Calculation error</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <textarea class="form-control" id="rejectionDetails" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Admin Notes -->
+                <div class="admin-notes">
+                    <h6 class="text-muted border-bottom pb-2">Admin Notes</h6>
+                    <textarea class="form-control" id="adminNotes" rows="3" placeholder="Add any additional notes about this commission approval..."></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="rejectBtn" onclick="processCommission('reject')" style="display: none;">
+                    <i class="fas fa-times me-1"></i>Reject Commission
+                </button>
+                <button type="button" class="btn btn-success" id="approveBtn" onclick="processCommission('approve')" disabled>
+                    <i class="fas fa-check me-1"></i>Approve Commission
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-item {
+    margin-bottom: 0.5rem;
+}
+.detail-item label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+.verification-checklist .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+</style>
+
+<script>
+let currentCommissionData = null;
+
+function showApproveCommissionModal(commissionData) {
+    currentCommissionData = commissionData;
+    
+    // Populate commission data
+    document.getElementById('commissionId').textContent = commissionData.id || 'COM-001234';
+    document.getElementById('saleId').textContent = commissionData.saleId || 'SALE-001234';
+    document.getElementById('resellerName').textContent = commissionData.resellerName || 'John Doe';
+    document.getElementById('productName').textContent = commissionData.productName || 'Pro Plan';
+    document.getElementById('saleAmount').textContent = '$' + (commissionData.saleAmount || '99.00');
+    document.getElementById('commissionRate').textContent = (commissionData.commissionRate || '15') + '%';
+    document.getElementById('commissionAmount').textContent = '$' + (commissionData.commissionAmount || '14.85');
+    document.getElementById('saleDate').textContent = commissionData.saleDate || '2024-01-20';
+    document.getElementById('customerName').textContent = commissionData.customerName || 'ABC Corporation';
+    document.getElementById('customerEmail').textContent = commissionData.customerEmail || 'customer@abc.com';
+    document.getElementById('fullAmount').textContent = commissionData.commissionAmount || '14.85';
+    
+    // Set max value for partial amount
+    const maxAmount = parseFloat(commissionData.commissionAmount || '14.85');
+    document.getElementById('partialAmount').max = maxAmount;
+    
+    // Reset form
+    resetApprovalForm();
+    
+    const modal = new bootstrap.Modal(document.getElementById('approveCommissionModal'));
+    modal.show();
+}
+
+function resetApprovalForm() {
+    // Reset checkboxes
+    document.querySelectorAll('.verification-checklist input[type="checkbox"]').forEach(cb => cb.checked = false);
+    
+    // Reset radio buttons
+    document.getElementById('approveFullAmount').checked = true;
+    
+    // Hide conditional sections
+    document.getElementById('partialAmountSection').style.display = 'none';
+    document.getElementById('rejectionReasonSection').style.display = 'none';
+    
+    // Clear inputs
+    document.getElementById('partialAmount').value = '';
+    document.getElementById('partialReason').value = '';
+    document.getElementById('rejectionReason').value = '';
+    document.getElementById('rejectionDetails').value = '';
+    document.getElementById('adminNotes').value = '';
+    
+    updateApprovalStatus();
+}
+
+function updateApprovalStatus() {
+    const allChecked = document.querySelectorAll('.verification-checklist input[type="checkbox"]:checked').length === 4;
+    const approveBtn = document.getElementById('approveBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+    const decision = document.querySelector('input[name="approvalDecision"]:checked').value;
+    
+    if (decision === 'reject') {
+        approveBtn.style.display = 'none';
+        rejectBtn.style.display = 'inline-block';
+        rejectBtn.disabled = false;
+    } else {
+        approveBtn.style.display = 'inline-block';
+        rejectBtn.style.display = 'none';
+        approveBtn.disabled = !allChecked;
+    }
+}
+
+// Event listeners for approval decision
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[name="approvalDecision"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const partialSection = document.getElementById('partialAmountSection');
+            const rejectionSection = document.getElementById('rejectionReasonSection');
+            
+            if (this.value === 'partial') {
+                partialSection.style.display = 'block';
+                rejectionSection.style.display = 'none';
+            } else if (this.value === 'reject') {
+                partialSection.style.display = 'none';
+                rejectionSection.style.display = 'block';
+            } else {
+                partialSection.style.display = 'none';
+                rejectionSection.style.display = 'none';
+            }
+            
+            updateApprovalStatus();
+        });
+    });
+});
+
+function processCommission(action) {
+    const decision = document.querySelector('input[name="approvalDecision"]:checked').value;
+    const adminNotes = document.getElementById('adminNotes').value;
+    
+    let processData = {
+        commissionId: currentCommissionData.id,
+        action: action,
+        decision: decision,
+        adminNotes: adminNotes,
+        processedBy: 'Current Admin',
+        processedAt: new Date().toISOString()
+    };
+    
+    if (decision === 'partial') {
+        const partialAmount = document.getElementById('partialAmount').value;
+        const partialReason = document.getElementById('partialReason').value;
+        
+        if (!partialAmount || !partialReason) {
+            alert('Please enter partial amount and reason');
+            return;
+        }
+        
+        processData.approvedAmount = partialAmount;
+        processData.partialReason = partialReason;
+    } else if (decision === 'reject') {
+        const rejectionReason = document.getElementById('rejectionReason').value;
+        const rejectionDetails = document.getElementById('rejectionDetails').value;
+        
+        if (!rejectionReason) {
+            alert('Please select a rejection reason');
+            return;
+        }
+        
+        processData.rejectionReason = rejectionReason;
+        processData.rejectionDetails = rejectionDetails;
+    }
+    
+    // Simulate processing
+    const btn = action === 'approve' ? document.getElementById('approveBtn') : document.getElementById('rejectBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        if (action === 'approve') {
+            if (decision === 'partial') {
+                alert(`Commission partially approved for $${processData.approvedAmount}`);
+            } else {
+                alert('Commission approved successfully!');
+            }
+        } else {
+            alert('Commission rejected successfully!');
+        }
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        bootstrap.Modal.getInstance(document.getElementById('approveCommissionModal')).hide();
+        
+        // Trigger refresh of commission list
+        if (typeof refreshCommissionList === 'function') {
+            refreshCommissionList();
+        }
+    }, 2000);
+}
+</script>

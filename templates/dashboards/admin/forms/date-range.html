@@ -1,0 +1,537 @@
+<!-- Date Range Form Component -->
+<div class="date-range-form">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0 fw-semibold">
+                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                Date Range Selection
+            </h6>
+        </div>
+        
+        <div class="card-body">
+            <form id="dateRangeForm" method="GET">
+                <div class="row g-3">
+                    <!-- Quick Presets -->
+                    <div class="col-12">
+                        <label class="form-label small fw-medium">Quick Select</label>
+                        <div class="btn-group w-100 preset-buttons" role="group">
+                            <input type="radio" class="btn-check" name="preset" id="today" value="today">
+                            <label class="btn btn-outline-secondary btn-sm" for="today">Today</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="yesterday" value="yesterday">
+                            <label class="btn btn-outline-secondary btn-sm" for="yesterday">Yesterday</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="last7" value="last7">
+                            <label class="btn btn-outline-secondary btn-sm" for="last7">Last 7 Days</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="last30" value="last30">
+                            <label class="btn btn-outline-secondary btn-sm" for="last30">Last 30 Days</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="thisMonth" value="thisMonth">
+                            <label class="btn btn-outline-secondary btn-sm" for="thisMonth">This Month</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="lastMonth" value="lastMonth">
+                            <label class="btn btn-outline-secondary btn-sm" for="lastMonth">Last Month</label>
+                            
+                            <input type="radio" class="btn-check" name="preset" id="custom" value="custom" checked>
+                            <label class="btn btn-outline-primary btn-sm" for="custom">Custom</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Date Range -->
+                    <div class="col-md-6" id="customDateRange">
+                        <label class="form-label small fw-medium">From Date</label>
+                        <input type="date" class="form-control" name="start_date" id="startDate" 
+                               value="{{ request.GET.start_date|default:'' }}">
+                        <div class="form-text">Select start date</div>
+                    </div>
+                    
+                    <div class="col-md-6" id="customDateRangeEnd">
+                        <label class="form-label small fw-medium">To Date</label>
+                        <input type="date" class="form-control" name="end_date" id="endDate" 
+                               value="{{ request.GET.end_date|default:'' }}">
+                        <div class="form-text">Select end date</div>
+                    </div>
+                    
+                    <!-- Time Selection (Optional) -->
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="includeTime" name="include_time">
+                            <label class="form-check-label" for="includeTime">
+                                Include specific time
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Time Inputs (Hidden by default) -->
+                    <div class="time-inputs d-none" id="timeInputs">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-medium">Start Time</label>
+                                <input type="time" class="form-control" name="start_time" id="startTime" value="00:00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-medium">End Time</label>
+                                <input type="time" class="form-control" name="end_time" id="endTime" value="23:59">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timezone Selection -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-medium">Timezone</label>
+                        <select class="form-select" name="timezone" id="timezone">
+                            <option value="UTC" selected>UTC (Universal Time)</option>
+                            <option value="America/New_York">Eastern Time (EST/EDT)</option>
+                            <option value="America/Chicago">Central Time (CST/CDT)</option>
+                            <option value="America/Denver">Mountain Time (MST/MDT)</option>
+                            <option value="America/Los_Angeles">Pacific Time (PST/PDT)</option>
+                            <option value="Europe/London">London (GMT/BST)</option>
+                            <option value="Europe/Paris">Paris (CET/CEST)</option>
+                            <option value="Asia/Tokyo">Tokyo (JST)</option>
+                            <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Comparison Option -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-medium">Compare With</label>
+                        <select class="form-select" name="compare_with" id="compareWith">
+                            <option value="">No Comparison</option>
+                            <option value="previous_period">Previous Period</option>
+                            <option value="previous_year">Same Period Last Year</option>
+                            <option value="custom_period">Custom Period</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="selected-range-info">
+                                <small class="text-muted">
+                                    Selected Range: <span id="selectedRange" class="fw-medium">Not selected</span>
+                                    <span id="rangeDuration" class="text-primary"></span>
+                                </small>
+                            </div>
+                            <div class="actions">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearDateRange()">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </button>
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-check me-1"></i>Apply Range
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Date Range Summary Card -->
+    <div class="date-summary-card mt-3" id="dateSummary" style="display: none;">
+        <div class="card border-0 bg-light">
+            <div class="card-body py-2">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <div>
+                                <strong id="summaryText">Date Range Summary</strong>
+                                <div class="small text-muted" id="summaryDetails"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-primary" id="dayCount">0 days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.date-range-form .card {
+    border-radius: 10px;
+}
+
+.preset-buttons .btn {
+    font-size: 0.875rem;
+    border-radius: 0;
+}
+
+.preset-buttons .btn:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+.preset-buttons .btn:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.preset-buttons .btn-check:checked + .btn {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+.time-inputs {
+    animation: slideDown 0.3s ease;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selected-range-info {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(10, 36, 99, 0.25);
+}
+
+.date-summary-card .card {
+    border-radius: 8px;
+    border: 1px solid rgba(var(--bs-info-rgb), 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .preset-buttons {
+        flex-direction: column;
+    }
+    
+    .preset-buttons .btn {
+        border-radius: 0 !important;
+        border-bottom-width: 0;
+    }
+    
+    .preset-buttons .btn:first-child {
+        border-top-left-radius: 6px !important;
+        border-top-right-radius: 6px !important;
+    }
+    
+    .preset-buttons .btn:last-child {
+        border-bottom-left-radius: 6px !important;
+        border-bottom-right-radius: 6px !important;
+        border-bottom-width: 1px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDateRange();
+});
+
+function initializeDateRange() {
+    updateSelectedRangeDisplay();
+    
+    // Handle preset button changes
+    document.querySelectorAll('input[name="preset"]').forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value !== 'custom') {
+                applyPreset(this.value);
+            }
+            toggleCustomInputs();
+        });
+    });
+    
+    // Handle date input changes
+    document.getElementById('startDate').addEventListener('change', updateSelectedRangeDisplay);
+    document.getElementById('endDate').addEventListener('change', updateSelectedRangeDisplay);
+    
+    // Handle time toggle
+    document.getElementById('includeTime').addEventListener('change', function() {
+        const timeInputs = document.getElementById('timeInputs');
+        if (this.checked) {
+            timeInputs.classList.remove('d-none');
+        } else {
+            timeInputs.classList.add('d-none');
+        }
+    });
+    
+    // Validate date range
+    document.getElementById('startDate').addEventListener('change', validateDateRange);
+    document.getElementById('endDate').addEventListener('change', validateDateRange);
+    
+    // Auto-detect timezone
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timezoneSelect = document.getElementById('timezone');
+    if (timezoneSelect.querySelector(`option[value="${timezone}"]`)) {
+        timezoneSelect.value = timezone;
+    }
+}
+
+function applyPreset(preset) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const today = new Date();
+    let startDate, endDate;
+    
+    switch (preset) {
+        case 'today':
+            startDate = endDate = new Date();
+            break;
+        case 'yesterday':
+            startDate = endDate = new Date(today);
+            startDate.setDate(today.getDate() - 1);
+            endDate.setDate(today.getDate() - 1);
+            break;
+        case 'last7':
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 7);
+            endDate = new Date();
+            break;
+        case 'last30':
+            startDate = new Date(today);
+            startDate.setDate(today.getDate() - 30);
+            endDate = new Date();
+            break;
+        case 'thisMonth':
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            break;
+        case 'lastMonth':
+            startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+            break;
+        default:
+            return;
+    }
+    
+    startDateInput.value = formatDateForInput(startDate);
+    endDateInput.value = formatDateForInput(endDate);
+    
+    updateSelectedRangeDisplay();
+}
+
+function toggleCustomInputs() {
+    const customRadio = document.getElementById('custom');
+    const customInputs = document.querySelectorAll('#customDateRange, #customDateRangeEnd');
+    
+    if (customRadio.checked) {
+        customInputs.forEach(input => input.style.opacity = '1');
+    } else {
+        customInputs.forEach(input => input.style.opacity = '0.6');
+    }
+}
+
+function validateDateRange() {
+    const startDate = new Date(document.getElementById('startDate').value);
+    const endDate = new Date(document.getElementById('endDate').value);
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    
+    // Clear previous validation states
+    startInput.classList.remove('is-invalid');
+    endInput.classList.remove('is-invalid');
+    
+    if (startDate && endDate) {
+        if (startDate > endDate) {
+            endInput.classList.add('is-invalid');
+            showToast('End date must be after start date', 'error');
+            return false;
+        }
+        
+        // Check for reasonable date range (not more than 2 years)
+        const maxDays = 365 * 2;
+        const diffDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > maxDays) {
+            startInput.classList.add('is-invalid');
+            endInput.classList.add('is-invalid');
+            showToast('Date range cannot exceed 2 years', 'warning');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function updateSelectedRangeDisplay() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const selectedRangeElement = document.getElementById('selectedRange');
+    const rangeDurationElement = document.getElementById('rangeDuration');
+    const dateSummary = document.getElementById('dateSummary');
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        
+        // Format dates for display
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        const startFormatted = start.toLocaleDateString('en-US', options);
+        const endFormatted = end.toLocaleDateString('en-US', options);
+        
+        selectedRangeElement.textContent = `${startFormatted} - ${endFormatted}`;
+        rangeDurationElement.textContent = `(${diffDays} ${diffDays === 1 ? 'day' : 'days'})`;
+        
+        // Update summary card
+        updateSummaryCard(start, end, diffDays);
+        dateSummary.style.display = 'block';
+        
+        // Mark custom as selected when dates are manually changed
+        if (!isPresetActive()) {
+            document.getElementById('custom').checked = true;
+        }
+    } else {
+        selectedRangeElement.textContent = 'Not selected';
+        rangeDurationElement.textContent = '';
+        dateSummary.style.display = 'none';
+    }
+}
+
+function updateSummaryCard(startDate, endDate, diffDays) {
+    const summaryText = document.getElementById('summaryText');
+    const summaryDetails = document.getElementById('summaryDetails');
+    const dayCount = document.getElementById('dayCount');
+    
+    // Calculate some statistics
+    const today = new Date();
+    const isCurrentPeriod = startDate <= today && endDate >= today;
+    const isPastPeriod = endDate < today;
+    const isFuturePeriod = startDate > today;
+    
+    let periodType = 'Custom Range';
+    if (isCurrentPeriod) {
+        periodType = 'Current Period';
+    } else if (isPastPeriod) {
+        periodType = 'Historical Period';
+    } else if (isFuturePeriod) {
+        periodType = 'Future Period';
+    }
+    
+    summaryText.textContent = periodType;
+    
+    // Calculate business days (excluding weekends)
+    let businessDays = 0;
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        if (d.getDay() !== 0 && d.getDay() !== 6) { // Not Sunday (0) or Saturday (6)
+            businessDays++;
+        }
+    }
+    
+    summaryDetails.textContent = `${businessDays} business days, ${diffDays - businessDays} weekend days`;
+    dayCount.textContent = `${diffDays} ${diffDays === 1 ? 'day' : 'days'}`;
+    
+    // Adjust badge color based on period type
+    dayCount.className = 'badge ' + (isPastPeriod ? 'bg-secondary' : isCurrentPeriod ? 'bg-primary' : 'bg-info');
+}
+
+function isPresetActive() {
+    const presets = document.querySelectorAll('input[name="preset"]:not(#custom)');
+    return Array.from(presets).some(preset => preset.checked);
+}
+
+function clearDateRange() {
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    document.getElementById('custom').checked = true;
+    document.getElementById('includeTime').checked = false;
+    document.getElementById('timeInputs').classList.add('d-none');
+    document.getElementById('compareWith').value = '';
+    
+    updateSelectedRangeDisplay();
+    
+    // Clear any validation states
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+}
+
+function formatDateForInput(date) {
+    return date.toISOString().split('T')[0];
+}
+
+// Export date range configuration
+function getDateRangeConfig() {
+    const form = document.getElementById('dateRangeForm');
+    const formData = new FormData(form);
+    const config = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) config[key] = value;
+    }
+    
+    return config;
+}
+
+// Apply date range from external source
+function applyDateRange(config) {
+    Object.keys(config).forEach(key => {
+        const input = document.querySelector(`[name="${key}"]`);
+        if (input) {
+            if (input.type === 'radio') {
+                document.getElementById(config[key]).checked = true;
+            } else {
+                input.value = config[key];
+            }
+        }
+    });
+    
+    updateSelectedRangeDisplay();
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // T for Today
+    if (e.key === 't' && e.altKey) {
+        e.preventDefault();
+        document.getElementById('today').checked = true;
+        applyPreset('today');
+    }
+    
+    // Y for Yesterday
+    if (e.key === 'y' && e.altKey) {
+        e.preventDefault();
+        document.getElementById('yesterday').checked = true;
+        applyPreset('yesterday');
+    }
+    
+    // 7 for Last 7 days
+    if (e.key === '7' && e.altKey) {
+        e.preventDefault();
+        document.getElementById('last7').checked = true;
+        applyPreset('last7');
+    }
+});
+
+// Form submission enhancement
+document.getElementById('dateRangeForm').addEventListener('submit', function(e) {
+    if (!validateDateRange()) {
+        e.preventDefault();
+        return;
+    }
+    
+    // Add loading state to submit button
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Applying...';
+    submitBtn.disabled = true;
+    
+    // Re-enable after a delay (in case of same-page updates)
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 2000);
+});
+</script>

@@ -1,0 +1,166 @@
+<!-- Search Filter Component -->
+<!-- Usage: {% include 'dashboards/admin/components/search-filter.html' with filters=filter_config %} -->
+
+<div class="card search-filter-card mb-4">
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="fas fa-filter me-2"></i>{{ title|default:"Filter Options" }}
+            </h6>
+            <button class="btn btn-sm btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+    </div>
+    <div class="collapse show" id="filterCollapse">
+        <div class="card-body">
+            <form id="filterForm" method="get" action="{{ form_action }}">
+                <div class="row g-3">
+                    <!-- Search Input -->
+                    {% if show_search %}
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" name="search" placeholder="{{ search_placeholder|default:'Search...' }}" 
+                                   value="{{ request.GET.search }}">
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Dynamic Filters -->
+                    {% for filter in filters %}
+                    <div class="col-md-{{ filter.col_size|default:'6' }}">
+                        <label class="form-label small text-muted">{{ filter.label }}</label>
+                        
+                        {% if filter.type == 'select' %}
+                        <select class="form-select" name="{{ filter.name }}" {% if filter.multiple %}multiple{% endif %}>
+                            <option value="">{{ filter.placeholder|default:'All' }}</option>
+                            {% for option in filter.options %}
+                            <option value="{{ option.value }}" {% if option.value in request.GET|lookup:filter.name %}selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        
+                        {% elif filter.type == 'date_range' %}
+                        <div class="input-group">
+                            <input type="date" class="form-control" name="{{ filter.name }}_from" 
+                                   value="{{ request.GET|lookup:filter.name|add:'_from' }}" placeholder="From">
+                            <span class="input-group-text">to</span>
+                            <input type="date" class="form-control" name="{{ filter.name }}_to" 
+                                   value="{{ request.GET|lookup:filter.name|add:'_to' }}" placeholder="To">
+                        </div>
+                        
+                        {% elif filter.type == 'checkbox' %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ filter.name }}" value="1" 
+                                   {% if request.GET|lookup:filter.name %}checked{% endif %}>
+                            <label class="form-check-label">{{ filter.label }}</label>
+                        </div>
+                        
+                        {% elif filter.type == 'radio' %}
+                        <div>
+                            {% for option in filter.options %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ filter.name }}" 
+                                       value="{{ option.value }}" {% if option.value == request.GET|lookup:filter.name %}checked{% endif %}>
+                                <label class="form-check-label">{{ option.label }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% elif filter.type == 'number_range' %}
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="{{ filter.name }}_min" 
+                                   placeholder="Min" value="{{ request.GET|lookup:filter.name|add:'_min' }}">
+                            <span class="input-group-text">-</span>
+                            <input type="number" class="form-control" name="{{ filter.name }}_max" 
+                                   placeholder="Max" value="{{ request.GET|lookup:filter.name|add:'_max' }}">
+                        </div>
+                        
+                        {% else %}
+                        <input type="{{ filter.type|default:'text' }}" class="form-control" name="{{ filter.name }}" 
+                               placeholder="{{ filter.placeholder }}" value="{{ request.GET|lookup:filter.name }}">
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Quick Filters -->
+                    {% if quick_filters %}
+                    <div class="col-12">
+                        <div class="quick-filters">
+                            <span class="text-muted small me-2">Quick filters:</span>
+                            {% for qf in quick_filters %}
+                            <button type="button" class="btn btn-sm btn-outline-secondary me-2" 
+                                    onclick="applyQuickFilter('{{ qf.params }}')">
+                                {{ qf.label }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-sm btn-light" onclick="clearFilters()">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </button>
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fas fa-check me-1"></i>Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Active Filters Display -->
+{% if active_filters %}
+<div class="active-filters mb-3">
+    <span class="text-muted me-2">Active filters:</span>
+    {% for filter in active_filters %}
+    <span class="badge bg-primary me-2">
+        {{ filter.label }}: {{ filter.value }}
+        <a href="#" class="text-white ms-1" onclick="removeFilter('{{ filter.name }}')">
+            <i class="fas fa-times"></i>
+        </a>
+    </span>
+    {% endfor %}
+    <a href="#" class="text-decoration-none" onclick="clearFilters()">Clear all</a>
+</div>
+{% endif %}
+
+<script>
+function clearFilters() {
+    document.getElementById('filterForm').reset();
+    // Remove all query parameters
+    window.location.href = window.location.pathname;
+}
+
+function removeFilter(filterName) {
+    const url = new URL(window.location);
+    url.searchParams.delete(filterName);
+    window.location.href = url.toString();
+}
+
+function applyQuickFilter(params) {
+    const url = new URL(window.location);
+    const filterParams = JSON.parse(params);
+    
+    Object.keys(filterParams).forEach(key => {
+        url.searchParams.set(key, filterParams[key]);
+    });
+    
+    window.location.href = url.toString();
+}
+
+// Auto-submit on select change if enabled
+document.querySelectorAll('.auto-submit').forEach(element => {
+    element.addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+});
+</script>

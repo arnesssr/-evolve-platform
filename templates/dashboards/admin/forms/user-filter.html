@@ -1,0 +1,524 @@
+<!-- User Filter Form Component -->
+<div class="user-filter-form">
+    <form id="userFilterForm" class="search-filter-form" method="GET">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">
+                        <i class="fas fa-filter text-primary me-2"></i>
+                        Filter Users
+                    </h6>
+                    <div class="filter-actions">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times me-1"></i>
+                            Clear
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleAdvancedFilters()">
+                            <i class="fas fa-cog me-1"></i>
+                            Advanced
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Basic Filters -->
+                <div class="row g-3">
+                    <!-- Search -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-medium">Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control" name="search" 
+                                   placeholder="Name, email, or ID..."
+                                   value="{{ request.GET.search }}">
+                        </div>
+                    </div>
+                    
+                    <!-- User Type -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">User Type</label>
+                        <select class="form-select" name="user_type">
+                            <option value="">All Types</option>
+                            <option value="business" {% if request.GET.user_type == 'business' %}selected{% endif %}>Business</option>
+                            <option value="reseller" {% if request.GET.user_type == 'reseller' %}selected{% endif %}>Reseller</option>
+                            <option value="admin" {% if request.GET.user_type == 'admin' %}selected{% endif %}>Administrator</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Status -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-medium">Status</label>
+                        <select class="form-select" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                            <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>Suspended</option>
+                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Apply Button -->
+                    <div class="col-md-2">
+                        <label class="form-label small fw-medium invisible">Apply</label>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i>
+                            Apply
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Advanced Filters (Initially Hidden) -->
+                <div class="advanced-filters mt-4 d-none" id="advancedFilters">
+                    <hr class="my-3">
+                    <h6 class="text-muted mb-3">Advanced Filters</h6>
+                    
+                    <div class="row g-3">
+                        <!-- Date Joined Range -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium">Registration Date</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="date" class="form-control form-control-sm" 
+                                           name="date_joined_from" 
+                                           value="{{ request.GET.date_joined_from }}"
+                                           placeholder="From">
+                                </div>
+                                <div class="col-6">
+                                    <input type="date" class="form-control form-control-sm" 
+                                           name="date_joined_to" 
+                                           value="{{ request.GET.date_joined_to }}"
+                                           placeholder="To">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Last Login -->
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Last Login</label>
+                            <select class="form-select form-select-sm" name="last_login">
+                                <option value="">Any time</option>
+                                <option value="today" {% if request.GET.last_login == 'today' %}selected{% endif %}>Today</option>
+                                <option value="week" {% if request.GET.last_login == 'week' %}selected{% endif %}>This week</option>
+                                <option value="month" {% if request.GET.last_login == 'month' %}selected{% endif %}>This month</option>
+                                <option value="never" {% if request.GET.last_login == 'never' %}selected{% endif %}>Never logged in</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Verification Status -->
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Verification</label>
+                            <select class="form-select form-select-sm" name="verification_status">
+                                <option value="">All</option>
+                                <option value="verified" {% if request.GET.verification_status == 'verified' %}selected{% endif %}>Verified</option>
+                                <option value="unverified" {% if request.GET.verification_status == 'unverified' %}selected{% endif %}>Unverified</option>
+                                <option value="pending" {% if request.GET.verification_status == 'pending' %}selected{% endif %}>Pending</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Revenue Range -->
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium">Total Revenue</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" 
+                                               name="revenue_min" 
+                                               value="{{ request.GET.revenue_min }}"
+                                               placeholder="Min">
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" 
+                                               name="revenue_max" 
+                                               value="{{ request.GET.revenue_max }}"
+                                               placeholder="Max">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Commission Tier -->
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Commission Tier</label>
+                            <select class="form-select form-select-sm" name="commission_tier">
+                                <option value="">All Tiers</option>
+                                <option value="bronze" {% if request.GET.commission_tier == 'bronze' %}selected{% endif %}>Bronze</option>
+                                <option value="silver" {% if request.GET.commission_tier == 'silver' %}selected{% endif %}>Silver</option>
+                                <option value="gold" {% if request.GET.commission_tier == 'gold' %}selected{% endif %}>Gold</option>
+                                <option value="platinum" {% if request.GET.commission_tier == 'platinum' %}selected{% endif %}>Platinum</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Location -->
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Location</label>
+                            <select class="form-select form-select-sm" name="country">
+                                <option value="">All Countries</option>
+                                <option value="US" {% if request.GET.country == 'US' %}selected{% endif %}>United States</option>
+                                <option value="CA" {% if request.GET.country == 'CA' %}selected{% endif %}>Canada</option>
+                                <option value="UK" {% if request.GET.country == 'UK' %}selected{% endif %}>United Kingdom</option>
+                                <option value="AU" {% if request.GET.country == 'AU' %}selected{% endif %}>Australia</option>
+                                <option value="DE" {% if request.GET.country == 'DE' %}selected{% endif %}>Germany</option>
+                                <option value="FR" {% if request.GET.country == 'FR' %}selected{% endif %}>France</option>
+                                <option value="other" {% if request.GET.country == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom Tags -->
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-medium">Tags</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                   name="tags" 
+                                   value="{{ request.GET.tags }}"
+                                   placeholder="Enter tags separated by commas">
+                            <div class="form-text">Search for users with specific tags</div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Sort By</label>
+                            <select class="form-select form-select-sm" name="sort_by">
+                                <option value="date_joined" {% if request.GET.sort_by == 'date_joined' %}selected{% endif %}>Registration Date</option>
+                                <option value="last_login" {% if request.GET.sort_by == 'last_login' %}selected{% endif %}>Last Login</option>
+                                <option value="revenue" {% if request.GET.sort_by == 'revenue' %}selected{% endif %}>Total Revenue</option>
+                                <option value="name" {% if request.GET.sort_by == 'name' %}selected{% endif %}>Name</option>
+                                <option value="email" {% if request.GET.sort_by == 'email' %}selected{% endif %}>Email</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label small fw-medium">Order</label>
+                            <select class="form-select form-select-sm" name="order">
+                                <option value="desc" {% if request.GET.order == 'desc' %}selected{% endif %}>Descending</option>
+                                <option value="asc" {% if request.GET.order == 'asc' %}selected{% endif %}>Ascending</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Filter Badges -->
+            <div class="card-footer bg-light" id="activeFilters">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <small class="text-muted me-2">Active Filters:</small>
+                    <div class="filter-badges" id="filterBadges">
+                        <!-- Filter badges will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+.user-filter-form .card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.user-filter-form .form-label {
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.user-filter-form .form-control,
+.user-filter-form .form-select {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    transition: all 0.3s ease;
+}
+
+.user-filter-form .form-control:focus,
+.user-filter-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(10, 36, 99, 0.25);
+}
+
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-badge:hover {
+    background: rgba(var(--bs-primary-rgb), 0.2);
+    transform: scale(1.05);
+}
+
+.filter-badge .remove-filter {
+    margin-left: 0.25rem;
+    color: var(--bs-danger);
+    cursor: pointer;
+}
+
+.advanced-filters {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-group-text {
+    background: #f8f9fa;
+    border-color: #d1d5db;
+}
+
+#activeFilters {
+    display: none;
+}
+
+#activeFilters.has-filters {
+    display: block;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeUserFilter();
+});
+
+function initializeUserFilter() {
+    updateFilterBadges();
+    
+    // Auto-submit on form change (with debounce)
+    const form = document.getElementById('userFilterForm');
+    const inputs = form.querySelectorAll('input, select');
+    let debounceTimer;
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (this.type !== 'submit') {
+                    submitFilters();
+                }
+            }, 500);
+        });
+        
+        // For text inputs, debounce on keyup
+        if (input.type === 'text' || input.type === 'search') {
+            input.addEventListener('keyup', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    submitFilters();
+                }, 1000);
+            });
+        }
+    });
+}
+
+function toggleAdvancedFilters() {
+    const advancedFilters = document.getElementById('advancedFilters');
+    const button = event.target.closest('button');
+    
+    if (advancedFilters.classList.contains('d-none')) {
+        advancedFilters.classList.remove('d-none');
+        button.innerHTML = '<i class="fas fa-minus me-1"></i>Basic';
+    } else {
+        advancedFilters.classList.add('d-none');
+        button.innerHTML = '<i class="fas fa-cog me-1"></i>Advanced';
+    }
+}
+
+function clearFilters() {
+    const form = document.getElementById('userFilterForm');
+    const inputs = form.querySelectorAll('input, select');
+    
+    inputs.forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+    
+    // Clear URL parameters and reload
+    window.location.href = window.location.pathname;
+}
+
+function submitFilters() {
+    const form = document.getElementById('userFilterForm');
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Filtering...';
+    submitBtn.disabled = true;
+    
+    // Submit form
+    form.submit();
+}
+
+function updateFilterBadges() {
+    const params = new URLSearchParams(window.location.search);
+    const badgesContainer = document.getElementById('filterBadges');
+    const activeFiltersSection = document.getElementById('activeFilters');
+    
+    badgesContainer.innerHTML = '';
+    let hasFilters = false;
+    
+    // Define filter labels
+    const filterLabels = {
+        'search': 'Search',
+        'user_type': 'Type',
+        'status': 'Status',
+        'date_joined_from': 'Registered After',
+        'date_joined_to': 'Registered Before',
+        'last_login': 'Last Login',
+        'verification_status': 'Verification',
+        'revenue_min': 'Min Revenue',
+        'revenue_max': 'Max Revenue',
+        'commission_tier': 'Tier',
+        'country': 'Country',
+        'tags': 'Tags',
+        'sort_by': 'Sort By',
+        'order': 'Order'
+    };
+    
+    params.forEach((value, key) => {
+        if (value && filterLabels[key]) {
+            hasFilters = true;
+            const badge = createFilterBadge(key, value, filterLabels[key]);
+            badgesContainer.appendChild(badge);
+        }
+    });
+    
+    // Show/hide active filters section
+    if (hasFilters) {
+        activeFiltersSection.classList.add('has-filters');
+    } else {
+        activeFiltersSection.classList.remove('has-filters');
+        badgesContainer.innerHTML = '<span class="text-muted small">No active filters</span>';
+    }
+}
+
+function createFilterBadge(key, value, label) {
+    const badge = document.createElement('span');
+    badge.className = 'filter-badge';
+    badge.innerHTML = `
+        ${label}: ${formatFilterValue(key, value)}
+        <i class="fas fa-times remove-filter ms-1" onclick="removeFilter('${key}')"></i>
+    `;
+    return badge;
+}
+
+function formatFilterValue(key, value) {
+    // Format special values
+    if (key === 'revenue_min' || key === 'revenue_max') {
+        return `$${value}`;
+    }
+    if (key === 'user_type') {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+    if (key === 'status') {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+    return value;
+}
+
+function removeFilter(key) {
+    const params = new URLSearchParams(window.location.search);
+    params.delete(key);
+    
+    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    window.location.href = newUrl;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl/Cmd + F to focus search
+    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+    
+    // Escape to clear search
+    if (e.key === 'Escape') {
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput && document.activeElement === searchInput) {
+            searchInput.value = '';
+            submitFilters();
+        }
+    }
+});
+
+// Save filter preferences
+function saveFilterPreferences() {
+    const form = document.getElementById('userFilterForm');
+    const formData = new FormData(form);
+    const preferences = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) preferences[key] = value;
+    }
+    
+    localStorage.setItem('userFilterPreferences', JSON.stringify(preferences));
+}
+
+// Load filter preferences
+function loadFilterPreferences() {
+    const saved = localStorage.getItem('userFilterPreferences');
+    if (saved) {
+        const preferences = JSON.parse(saved);
+        const form = document.getElementById('userFilterForm');
+        
+        Object.keys(preferences).forEach(key => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) {
+                input.value = preferences[key];
+            }
+        });
+    }
+}
+
+// Export filtered results
+function exportFilteredResults(format = 'csv') {
+    const form = document.getElementById('userFilterForm');
+    const formData = new FormData(form);
+    
+    // Add export format to form data
+    formData.append('export', format);
+    
+    // Create temporary form for export
+    const exportForm = document.createElement('form');
+    exportForm.method = 'GET';
+    exportForm.action = window.location.pathname + '/export';
+    
+    for (let [key, value] of formData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        exportForm.appendChild(input);
+    }
+    
+    document.body.appendChild(exportForm);
+    exportForm.submit();
+    document.body.removeChild(exportForm);
+}
+</script>

@@ -1,0 +1,511 @@
+<!-- Generate Report Modal Component -->
+<div class="modal fade" id="generateReportModal" tabindex="-1" aria-labelledby="generateReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="generateReportModalLabel">
+                    <i class="fas fa-chart-bar me-2"></i>Generate Report
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Report Type Selection -->
+                <div class="report-type mb-4">
+                    <label class="form-label fw-bold">Report Type</label>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="userReport" value="users" checked onchange="updateReportFields()">
+                                <label class="form-check-label" for="userReport">
+                                    <i class="fas fa-users text-primary me-2"></i>
+                                    <strong>User Report</strong><br>
+                                    <small class="text-muted">User analytics and activity</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="commissionReport" value="commissions" onchange="updateReportFields()">
+                                <label class="form-check-label" for="commissionReport">
+                                    <i class="fas fa-percentage text-success me-2"></i>
+                                    <strong>Commission Report</strong><br>
+                                    <small class="text-muted">Commission tracking and payouts</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="salesReport" value="sales" onchange="updateReportFields()">
+                                <label class="form-check-label" for="salesReport">
+                                    <i class="fas fa-chart-line text-info me-2"></i>
+                                    <strong>Sales Report</strong><br>
+                                    <small class="text-muted">Sales performance metrics</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="financialReport" value="financial" onchange="updateReportFields()">
+                                <label class="form-check-label" for="financialReport">
+                                    <i class="fas fa-dollar-sign text-warning me-2"></i>
+                                    <strong>Financial Report</strong><br>
+                                    <small class="text-muted">Revenue and financial data</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="activityReport" value="activity" onchange="updateReportFields()">
+                                <label class="form-check-label" for="activityReport">
+                                    <i class="fas fa-activity text-secondary me-2"></i>
+                                    <strong>Activity Report</strong><br>
+                                    <small class="text-muted">System activity and logs</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check report-option">
+                                <input class="form-check-input" type="radio" name="reportType" id="customReport" value="custom" onchange="updateReportFields()">
+                                <label class="form-check-label" for="customReport">
+                                    <i class="fas fa-cogs text-dark me-2"></i>
+                                    <strong>Custom Report</strong><br>
+                                    <small class="text-muted">Build your own report</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Date Range Selection -->
+                <div class="date-range mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Date Range</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Quick Select</label>
+                            <select class="form-select" id="datePreset" onchange="updateDateRange()">
+                                <option value="today">Today</option>
+                                <option value="yesterday">Yesterday</option>
+                                <option value="last7days" selected>Last 7 Days</option>
+                                <option value="last30days">Last 30 Days</option>
+                                <option value="thisMonth">This Month</option>
+                                <option value="lastMonth">Last Month</option>
+                                <option value="thisYear">This Year</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Filters -->
+                <div class="report-filters mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Filters</h6>
+                    <div id="filterFields">
+                        <!-- Dynamic filter fields will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Output Options -->
+                <div class="output-options mb-4">
+                    <h6 class="text-muted border-bottom pb-2">Output Options</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Format</label>
+                            <select class="form-select" id="reportFormat">
+                                <option value="pdf">PDF Document</option>
+                                <option value="excel">Excel Spreadsheet</option>
+                                <option value="csv">CSV File</option>
+                                <option value="html">HTML Report</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Delivery Method</label>
+                            <select class="form-select" id="deliveryMethod">
+                                <option value="download">Download Now</option>
+                                <option value="email">Send via Email</option>
+                                <option value="schedule">Schedule Generation</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="emailDelivery" class="mt-3" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="emailAddress" placeholder="Enter email address">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="includeCharts">
+                                    <label class="form-check-label" for="includeCharts">Include Charts</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="scheduleDelivery" class="mt-3" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Schedule Date</label>
+                                <input type="datetime-local" class="form-control" id="scheduleDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Recurrence</label>
+                                <select class="form-select" id="recurrence">
+                                    <option value="once">One Time</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Preview -->
+                <div class="report-preview">
+                    <h6 class="text-muted border-bottom pb-2">Report Preview</h6>
+                    <div class="preview-summary">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-primary" id="previewRecords">-</div>
+                                    <small class="text-muted">Total Records</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-success" id="previewColumns">-</div>
+                                    <small class="text-muted">Data Columns</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-info" id="previewSize">-</div>
+                                    <small class="text-muted">Est. Size</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4 text-warning" id="previewTime">-</div>
+                                    <small class="text-muted">Est. Time</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-primary" onclick="previewReport()">
+                    <i class="fas fa-eye me-1"></i>Preview
+                </button>
+                <button type="button" class="btn btn-primary" onclick="generateReport()" id="generateBtn">
+                    <i class="fas fa-play me-1"></i>Generate Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.report-option {
+    padding: 1rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.report-option:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.report-option input:checked ~ label {
+    color: #007bff;
+}
+
+.preview-summary {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+</style>
+
+<script>
+function showGenerateReportModal() {
+    // Initialize date range
+    updateDateRange();
+    
+    // Initialize filters
+    updateReportFields();
+    
+    // Update delivery method fields
+    updateDeliveryFields();
+    
+    const modal = new bootstrap.Modal(document.getElementById('generateReportModal'));
+    modal.show();
+}
+
+function updateDateRange() {
+    const preset = document.getElementById('datePreset').value;
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    switch (preset) {
+        case 'today':
+            startDate.value = todayStr;
+            endDate.value = todayStr;
+            break;
+        case 'yesterday':
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            startDate.value = yesterdayStr;
+            endDate.value = yesterdayStr;
+            break;
+        case 'last7days':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            startDate.value = weekAgo.toISOString().split('T')[0];
+            endDate.value = todayStr;
+            break;
+        case 'last30days':
+            const monthAgo = new Date(today);
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            startDate.value = monthAgo.toISOString().split('T')[0];
+            endDate.value = todayStr;
+            break;
+        case 'thisMonth':
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            startDate.value = monthStart.toISOString().split('T')[0];
+            endDate.value = todayStr;
+            break;
+        case 'lastMonth':
+            const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+            startDate.value = lastMonthStart.toISOString().split('T')[0];
+            endDate.value = lastMonthEnd.toISOString().split('T')[0];
+            break;
+        case 'thisYear':
+            const yearStart = new Date(today.getFullYear(), 0, 1);
+            startDate.value = yearStart.toISOString().split('T')[0];
+            endDate.value = todayStr;
+            break;
+    }
+    
+    // Enable/disable date inputs based on preset
+    if (preset === 'custom') {
+        startDate.disabled = false;
+        endDate.disabled = false;
+    } else {
+        startDate.disabled = true;
+        endDate.disabled = true;
+    }
+    
+    updatePreview();
+}
+
+function updateReportFields() {
+    const reportType = document.querySelector('input[name="reportType"]:checked').value;
+    const filterFields = document.getElementById('filterFields');
+    
+    let filtersHTML = '';
+    
+    switch (reportType) {
+        case 'users':
+            filtersHTML = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">User Type</label>
+                        <select class="form-select" id="userType">
+                            <option value="">All Types</option>
+                            <option value="business">Business</option>
+                            <option value="reseller">Reseller</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="userStatus">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            break;
+        case 'commissions':
+            filtersHTML = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Commission Status</label>
+                        <select class="form-select" id="commissionStatus">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="paid">Paid</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Amount Range</label>
+                        <select class="form-select" id="amountRange">
+                            <option value="">All Amounts</option>
+                            <option value="0-50">$0 - $50</option>
+                            <option value="50-100">$50 - $100</option>
+                            <option value="100+">$100+</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            break;
+        case 'sales':
+            filtersHTML = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Product Category</label>
+                        <select class="form-select" id="productCategory">
+                            <option value="">All Categories</option>
+                            <option value="basic">Basic Plans</option>
+                            <option value="premium">Premium Plans</option>
+                            <option value="enterprise">Enterprise Plans</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Sales Channel</label>
+                        <select class="form-select" id="salesChannel">
+                            <option value="">All Channels</option>
+                            <option value="direct">Direct Sales</option>
+                            <option value="reseller">Reseller</option>
+                            <option value="partner">Partner</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            break;
+    }
+    
+    filterFields.innerHTML = filtersHTML;
+    updatePreview();
+}
+
+function updateDeliveryFields() {
+    const deliveryMethod = document.getElementById('deliveryMethod').value;
+    const emailSection = document.getElementById('emailDelivery');
+    const scheduleSection = document.getElementById('scheduleDelivery');
+    
+    emailSection.style.display = deliveryMethod === 'email' ? 'block' : 'none';
+    scheduleSection.style.display = deliveryMethod === 'schedule' ? 'block' : 'none';
+}
+
+function updatePreview() {
+    // Simulate preview calculation
+    const reportType = document.querySelector('input[name="reportType"]:checked').value;
+    
+    let records, columns, size, time;
+    
+    switch (reportType) {
+        case 'users':
+            records = '1,247';
+            columns = '12';
+            size = '2.1 MB';
+            time = '15 sec';
+            break;
+        case 'commissions':
+            records = '3,856';
+            columns = '15';
+            size = '4.2 MB';
+            time = '25 sec';
+            break;
+        case 'sales':
+            records = '2,134';
+            columns = '18';
+            size = '3.7 MB';
+            time = '20 sec';
+            break;
+        default:
+            records = '1,000';
+            columns = '10';
+            size = '1.5 MB';
+            time = '10 sec';
+    }
+    
+    document.getElementById('previewRecords').textContent = records;
+    document.getElementById('previewColumns').textContent = columns;
+    document.getElementById('previewSize').textContent = size;
+    document.getElementById('previewTime').textContent = time;
+}
+
+function previewReport() {
+    alert('Report preview will be generated and displayed in a new window.');
+}
+
+function generateReport() {
+    const reportType = document.querySelector('input[name="reportType"]:checked').value;
+    const format = document.getElementById('reportFormat').value;
+    const deliveryMethod = document.getElementById('deliveryMethod').value;
+    
+    // Validate delivery method requirements
+    if (deliveryMethod === 'email') {
+        const email = document.getElementById('emailAddress').value;
+        if (!email) {
+            alert('Please enter an email address');
+            return;
+        }
+    }
+    
+    if (deliveryMethod === 'schedule') {
+        const scheduleDate = document.getElementById('scheduleDate').value;
+        if (!scheduleDate) {
+            alert('Please select a schedule date');
+            return;
+        }
+    }
+    
+    // Simulate report generation
+    const generateBtn = document.getElementById('generateBtn');
+    const originalText = generateBtn.innerHTML;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+    generateBtn.disabled = true;
+    
+    setTimeout(() => {
+        if (deliveryMethod === 'download') {
+            alert(`${reportType} report generated successfully! Download will start automatically.`);
+        } else if (deliveryMethod === 'email') {
+            const email = document.getElementById('emailAddress').value;
+            alert(`${reportType} report will be sent to ${email} when ready.`);
+        } else if (deliveryMethod === 'schedule') {
+            const scheduleDate = document.getElementById('scheduleDate').value;
+            alert(`${reportType} report scheduled for ${scheduleDate}.`);
+        }
+        
+        generateBtn.innerHTML = originalText;
+        generateBtn.disabled = false;
+        
+        bootstrap.Modal.getInstance(document.getElementById('generateReportModal')).hide();
+    }, 3000);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('deliveryMethod').addEventListener('change', updateDeliveryFields);
+    document.getElementById('datePreset').addEventListener('change', updateDateRange);
+});
+</script>

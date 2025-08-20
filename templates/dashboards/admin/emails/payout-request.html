@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout Request - Evolve Platform</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: #0a2463;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .highlight {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .details-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        .details-table th,
+        .details-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .details-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #0a2463;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>💰 Payout Request</h1>
+            <p>New payout request submitted</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hello Admin Team,</h2>
+            
+            <p>A new payout request has been submitted by one of our resellers and requires your review.</p>
+            
+            <div class="highlight">
+                <h3>📋 Request Summary</h3>
+                <p><strong>Reseller:</strong> {{ reseller_name }}</p>
+                <p><strong>Email:</strong> {{ reseller_email }}</p>
+                <p><strong>Amount:</strong> <span class="amount">${{ payout_amount }}</span></p>
+                <p><strong>Request Date:</strong> {{ request_date }}</p>
+            </div>
+            
+            <h3>💼 Payout Details</h3>
+            <table class="details-table">
+                <tr>
+                    <th>Commission Period</th>
+                    <td>{{ commission_period }}</td>
+                </tr>
+                <tr>
+                    <th>Total Commissions</th>
+                    <td>${{ total_commissions }}</td>
+                </tr>
+                <tr>
+                    <th>Previous Payouts</th>
+                    <td>${{ previous_payouts }}</td>
+                </tr>
+                <tr>
+                    <th>Available Balance</th>
+                    <td>${{ available_balance }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Method</th>
+                    <td>{{ payment_method }}</td>
+                </tr>
+                <tr>
+                    <th>Account Details</th>
+                    <td>{{ payment_details }}</td>
+                </tr>
+            </table>
+            
+            <div class="alert">
+                <strong>⏰ Action Required:</strong> This payout request needs to be reviewed and processed within 3-5 business days.
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ admin_dashboard_url }}" class="button">Review Payout Request</a>
+            </div>
+            
+            <h3>📊 Recent Performance</h3>
+            <table class="details-table">
+                <tr>
+                    <th>Businesses Referred</th>
+                    <td>{{ businesses_referred }}</td>
+                </tr>
+                <tr>
+                    <th>Revenue Generated</th>
+                    <td>${{ revenue_generated }}</td>
+                </tr>
+                <tr>
+                    <th>Commission Rate</th>
+                    <td>{{ commission_rate }}%</td>
+                </tr>
+                <tr>
+                    <th>Performance Rating</th>
+                    <td>{{ performance_rating }}/5 ⭐</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Evolve Platform Admin Team</strong></p>
+            <p>This is an automated notification from your admin dashboard.</p>
+            <p>
+                <a href="{{ unsubscribe_url }}">Unsubscribe</a> |
+                <a href="{{ support_url }}">Support</a> |
+                <a href="{{ dashboard_url }}">Admin Dashboard</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

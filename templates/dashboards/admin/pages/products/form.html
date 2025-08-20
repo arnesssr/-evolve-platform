@@ -1,0 +1,454 @@
+{% extends 'dashboards/admin/layouts/admin-base.html' %}
+{% load static %}
+
+{% block title %}{% if product.id %}Edit{% else %}Add{% endif %} Product{% endblock %}
+
+{% block page_title %}{% if product.id %}Edit Product{% else %}Add New Product{% endif %}{% endblock %}
+{% block page_subtitle %}{% if product.id %}Update product information and settings{% else %}Create a new product for the marketplace{% endif %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'admin:products_list' %}">Product Management</a></li>
+    <li class="breadcrumb-item active">{% if product.id %}Edit{% else %}Add{% endif %} Product</li>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+    <a href="{% url 'admin:products_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to List
+    </a>
+    <button type="button" class="btn btn-outline-primary" onclick="saveAsDraft()">
+        <i class="fas fa-save me-2"></i>Save as Draft
+    </button>
+    <button type="submit" form="productForm" class="btn btn-primary">
+        <i class="fas fa-check me-2"></i>{% if product.id %}Update{% else %}Create{% endif %} Product
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<form id="productForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Basic Information -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Basic Information</h5>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="productName" class="form-label">Product Name *</label>
+                        <input type="text" class="form-control" id="productName" name="name" 
+                               value="{{ product.name|default:'' }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="productSku" class="form-label">SKU</label>
+                        <input type="text" class="form-control" id="productSku" name="sku" 
+                               value="{{ product.sku|default:'' }}" placeholder="AUTO-GENERATED">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="productDescription" class="form-label">Description *</label>
+                    <textarea class="form-control" id="productDescription" name="description" 
+                              rows="4" required>{{ product.description|default:'' }}</textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productCategory" class="form-label">Category *</label>
+                        <select class="form-select" id="productCategory" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="software" {% if product.category == 'software' %}selected{% endif %}>Software</option>
+                            <option value="marketing" {% if product.category == 'marketing' %}selected{% endif %}>Marketing</option>
+                            <option value="design" {% if product.category == 'design' %}selected{% endif %}>Design</option>
+                            <option value="business" {% if product.category == 'business' %}selected{% endif %}>Business Tools</option>
+                            <option value="education" {% if product.category == 'education' %}selected{% endif %}>Education</option>
+                            <option value="finance" {% if product.category == 'finance' %}selected{% endif %}>Finance</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="productVendor" class="form-label">Vendor *</label>
+                        <select class="form-select" id="productVendor" name="vendor" required>
+                            <option value="">Select Vendor</option>
+                            <option value="techcorp" {% if product.vendor == 'techcorp' %}selected{% endif %}>TechCorp Solutions</option>
+                            <option value="digitalmarketing" {% if product.vendor == 'digitalmarketing' %}selected{% endif %}>Digital Marketing Pro</option>
+                            <option value="creative" {% if product.vendor == 'creative' %}selected{% endif %}>Creative Studio</option>
+                            <option value="fintech" {% if product.vendor == 'fintech' %}selected{% endif %}>FinTech Solutions</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="productTags" class="form-label">Tags</label>
+                    <input type="text" class="form-control" id="productTags" name="tags" 
+                           value="{{ product.tags|default:'' }}" 
+                           placeholder="Separate tags with commas">
+                    <small class="text-muted">e.g., CRM, automation, lead generation</small>
+                </div>
+            </div>
+            
+            <!-- Pricing & Commission -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Pricing & Commission</h5>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="productPrice" class="form-label">Product Price *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="productPrice" name="price" 
+                                   value="{{ product.price|default:'' }}" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="commissionRate" class="form-label">Commission Rate *</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="commissionRate" name="commission_rate" 
+                                   value="{{ product.commission_rate|default:'' }}" step="0.01" min="0" max="100" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="commissionAmount" class="form-label">Commission Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control" id="commissionAmount" readonly>
+                        </div>
+                        <small class="text-muted">Calculated automatically</small>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="recurringBilling" class="form-label">Billing Type</label>
+                        <select class="form-select" id="recurringBilling" name="billing_type">
+                            <option value="one_time" {% if product.billing_type == 'one_time' %}selected{% endif %}>One-time Payment</option>
+                            <option value="monthly" {% if product.billing_type == 'monthly' %}selected{% endif %}>Monthly Subscription</option>
+                            <option value="yearly" {% if product.billing_type == 'yearly' %}selected{% endif %}>Yearly Subscription</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="trialPeriod" class="form-label">Trial Period (days)</label>
+                        <input type="number" class="form-control" id="trialPeriod" name="trial_period" 
+                               value="{{ product.trial_period|default:'' }}" min="0">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Links -->
+            <div class="content-card mb-4">
+                <h5 class="mb-4">Product Links</h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="productUrl" class="form-label">Product URL *</label>
+                        <input type="url" class="form-control" id="productUrl" name="product_url" 
+                               value="{{ product.product_url|default:'' }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="affiliateUrl" class="form-label">Affiliate URL</label>
+                        <input type="url" class="form-control" id="affiliateUrl" name="affiliate_url" 
+                               value="{{ product.affiliate_url|default:'' }}">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="demoUrl" class="form-label">Demo URL</label>
+                        <input type="url" class="form-control" id="demoUrl" name="demo_url" 
+                               value="{{ product.demo_url|default:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="supportUrl" class="form-label">Support URL</label>
+                        <input type="url" class="form-control" id="supportUrl" name="support_url" 
+                               value="{{ product.support_url|default:'' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Information -->
+            <div class="content-card">
+                <h5 class="mb-4">Additional Information</h5>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="productFeatures" class="form-label">Key Features</label>
+                        <textarea class="form-control" id="productFeatures" name="features" 
+                                  rows="3">{{ product.features|default:'' }}</textarea>
+                        <small class="text-muted">List main features, one per line</small>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="systemRequirements" class="form-label">System Requirements</label>
+                        <textarea class="form-control" id="systemRequirements" name="system_requirements" 
+                                  rows="3">{{ product.system_requirements|default:'' }}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="targetAudience" class="form-label">Target Audience</label>
+                        <textarea class="form-control" id="targetAudience" name="target_audience" 
+                                  rows="3">{{ product.target_audience|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Product Image -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">Product Image</h6>
+                
+                <div class="text-center mb-3">
+                    <div class="product-image-preview" id="imagePreview">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="Product Image" class="img-fluid rounded">
+                        {% else %}
+                            <div class="bg-light border rounded p-4">
+                                <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">No image uploaded</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <input type="file" class="form-control" id="productImage" name="image" accept="image/*">
+                <small class="text-muted">Recommended: 400x300px, max 2MB</small>
+            </div>
+            
+            <!-- Status & Visibility -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">Status & Visibility</h6>
+                
+                <div class="mb-3">
+                    <label for="productStatus" class="form-label">Status</label>
+                    <select class="form-select" id="productStatus" name="status">
+                        <option value="draft" {% if product.status == 'draft' %}selected{% endif %}>Draft</option>
+                        <option value="pending" {% if product.status == 'pending' %}selected{% endif %}>Pending Review</option>
+                        <option value="active" {% if product.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="suspended" {% if product.status == 'suspended' %}selected{% endif %}>Suspended</option>
+                    </select>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="isFeatured" name="is_featured" 
+                           {% if product.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="isFeatured">
+                        Featured Product
+                    </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="isPopular" name="is_popular" 
+                           {% if product.is_popular %}checked{% endif %}>
+                    <label class="form-check-label" for="isPopular">
+                        Popular Product
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="allowReviews" name="allow_reviews" 
+                           {% if product.allow_reviews or not product.id %}checked{% endif %}>
+                    <label class="form-check-label" for="allowReviews">
+                        Allow Reviews
+                    </label>
+                </div>
+            </div>
+            
+            <!-- SEO Settings -->
+            <div class="content-card mb-4">
+                <h6 class="fw-bold mb-3">SEO Settings</h6>
+                
+                <div class="mb-3">
+                    <label for="metaTitle" class="form-label">Meta Title</label>
+                    <input type="text" class="form-control" id="metaTitle" name="meta_title" 
+                           value="{{ product.meta_title|default:'' }}" maxlength="60">
+                    <small class="text-muted">60 characters max</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="metaDescription" class="form-label">Meta Description</label>
+                    <textarea class="form-control" id="metaDescription" name="meta_description" 
+                              rows="3" maxlength="160">{{ product.meta_description|default:'' }}</textarea>
+                    <small class="text-muted">160 characters max</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="urlSlug" class="form-label">URL Slug</label>
+                    <input type="text" class="form-control" id="urlSlug" name="slug" 
+                           value="{{ product.slug|default:'' }}">
+                    <small class="text-muted">Auto-generated from name if empty</small>
+                </div>
+            </div>
+            
+            <!-- Analytics -->
+            {% if product.id %}
+            <div class="content-card">
+                <h6 class="fw-bold mb-3">Analytics</h6>
+                
+                <table class="table table-sm table-borderless">
+                    <tr>
+                        <td class="text-muted">Views:</td>
+                        <td class="fw-semibold">{{ product.views|default:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Sales:</td>
+                        <td class="fw-semibold">{{ product.sales_count|default:"0" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Revenue:</td>
+                        <td class="fw-semibold">${{ product.total_revenue|default:"0.00" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Conversion Rate:</td>
+                        <td class="fw-semibold">{{ product.conversion_rate|default:"0.0" }}%</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Rating:</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="stars-rating me-2">
+                                    {% for i in "12345" %}
+                                        <i class="fas fa-star{% if forloop.counter > product.average_rating|default:0 %} text-muted{% else %} text-warning{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">({{ product.review_count|default:"0" }} reviews)</small>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <div class="mt-3">
+                    <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-chart-line me-2"></i>View Detailed Analytics
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('productForm');
+    const priceInput = document.getElementById('productPrice');
+    const commissionRateInput = document.getElementById('commissionRate');
+    const commissionAmountInput = document.getElementById('commissionAmount');
+    const nameInput = document.getElementById('productName');
+    const slugInput = document.getElementById('urlSlug');
+    const imageInput = document.getElementById('productImage');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Calculate commission amount
+    function calculateCommission() {
+        const price = parseFloat(priceInput.value) || 0;
+        const rate = parseFloat(commissionRateInput.value) || 0;
+        const amount = (price * rate / 100).toFixed(2);
+        commissionAmountInput.value = amount;
+    }
+    
+    priceInput.addEventListener('input', calculateCommission);
+    commissionRateInput.addEventListener('input', calculateCommission);
+    
+    // Auto-generate slug from name
+    nameInput.addEventListener('input', function() {
+        if (!slugInput.value || slugInput.dataset.autoGenerated === 'true') {
+            const slug = this.value
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            slugInput.value = slug;
+            slugInput.dataset.autoGenerated = 'true';
+        }
+    });
+    
+    // Manual slug editing
+    slugInput.addEventListener('input', function() {
+        this.dataset.autoGenerated = 'false';
+    });
+    
+    // Image preview
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Product Image" class="img-fluid rounded">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate required fields
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            showToast('Please fill in all required fields.', 'error');
+            return;
+        }
+        
+        // In a real application, submit the form data
+        showToast('Product {% if product.id %}updated{% else %}created{% endif %} successfully!', 'success');
+        
+        setTimeout(() => {
+            window.location.href = "{% url 'admin:products_list' %}";
+        }, 1500);
+    });
+    
+    // Initial calculation
+    calculateCommission();
+});
+
+function saveAsDraft() {
+    const statusSelect = document.getElementById('productStatus');
+    statusSelect.value = 'draft';
+    
+    showToast('Product saved as draft!', 'success');
+    // In a real application, submit the form with draft status
+}
+
+// Character counters for SEO fields
+document.getElementById('metaTitle').addEventListener('input', function() {
+    updateCharCounter(this, 60);
+});
+
+document.getElementById('metaDescription').addEventListener('input', function() {
+    updateCharCounter(this, 160);
+});
+
+function updateCharCounter(input, maxLength) {
+    const current = input.value.length;
+    const remaining = maxLength - current;
+    const color = remaining < 10 ? 'text-danger' : remaining < 20 ? 'text-warning' : 'text-muted';
+    
+    let counter = input.nextElementSibling;
+    if (counter && counter.classList.contains('char-counter')) {
+        counter.textContent = `${current}/${maxLength} characters`;
+        counter.className = `char-counter small ${color}`;
+    } else {
+        counter = document.createElement('small');
+        counter.className = `char-counter small ${color}`;
+        counter.textContent = `${current}/${maxLength} characters`;
+        input.parentNode.appendChild(counter);
+    }
+}
+</script>
+{% endblock %}

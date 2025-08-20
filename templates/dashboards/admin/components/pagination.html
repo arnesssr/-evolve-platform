@@ -1,0 +1,129 @@
+<!-- Pagination Component -->
+<!-- Usage: {% include 'dashboards/admin/components/pagination.html' with page_obj=page_obj %} -->
+
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <!-- Results info -->
+        <div class="pagination-info text-muted mb-2 mb-md-0">
+            Showing 
+            <strong>{{ page_obj.start_index }}</strong> to 
+            <strong>{{ page_obj.end_index }}</strong> of 
+            <strong>{{ page_obj.paginator.count }}</strong> 
+            {{ item_name|default:"items" }}
+        </div>
+        
+        <!-- Pagination controls -->
+        <ul class="pagination mb-0 {% if size %}pagination-{{ size }}{% endif %}">
+            <!-- First page -->
+            {% if show_first_last %}
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="?page=1{% if query_string %}&{{ query_string }}{% endif %}" 
+                   aria-label="First" {% if not page_obj.has_previous %}tabindex="-1"{% endif %}>
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- Previous page -->
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" 
+                   aria-label="Previous" {% if not page_obj.has_previous %}tabindex="-1"{% endif %}>
+                    <i class="fas fa-angle-left"></i>
+                    {% if show_prev_next_text %}<span class="d-none d-sm-inline ms-1">Previous</span>{% endif %}
+                </a>
+            </li>
+            
+            <!-- Page numbers -->
+            {% for page_num in page_obj.paginator.page_range %}
+                {% if page_num %}
+                    {% if page_num == page_obj.number %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% else %}
+                        {% if page_num > page_obj.number|add:"-3" and page_num < page_obj.number|add:"3" %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_num }}{% if query_string %}&{{ query_string }}{% endif %}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% elif page_num == page_obj.number|add:"-3" or page_num == page_obj.number|add:"3" %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Next page -->
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" 
+                   aria-label="Next" {% if not page_obj.has_next %}tabindex="-1"{% endif %}>
+                    {% if show_prev_next_text %}<span class="d-none d-sm-inline me-1">Next</span>{% endif %}
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>
+            
+            <!-- Last page -->
+            {% if show_first_last %}
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}" 
+                   aria-label="Last" {% if not page_obj.has_next %}tabindex="-1"{% endif %}>
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+        
+        <!-- Items per page selector -->
+        {% if show_per_page %}
+        <div class="per-page-selector ms-3">
+            <select class="form-select form-select-sm" onchange="changePerPage(this.value)" style="width: auto;">
+                <option value="10" {% if per_page == 10 %}selected{% endif %}>10 per page</option>
+                <option value="25" {% if per_page == 25 %}selected{% endif %}>25 per page</option>
+                <option value="50" {% if per_page == 50 %}selected{% endif %}>50 per page</option>
+                <option value="100" {% if per_page == 100 %}selected{% endif %}>100 per page</option>
+            </select>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+<script>
+function changePerPage(perPage) {
+    const url = new URL(window.location);
+    url.searchParams.set('per_page', perPage);
+    url.searchParams.set('page', '1'); // Reset to first page
+    window.location.href = url.toString();
+}
+</script>
+{% endif %}
+
+<!-- Simple pagination without page object -->
+{% if not page_obj and total_pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center {% if size %}pagination-{{ size }}{% endif %}">
+        <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ current_page|add:"-1" }}{% if query_string %}&{{ query_string }}{% endif %}">
+                Previous
+            </a>
+        </li>
+        
+        {% for page in page_range %}
+        <li class="page-item {% if page == current_page %}active{% endif %}">
+            <a class="page-link" href="?page={{ page }}{% if query_string %}&{{ query_string }}{% endif %}">
+                {{ page }}
+            </a>
+        </li>
+        {% endfor %}
+        
+        <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+            <a class="page-link" href="?page={{ current_page|add:"1" }}{% if query_string %}&{{ query_string }}{% endif %}">
+                Next
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
