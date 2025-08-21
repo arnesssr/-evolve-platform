@@ -22,7 +22,8 @@
                 <!-- Dashboard -->
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
-                       href="{% url 'platform_admin:dashboard' %}">
+                       href="{% url 'platform_admin:dashboard' %}" 
+                       data-tooltip="Dashboard">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <span class="nav-text">Dashboard</span>
                     </a>
@@ -30,34 +31,35 @@
                 
                 <!-- Users Management -->
                 <li class="nav-item">
-                    <a class="nav-link {% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path %}active{% endif %}" 
+                    <a class="nav-link {% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path or 'admins' in request.path %}active{% endif %}" 
                        href="#usersSubmenu" data-bs-toggle="collapse" role="button" 
-                       aria-expanded="{% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path %}true{% else %}false{% endif %}" 
-                       aria-controls="usersSubmenu">
+                       aria-expanded="{% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path or 'admins' in request.path %}true{% else %}false{% endif %}" 
+                       aria-controls="usersSubmenu" 
+                       data-tooltip="Users">
                         <i class="nav-icon fas fa-users"></i>
                         <span class="nav-text">Users</span>
                         <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
                     </a>
-                    <div class="collapse {% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path %}show{% endif %}" 
+                    <div class="collapse {% if 'users' in request.path or 'businesses' in request.path or 'resellers' in request.path or 'admins' in request.path %}show{% endif %}" 
                          id="usersSubmenu">
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link {% if 'businesses/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:businesses-list' %}">
+                                <a class="nav-link {% if 'businesses' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:businesses_list' %}">
                                     <i class="nav-icon fas fa-building"></i>
                                     <span class="nav-text">Businesses</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'resellers/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:resellers-list' %}">
+                                <a class="nav-link {% if 'resellers' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:resellers_list' %}">
                                     <i class="nav-icon fas fa-handshake"></i>
                                     <span class="nav-text">Resellers</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'admins/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:admins-list' %}">
+                                <a class="nav-link {% if 'admins' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:admins_list' %}">
                                     <i class="nav-icon fas fa-user-shield"></i>
                                     <span class="nav-text">Administrators</span>
                                 </a>
@@ -71,7 +73,8 @@
                     <a class="nav-link {% if 'products' in request.path or 'plans' in request.path %}active{% endif %}" 
                        href="#productsSubmenu" data-bs-toggle="collapse" role="button" 
                        aria-expanded="{% if 'products' in request.path or 'plans' in request.path %}true{% else %}false{% endif %}" 
-                       aria-controls="productsSubmenu">
+                       aria-controls="productsSubmenu" 
+                       data-tooltip="Products">
                         <i class="nav-icon fas fa-box"></i>
                         <span class="nav-text">Products</span>
                         <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
@@ -81,14 +84,14 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'products/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:products-list' %}">
+                                   href="{% url 'platform_admin:products_list' %}">
                                     <i class="nav-icon fas fa-cube"></i>
                                     <span class="nav-text">All Products</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'plans/list' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:plans-list' %}">
+                                   href="{% url 'platform_admin:plans_list' %}">
                                     <i class="nav-icon fas fa-layer-group"></i>
                                     <span class="nav-text">Subscription Plans</span>
                                 </a>
@@ -102,7 +105,8 @@
                     <a class="nav-link {% if 'financial' in request.path %}active{% endif %}" 
                        href="#financialSubmenu" data-bs-toggle="collapse" role="button" 
                        aria-expanded="{% if 'financial' in request.path %}true{% else %}false{% endif %}" 
-                       aria-controls="financialSubmenu">
+                       aria-controls="financialSubmenu" 
+                       data-tooltip="Financial">
                         <i class="nav-icon fas fa-chart-line"></i>
                         <span class="nav-text">Financial</span>
                         <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
@@ -111,39 +115,36 @@
                          id="financialSubmenu">
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link {% if 'financial/revenue' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:financial-revenue' %}">
+                                <a class="nav-link {% if 'revenue' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:financial_revenue' %}">
                                     <i class="nav-icon fas fa-dollar-sign"></i>
                                     <span class="nav-text">Revenue</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'financial/commissions' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:financial-commissions' %}">
+                                <a class="nav-link {% if 'commissions' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:financial_commissions' %}">
                                     <i class="nav-icon fas fa-percentage"></i>
                                     <span class="nav-text">Commissions</span>
-                                    {% if pending_commissions_count > 0 %}
-                                    <span class="badge bg-warning rounded-pill ms-auto">{{ pending_commissions_count }}</span>
-                                    {% endif %}
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'financial/payouts' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:financial-payouts' %}">
+                                <a class="nav-link {% if 'payouts' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:financial_payouts' %}">
                                     <i class="nav-icon fas fa-money-bill-wave"></i>
                                     <span class="nav-text">Payouts</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'financial/invoices' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:financial-invoices' %}">
+                                <a class="nav-link {% if 'invoices' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:financial_invoices' %}">
                                     <i class="nav-icon fas fa-file-invoice"></i>
                                     <span class="nav-text">Invoices</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {% if 'financial/transactions' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:financial-transactions' %}">
+                                <a class="nav-link {% if 'transactions' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:financial_transactions' %}">
                                     <i class="nav-icon fas fa-exchange-alt"></i>
                                     <span class="nav-text">Transactions</span>
                                 </a>
@@ -155,7 +156,8 @@
                 <!-- Analytics -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'analytics' in request.path %}active{% endif %}" 
-                       href="{% url 'platform_admin:analytics-overview' %}">
+                       href="{% url 'platform_admin:analytics_overview' %}" 
+                       data-tooltip="Analytics">
                         <i class="nav-icon fas fa-chart-bar"></i>
                         <span class="nav-text">Analytics</span>
                     </a>
@@ -164,10 +166,33 @@
                 <!-- Reports -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'reports' in request.path %}active{% endif %}" 
-                       href="{% url 'platform_admin:reports-generate' %}">
+                       href="#reportsSubmenu" data-bs-toggle="collapse" role="button" 
+                       aria-expanded="{% if 'reports' in request.path %}true{% else %}false{% endif %}" 
+                       aria-controls="reportsSubmenu" 
+                       data-tooltip="Reports">
                         <i class="nav-icon fas fa-file-alt"></i>
                         <span class="nav-text">Reports</span>
+                        <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
                     </a>
+                    <div class="collapse {% if 'reports' in request.path %}show{% endif %}" 
+                         id="reportsSubmenu">
+                        <ul class="nav nav-pills flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'reports/generate' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:reports_generate' %}">
+                                    <i class="nav-icon fas fa-plus-circle"></i>
+                                    <span class="nav-text">Generate Report</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'reports/scheduled' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:reports_scheduled' %}">
+                                    <i class="nav-icon fas fa-clock"></i>
+                                    <span class="nav-text">Scheduled Reports</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
                 
                 <!-- Divider -->
@@ -175,12 +200,13 @@
                     <hr class="sidebar-divider">
                 </li>
                 
-                <!-- System Settings -->
+                <!-- Settings -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'settings' in request.path %}active{% endif %}" 
                        href="#settingsSubmenu" data-bs-toggle="collapse" role="button" 
                        aria-expanded="{% if 'settings' in request.path %}true{% else %}false{% endif %}" 
-                       aria-controls="settingsSubmenu">
+                       aria-controls="settingsSubmenu" 
+                       data-tooltip="Settings">
                         <i class="nav-icon fas fa-cog"></i>
                         <span class="nav-text">Settings</span>
                         <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
@@ -190,35 +216,43 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/general' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:settings-general' %}">
+                                   href="{% url 'platform_admin:settings_general' %}">
                                     <i class="nav-icon fas fa-sliders-h"></i>
                                     <span class="nav-text">General</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/security' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:settings-security' %}">
+                                   href="{% url 'platform_admin:settings_security' %}">
                                     <i class="nav-icon fas fa-shield-alt"></i>
                                     <span class="nav-text">Security</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'settings/notifications' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:settings-notifications' %}">
+                                   href="{% url 'platform_admin:settings_notifications' %}">
                                     <i class="nav-icon fas fa-bell"></i>
                                     <span class="nav-text">Notifications</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'settings/integrations' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:settings_integrations' %}">
+                                    <i class="nav-icon fas fa-plug"></i>
+                                    <span class="nav-text">Integrations</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
                 
-                <!-- System Info -->
+                <!-- System -->
                 <li class="nav-item">
                     <a class="nav-link {% if 'system' in request.path %}active{% endif %}" 
                        href="#systemSubmenu" data-bs-toggle="collapse" role="button" 
                        aria-expanded="{% if 'system' in request.path %}true{% else %}false{% endif %}" 
-                       aria-controls="systemSubmenu">
+                       aria-controls="systemSubmenu" 
+                       data-tooltip="System">
                         <i class="nav-icon fas fa-server"></i>
                         <span class="nav-text">System</span>
                         <i class="nav-arrow fas fa-chevron-down ms-auto"></i>
@@ -228,24 +262,30 @@
                         <ul class="nav nav-pills flex-column ms-3">
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/status' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:system-status' %}">
+                                   href="{% url 'platform_admin:system_status' %}">
                                     <i class="nav-icon fas fa-heartbeat"></i>
                                     <span class="nav-text">Status</span>
-                                    <span class="status-indicator bg-success"></span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/logs' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:system-logs' %}">
+                                   href="{% url 'platform_admin:system_logs' %}">
                                     <i class="nav-icon fas fa-list"></i>
                                     <span class="nav-text">System Logs</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link {% if 'system/backup' in request.path %}active{% endif %}" 
-                                   href="{% url 'platform_admin:system-backup' %}">
+                                   href="{% url 'platform_admin:system_backup' %}">
                                     <i class="nav-icon fas fa-download"></i>
                                     <span class="nav-text">Backups</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'system/maintenance' in request.path %}active{% endif %}" 
+                                   href="{% url 'platform_admin:system_maintenance' %}">
+                                    <i class="nav-icon fas fa-tools"></i>
+                                    <span class="nav-text">Maintenance</span>
                                 </a>
                             </li>
                         </ul>
@@ -256,35 +296,12 @@
         
         <!-- Sidebar Footer -->
         <div class="sidebar-footer mt-auto">
-            <!-- Quick Stats -->
-            <div class="quick-stats-mini p-3 d-none d-lg-block">
-                <div class="stats-item mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="stat-label">Active Users</span>
-                        <span class="stat-value">{{ active_users_count|default:0 }}</span>
-                    </div>
-                </div>
-                <div class="stats-item mb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="stat-label">Revenue Today</span>
-                        <span class="stat-value">${{ today_revenue|default:0|floatformat:0 }}</span>
-                    </div>
-                </div>
-                <div class="stats-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="stat-label">System Load</span>
-                        <span class="stat-value">{{ system_load|default:15 }}%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Footer Links -->
             <div class="footer-links p-3 border-top">
                 <div class="d-flex justify-content-center">
                     <a href="#" class="text-light me-3" title="Help">
                         <i class="fas fa-question-circle"></i>
                     </a>
-                    <a href="{% url 'platform_admin:system-status' %}" class="text-light me-3" title="System Status">
+                    <a href="{% url 'platform_admin:system_status' %}" class="text-light me-3" title="System Status">
                         <i class="fas fa-heartbeat"></i>
                     </a>
                     <a href="#" onclick="toggleTheme()" class="text-light" title="Toggle Theme">
@@ -301,8 +318,14 @@
 
 <style>
 .admin-sidebar {
+    background: linear-gradient(145deg, #1e293b, #334155);
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Hide scrollbar when collapsed */
+.admin-sidebar.collapsed {
+    overflow-y: hidden;
 }
 
 .admin-sidebar::-webkit-scrollbar {
@@ -320,6 +343,11 @@
 
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
+}
+
+/* Hide scrollbar completely when collapsed */
+.admin-sidebar.collapsed::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-content {
@@ -369,6 +397,12 @@
     overflow-y: auto;
 }
 
+/* Collapsed navigation optimization */
+.admin-sidebar.collapsed .sidebar-nav {
+    overflow-y: hidden;
+    padding: 0.5rem 0;
+}
+
 .sidebar-nav .nav-link {
     color: rgba(255, 255, 255, 0.8);
     padding: 0.75rem 1.5rem;
@@ -389,7 +423,7 @@
 .sidebar-nav .nav-link.active {
     color: white;
     background: rgba(255, 255, 255, 0.15);
-    border-left: 3px solid #3e92cc;
+    border-left: 3px solid #3b82f6;
 }
 
 .sidebar-nav .nav-link.active::before {
@@ -399,7 +433,7 @@
     top: 0;
     bottom: 0;
     width: 3px;
-    background: linear-gradient(to bottom, #3e92cc, #0a2463);
+    background: linear-gradient(to bottom, #3b82f6, #1e40af);
 }
 
 .nav-icon {
@@ -424,20 +458,143 @@
     transform: rotate(180deg);
 }
 
-/* Collapsed Sidebar */
+/* Collapsed Sidebar - Icons Only */
 .admin-sidebar.collapsed .nav-text,
 .admin-sidebar.collapsed .nav-arrow,
-.admin-sidebar.collapsed .badge {
-    display: none;
+.admin-sidebar.collapsed .badge,
+.admin-sidebar.collapsed .brand-text,
+.admin-sidebar.collapsed .brand-name,
+.admin-sidebar.collapsed .brand-subtitle {
+    display: none !important;
+}
+
+/* Force complete removal of all spacing */
+.admin-sidebar.collapsed .nav-item {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .admin-sidebar.collapsed .nav-link {
-    padding: 0.75rem;
-    justify-content: center;
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    position: relative;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
 .admin-sidebar.collapsed .nav-icon {
-    margin-right: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1.1rem !important;
+    width: auto !important;
+    text-align: center !important;
+    display: block !important;
+}
+
+/* Remove all Bootstrap nav spacing */
+.admin-sidebar.collapsed .nav {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.admin-sidebar.collapsed .nav-pills .nav-link {
+    margin: 0 !important;
+    padding: 0.5rem 0 !important;
+}
+
+.admin-sidebar.collapsed .flex-column {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Hide logo text and show mini logo only */
+.admin-sidebar.collapsed .logo-full {
+    display: none !important;
+}
+
+.admin-sidebar.collapsed .logo-mini {
+    display: block !important;
+}
+
+/* Compact spacing for collapsed divider */
+.admin-sidebar.collapsed .nav-divider {
+    padding: 0.25rem 0.5rem;
+    margin: 0.5rem 0;
+}
+
+.admin-sidebar.collapsed .sidebar-divider {
+    margin: 0.25rem 0;
+}
+
+/* Hide ALL submenus and collapsible content */
+.admin-sidebar.collapsed .collapse,
+.admin-sidebar.collapsed .collapse.show {
+    display: none !important;
+}
+
+/* Collapsed sidebar footer - icons only */
+.admin-sidebar.collapsed .footer-links {
+    padding: 0.5rem 0;
+}
+
+.admin-sidebar.collapsed .footer-links .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-sidebar.collapsed .footer-links a {
+    margin: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.admin-sidebar.collapsed .footer-links small,
+.admin-sidebar.collapsed .footer-links .text-center {
+    display: none !important;
+}
+
+/* Make sure no text is visible anywhere in collapsed state */
+.admin-sidebar.collapsed span,
+.admin-sidebar.collapsed .text-muted,
+.admin-sidebar.collapsed small {
+    display: none !important;
+}
+
+/* Only show icons in collapsed state */
+.admin-sidebar.collapsed i {
+    display: inline-block !important;
+}
+
+/* Override all Bootstrap utility classes in collapsed state */
+.admin-sidebar.collapsed .me-2,
+.admin-sidebar.collapsed .me-3,
+.admin-sidebar.collapsed .ms-3,
+.admin-sidebar.collapsed .ms-auto,
+.admin-sidebar.collapsed .py-3,
+.admin-sidebar.collapsed .p-3 {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force brand container to center logo only */
+.admin-sidebar.collapsed .brand-container {
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+    justify-content: center !important;
+    min-height: auto !important;
+}
+
+.admin-sidebar.collapsed .brand-logo {
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Submenu Styling */
@@ -451,36 +608,6 @@
     font-size: 0.875rem;
 }
 
-/* Badges and Indicators */
-.badge {
-    font-size: 0.6rem;
-    min-width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.status-indicator {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    margin-left: auto;
-    animation: pulse-status 2s infinite;
-}
-
-@keyframes pulse-status {
-    0% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-    }
-}
-
 /* Divider */
 .nav-divider {
     padding: 0.5rem 1.5rem;
@@ -492,22 +619,6 @@
 }
 
 /* Footer Styling */
-.quick-stats-mini {
-    background: rgba(255, 255, 255, 0.05);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.quick-stats-mini .stat-label {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.quick-stats-mini .stat-value {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: white;
-}
-
 .footer-links {
     background: rgba(0, 0, 0, 0.2);
 }
@@ -518,7 +629,7 @@
 
 .footer-links a:hover {
     transform: scale(1.1);
-    color: #3e92cc !important;
+    color: #3b82f6 !important;
 }
 
 /* Mobile Responsive */
@@ -526,13 +637,9 @@
     .admin-sidebar {
         z-index: 1050;
     }
-    
-    .quick-stats-mini {
-        display: none !important;
-    }
 }
 
-/* Tooltip for collapsed sidebar */
+/* Enhanced Tooltip for collapsed sidebar */
 .admin-sidebar.collapsed .nav-link {
     position: relative;
 }
@@ -540,46 +647,98 @@
 .admin-sidebar.collapsed .nav-link::after {
     content: attr(data-tooltip);
     position: absolute;
-    left: 100%;
+    left: calc(100% + 10px);
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(31, 41, 55, 0.95);
     color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
-    margin-left: 0.5rem;
-    font-size: 0.75rem;
-    z-index: 1000;
+    transition: all 0.3s ease;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    z-index: 1050;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tooltip arrow */
+.admin-sidebar.collapsed .nav-link::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid rgba(31, 41, 55, 0.95);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1049;
 }
 
 .admin-sidebar.collapsed .nav-link:hover::after {
     opacity: 1;
+    transform: translateY(-50%) translateX(0);
 }
 
-/* Loading state for nav items */
-.nav-link.loading {
-    opacity: 0.6;
+.admin-sidebar.collapsed .nav-link:hover::before {
+    opacity: 1;
+}
+
+/* Footer tooltips */
+.admin-sidebar.collapsed .footer-links a {
+    position: relative;
+}
+
+.admin-sidebar.collapsed .footer-links a::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(31, 41, 55, 0.95);
+    color: white;
+    padding: 0.375rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
     pointer-events: none;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+    font-weight: 500;
+    z-index: 1050;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.nav-link.loading .nav-icon::after {
+.admin-sidebar.collapsed .footer-links a::before {
     content: '';
     position: absolute;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+    left: calc(100% + 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-right: 4px solid rgba(31, 41, 55, 0.95);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1049;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.admin-sidebar.collapsed .footer-links a:hover::after {
+    opacity: 1;
+}
+
+.admin-sidebar.collapsed .footer-links a:hover::before {
+    opacity: 1;
 }
 </style>
 
@@ -594,7 +753,15 @@ function initializeSidebar() {
     
     // Handle collapse state changes
     document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(element => {
-        element.addEventListener('click', function() {
+        element.addEventListener('click', function(e) {
+            // Prevent dropdown functionality when sidebar is collapsed
+            const sidebar = document.getElementById('adminSidebar');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+            
             // Close other open collapses (accordion behavior)
             const targetId = this.getAttribute('href');
             const allCollapses = document.querySelectorAll('.sidebar-nav .collapse');
@@ -613,20 +780,15 @@ function initializeSidebar() {
     // Handle active state updates
     updateActiveStates();
     
-    // Real-time stats updates
-    if (typeof io !== 'undefined') {
-        const socket = io('/admin-stats');
-        
-        socket.on('sidebar_stats_update', function(data) {
-            updateSidebarStats(data);
-        });
-    }
+    // Observer to watch for sidebar collapse state changes
+    observeSidebarChanges();
 }
 
 function updateTooltips() {
+    // Clear existing tooltips first
     document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
         const textElement = link.querySelector('.nav-text');
-        if (textElement) {
+        if (textElement && textElement.textContent.trim()) {
             link.setAttribute('data-tooltip', textElement.textContent.trim());
         }
     });
@@ -638,132 +800,86 @@ function updateActiveStates() {
     
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
-        if (href && href !== '#' && currentPath.includes(href)) {
+        if (href && href !== '#' && !href.startsWith('#') && currentPath.includes(href)) {
             link.classList.add('active');
             
-            // Expand parent collapse if this is a submenu item
-            const parentCollapse = link.closest('.collapse');
-            if (parentCollapse) {
-                parentCollapse.classList.add('show');
-                const toggle = document.querySelector(`[href="#${parentCollapse.id}"]`);
-                if (toggle) {
-                    toggle.setAttribute('aria-expanded', 'true');
+            // Expand parent collapse if this is a submenu item and sidebar is not collapsed
+            const sidebar = document.getElementById('adminSidebar');
+            if (!sidebar.classList.contains('collapsed')) {
+                const parentCollapse = link.closest('.collapse');
+                if (parentCollapse) {
+                    parentCollapse.classList.add('show');
+                    const toggle = document.querySelector(`[href="#${parentCollapse.id}"]`);
+                    if (toggle) {
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
                 }
             }
         }
     });
 }
 
-function updateSidebarStats(data) {
-    // Update active users count
-    const activeUsersElement = document.querySelector('.quick-stats-mini .stat-value');
-    if (activeUsersElement && data.active_users !== undefined) {
-        animateCounter(activeUsersElement, data.active_users);
-    }
+function observeSidebarChanges() {
+    const sidebar = document.getElementById('adminSidebar');
+    if (!sidebar) return;
     
-    // Update revenue
-    const revenueElements = document.querySelectorAll('.quick-stats-mini .stat-value');
-    if (revenueElements[1] && data.today_revenue !== undefined) {
-        revenueElements[1].textContent = `$${data.today_revenue.toLocaleString()}`;
-    }
+    // Create a mutation observer to watch for class changes
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                handleSidebarStateChange();
+            }
+        });
+    });
     
-    // Update system load
-    if (revenueElements[2] && data.system_load !== undefined) {
-        revenueElements[2].textContent = `${data.system_load}%`;
+    // Start observing
+    observer.observe(sidebar, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+    
+    // Initial call
+    handleSidebarStateChange();
+}
+
+function handleSidebarStateChange() {
+    const sidebar = document.getElementById('adminSidebar');
+    if (!sidebar) return;
+    
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        // Close all open dropdowns when collapsing
+        document.querySelectorAll('.sidebar-nav .collapse.show').forEach(collapse => {
+            collapse.classList.remove('show');
+            const toggle = document.querySelector(`[href="#${collapse.id}"]`);
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
         
-        // Update color based on load
-        const loadElement = revenueElements[2];
-        loadElement.className = 'stat-value';
-        if (data.system_load > 80) {
-            loadElement.classList.add('text-danger');
-        } else if (data.system_load > 60) {
-            loadElement.classList.add('text-warning');
-        } else {
-            loadElement.classList.add('text-success');
-        }
-    }
-    
-    // Update commission badge
-    if (data.pending_commissions_count !== undefined) {
-        const commissionLink = document.querySelector('[href*="commissions"]');
-        if (commissionLink) {
-            let badge = commissionLink.querySelector('.badge');
-            if (data.pending_commissions_count > 0) {
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.className = 'badge bg-warning rounded-pill ms-auto';
-                    commissionLink.appendChild(badge);
-                }
-                badge.textContent = data.pending_commissions_count;
-            } else if (badge) {
-                badge.remove();
-            }
-        }
+        // Disable all dropdown toggles
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(toggle => {
+            toggle.style.pointerEvents = 'none';
+        });
+    } else {
+        // Re-enable dropdown toggles
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(toggle => {
+            toggle.style.pointerEvents = 'auto';
+        });
+        
+        // Restore active states
+        updateActiveStates();
     }
 }
 
-function animateCounter(element, newValue) {
-    const currentValue = parseInt(element.textContent) || 0;
-    const increment = (newValue - currentValue) / 20;
-    let current = currentValue;
-    
-    const timer = setInterval(() => {
-        current += increment;
-        if ((increment > 0 && current >= newValue) || (increment < 0 && current <= newValue)) {
-            current = newValue;
-            clearInterval(timer);
-        }
-        element.textContent = Math.round(current);
-    }, 50);
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+    localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
 }
 
-// Navigation helpers
-function navigateWithLoading(element, url) {
-    element.classList.add('loading');
-    setTimeout(() => {
-        window.location.href = url;
-    }, 200);
+// Load saved theme
+if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-theme');
 }
-
-// Handle navigation clicks with loading state
-document.querySelectorAll('.sidebar-nav .nav-link[href]:not([data-bs-toggle])').forEach(link => {
-    link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href && href !== '#' && !href.startsWith('javascript:')) {
-            e.preventDefault();
-            navigateWithLoading(this, href);
-        }
-    });
-});
-
-// Keyboard navigation
-document.addEventListener('keydown', function(e) {
-    // Alt + 1-9 for quick navigation
-    if (e.altKey && e.key >= '1' && e.key <= '9') {
-        e.preventDefault();
-        const index = parseInt(e.key) - 1;
-        const navLinks = document.querySelectorAll('.sidebar-nav > ul > li > .nav-link:not([data-bs-toggle])');
-        if (navLinks[index]) {
-            navLinks[index].click();
-        }
-    }
-});
-
-// Auto-collapse inactive submenus after 5 seconds
-let collapseTimeout;
-document.querySelectorAll('.sidebar-nav .collapse').forEach(collapse => {
-    collapse.addEventListener('shown.bs.collapse', function() {
-        clearTimeout(collapseTimeout);
-        collapseTimeout = setTimeout(() => {
-            const activeLink = this.querySelector('.nav-link.active');
-            if (!activeLink) {
-                bootstrap.Collapse.getInstance(this)?.hide();
-            }
-        }, 30000); // 30 seconds
-    });
-    
-    collapse.addEventListener('mouseenter', function() {
-        clearTimeout(collapseTimeout);
-    });
-});
 </script>
