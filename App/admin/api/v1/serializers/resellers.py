@@ -1,3 +1,2 @@
-# Optional API serializers scaffolding for admin resellers
-# Define DRF serializers for list/detail/stats if API is enabled
+# Placeholder for DRF serializers if/when we switch to DRF
 

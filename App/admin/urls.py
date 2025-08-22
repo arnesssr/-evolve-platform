@@ -4,6 +4,8 @@ from . import views
 app_name = 'platform_admin'
 
 urlpatterns = [
+    # API v1 (optional JSON endpoints)
+    path('api/v1/', include('App.admin.api.v1.urls')),
     # Main dashboard
     path('', views.dashboard, name='dashboard'),
 
