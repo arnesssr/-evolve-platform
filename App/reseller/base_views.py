@@ -27,15 +27,40 @@ def dashboard(request):
         )
         referral_code = reseller.referral_code
     
+    # Build recent transactions from real commissions
+    from .earnings.models import Commission
+    recent_commissions = Commission.objects.filter(reseller=reseller).order_by('-calculation_date')[:10]
+    status_color_map = {
+        'paid': 'success',
+        'approved': 'info',
+        'pending': 'warning',
+        'rejected': 'danger',
+    }
+    recent_transactions = [
+        {
+            'id': c.id,
+            'amount': float(c.amount),
+            'date': c.calculation_date,
+            'status': c.status,
+            'status_color': status_color_map.get(c.status, 'secondary'),
+        }
+        for c in recent_commissions
+    ]
+
+    # Map tier name
+    tier_names = {
+        'bronze': 'Bronze Partner',
+        'silver': 'Silver Partner',
+        'gold': 'Gold Partner',
+        'platinum': 'Platinum Partner',
+    }
+
     context = {
-        'current_tier': 'Silver Partner',
-        'total_commission': '15,000',
-        'subscription_level': 'Pro Tier',
+        'current_tier': tier_names.get(reseller.tier, reseller.tier),
+        'total_commission': str(reseller.total_commission_earned),
+        'subscription_level': '',
         'referral_code': referral_code,
-        'recent_transactions': [
-            {'id': 'TX123', 'amount': 5000, 'date': '2025-06-01', 'status': 'Paid', 'status_color': 'success'},
-            {'id': 'TX124', 'amount': 3000, 'date': '2025-06-15', 'status': 'Pending', 'status_color': 'warning'},
-        ]
+        'recent_transactions': recent_transactions,
     }
     return render(request, 'dashboards/reseller/reseller-dashboard.html', context)
 

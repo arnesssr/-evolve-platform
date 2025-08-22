@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Tuple
 
 from App.admin.repositories.resellers_repository import AdminResellersRepository
 from App.reseller.earnings.services.reseller_service import ResellerService
-from App.reseller.earnings.services.payout_service import PayoutService
+from App.reseller.earnings.services import PayoutService
 from App.reseller.earnings.models.reseller import Reseller
 from App.admin.services.audit_service import AuditService
 from django.core.mail import send_mail
@@ -46,20 +46,51 @@ class AdminResellerService:
 
     def create_reseller(self, data: Dict[str, Any]) -> int:
         """Create reseller via domain service and return new reseller ID.
-        NOTE: This expects a User to exist or to be created outside. For scaffold, we assume
-        a user has already been created and provided as part of data (e.g., user_id).
+        If user_id is not provided, create a new user from first_name/last_name/email.
         """
-        user_id = data.get('user_id')
-        if not user_id:
-            # In a real flow, we might create a user here, but admin may want explicit control
-            raise ValueError('user_id is required to create a reseller profile')
         from django.contrib.auth import get_user_model
         User = get_user_model()
-        user = User.objects.get(id=user_id)
+        user_id = data.get('user_id')
+        if user_id:
+            user = User.objects.get(id=user_id)
+        else:
+            email = data.get('email')
+            if not email:
+                raise ValueError('email is required to create a new user')
+            first_name = data.get('first_name') or ''
+            last_name = data.get('last_name') or ''
+            base_username = (email.split('@')[0] or 'user').lower()
+            username = base_username
+            suffix = 1
+            while User.objects.filter(**({'username': username} if hasattr(User, 'USERNAME_FIELD') and User.USERNAME_FIELD == 'username' else {'email': email})).exists():
+                username = f"{base_username}{suffix}"
+                suffix += 1
+            # Create user: for default Django, username is required; use email as username
+            if hasattr(User, 'USERNAME_FIELD') and User.USERNAME_FIELD == 'email':
+                user = User.objects.create_user(email=email, password=None)
+            else:
+                user = User.objects.create_user(username=username, email=email, password=None)
+            # Mark password unusable to force set/reset flow later
+            try:
+                user.set_unusable_password()
+                user.save(update_fields=['password'])
+            except Exception:
+                pass
+            # Set names
+            try:
+                user.first_name = first_name
+                user.last_name = last_name
+                user.save(update_fields=['first_name', 'last_name'])
+            except Exception:
+                pass
+        # Sanitize optional strings to avoid NULLs for non-nullable columns
+        company = (data.get('company') or '').strip()
+        phone = (data.get('phone') or '').strip()
+        paypal_email = (data.get('paypal_email') or '').strip()
         profile_data = {
-            'company_name': data.get('company'),
-            'phone_number': data.get('phone'),
-            'paypal_email': data.get('paypal_email'),
+            'company_name': company,
+            'phone_number': phone,
+            'paypal_email': paypal_email,
             # Map tier/status if applicable; domain tiers are bronze/silver/gold/platinum
         }
         reseller = self.domain_reseller.create_reseller_profile(user, profile_data)

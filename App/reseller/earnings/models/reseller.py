@@ -120,7 +120,7 @@ class Reseller(TimeStampedModel):
     @classmethod
     def generate_unique_referral_code(cls, user_id):
         """Generate a unique referral code, ensuring no duplicates."""
-        from myapp.reseller.utils import generate_partner_code
+        from App.reseller.utils import generate_partner_code
         
         max_attempts = 10
         for _ in range(max_attempts):

@@ -10,10 +10,10 @@
                 <span class="fw-bold">{{ pipeline_total|default:0 }}</span>
             </div>
             <div class="progress" style="height: 20px;">
-                <div class="progress-bar bg-info" style="width: {{ pipeline_stages.new|default:20 }}%" data-bs-toggle="tooltip" title="New: {{ pipeline_stages.new|default:20 }}%"></div>
-                <div class="progress-bar bg-warning" style="width: {{ pipeline_stages.qualified|default:30 }}%" data-bs-toggle="tooltip" title="Qualified: {{ pipeline_stages.qualified|default:30 }}%"></div>
-                <div class="progress-bar bg-primary" style="width: {{ pipeline_stages.proposal|default:25 }}%" data-bs-toggle="tooltip" title="Proposal: {{ pipeline_stages.proposal|default:25 }}%"></div>
-                <div class="progress-bar bg-success" style="width: {{ pipeline_stages.closing|default:25 }}%" data-bs-toggle="tooltip" title="Closing: {{ pipeline_stages.closing|default:25 }}%"></div>
+                <div class="progress-bar bg-info" style="width: {{ pipeline_stages.new|default:0 }}%" data-bs-toggle="tooltip" title="New: {{ pipeline_stages.new|default:0 }}%"></div>
+                <div class="progress-bar bg-warning" style="width: {{ pipeline_stages.qualified|default:0 }}%" data-bs-toggle="tooltip" title="Qualified: {{ pipeline_stages.qualified|default:0 }}%"></div>
+                <div class="progress-bar bg-primary" style="width: {{ pipeline_stages.proposal|default:0 }}%" data-bs-toggle="tooltip" title="Proposal: {{ pipeline_stages.proposal|default:0 }}%"></div>
+                <div class="progress-bar bg-success" style="width: {{ pipeline_stages.closing|default:0 }}%" data-bs-toggle="tooltip" title="Closing: {{ pipeline_stages.closing|default:0 }}%"></div>
             </div>
         </div>
 
@@ -25,28 +25,28 @@
                         <div class="stage-dot bg-info me-2"></div>
                         <span>New Leads</span>
                     </div>
-                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.new|default:8 }}</span>
+                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.new|default:0 }}</span>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <div class="d-flex align-items-center">
                         <div class="stage-dot bg-warning me-2"></div>
                         <span>Qualified</span>
                     </div>
-                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.qualified|default:12 }}</span>
+                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.qualified|default:0 }}</span>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <div class="d-flex align-items-center">
                         <div class="stage-dot bg-primary me-2"></div>
                         <span>Proposal Sent</span>
                     </div>
-                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.proposal|default:6 }}</span>
+                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.proposal|default:0 }}</span>
                 </div>
                 <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                     <div class="d-flex align-items-center">
                         <div class="stage-dot bg-success me-2"></div>
                         <span>Closing</span>
                     </div>
-                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.closing|default:4 }}</span>
+                    <span class="badge bg-secondary rounded-pill">{{ pipeline_counts.closing|default:0 }}</span>
                 </div>
             </div>
         </div>

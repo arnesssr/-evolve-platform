@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import views
+from . import base_views as views
 
 app_name = 'platform_admin'
 

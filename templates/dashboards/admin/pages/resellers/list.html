@@ -19,7 +19,7 @@
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
     </button>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickCreateModal">
+    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('user')">
         <i class="fas fa-plus me-2"></i>Add Reseller
     </button>
 </div>
@@ -38,46 +38,38 @@
     {% include 'dashboards/admin/components/metric-card.html' with title="Top Performer" value=metrics.top_performer icon="fa-trophy" color="warning" %}
 </div>
 
-<!-- Filters Section -->
-<div class="content-card mb-4">
-    <h5 class="mb-3">Filters & Search</h5>
-    <div class="row">
-        <div class="col-md-3">
-            {% include 'dashboards/admin/forms/user-filter.html' with filter_type="reseller" %}
-        </div>
-        <div class="col-md-3">
-            <label for="performanceFilter" class="form-label">Performance</label>
-            <select id="performanceFilter" class="form-select">
-                <option value="">All Performance</option>
-                <option value="top">Top Performers</option>
-                <option value="good">Good Performance</option>
-                <option value="average">Average Performance</option>
-                <option value="poor">Needs Improvement</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label for="commissionFilter" class="form-label">Commission Tier</label>
-            <select id="commissionFilter" class="form-select">
-                <option value="">All Tiers</option>
-                <option value="premium">Premium (10%)</option>
-                <option value="standard">Standard (5%)</option>
-                <option value="basic">Basic (3%)</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Registration Date</label>
-            <div>
-                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Registration date range">
-                    <i class="fas fa-calendar-alt me-2"></i>Choose Range
-                </button>
+<!-- Compact Search & Filters Toolbar -->
+<div class="content-card mb-3">
+    <form id="resellerToolbar" method="get" class="row g-2 align-items-center">
+        <div class="col-12 col-lg-5">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search text-muted"></i></span>
+                <input type="search" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search resellers (name, email, company)…">
             </div>
         </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col-12">
-            {% include 'dashboards/admin/components/search-filter.html' with placeholder="Search resellers by name, email, or company..." %}
+        <div class="col-6 col-lg-2">
+            <select class="form-select" name="status">
+                <option value="">Status: All</option>
+                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>Suspended</option>
+                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+            </select>
         </div>
-    </div>
+        <div class="col-6 col-lg-2">
+            <select class="form-select" name="commission_tier">
+                <option value="">Tier: All</option>
+                <option value="premium" {% if request.GET.commission_tier == 'premium' %}selected{% endif %}>Premium</option>
+                <option value="standard" {% if request.GET.commission_tier == 'standard' %}selected{% endif %}>Standard</option>
+                <option value="basic" {% if request.GET.commission_tier == 'basic' %}selected{% endif %}>Basic</option>
+            </select>
+        </div>
+        <div class="col-12 col-lg-3 d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Filter by date range">
+                <i class="fas fa-calendar-alt me-2"></i>Date Range
+            </button>
+            <button type="submit" class="btn btn-primary d-none" id="toolbarSubmit">Apply</button>
+        </div>
+    </form>
 </div>
 
 <!-- Resellers Table -->
@@ -161,9 +153,6 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="9" class="text-center text-muted">No resellers found.</td>
-                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -189,11 +178,25 @@ document.addEventListener('DOMContentLoaded', function() {
         responsive: true,
         pageLength: 25,
         order: [[7, 'desc']],
+        language: {
+            emptyTable: 'No resellers found.'
+        },
         columnDefs: [
             { orderable: false, targets: [0, 8] },
             { searchable: false, targets: [0, 8] }
         ]
     });
+
+    // Auto-submit toolbar on change
+    const form = document.getElementById('resellerToolbar');
+    if (form) {
+        form.addEventListener('change', function(e) {
+            if (e.target && (e.target.matches('select') || e.target.matches('input[type="search"]'))) {
+                form.requestSubmit();
+            }
+        });
+        // Submit on Enter in search field (default), debounce on typing if needed
+    }
 });
 </script>
 {% endblock %}

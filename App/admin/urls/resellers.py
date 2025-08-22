@@ -1,5 +1,5 @@
 from django.urls import path
-from App.admin.views.resellers import (
+from App.admin.views_resellers import (
     AdminResellerListView,
     AdminResellerDetailView,
     AdminResellerExportView,
@@ -12,8 +12,6 @@ from App.admin.views.resellers import (
     AdminResellerMessageView,
     AdminResellerStatsView,
 )
-
-app_name = 'platform_admin'
 
 urlpatterns = [
     path('resellers/list/', AdminResellerListView.as_view(), name='resellers-list'),
