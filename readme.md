@@ -50,8 +50,8 @@ This is a referral/reseller system where:
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/JoyNyayieka/evolve-payments-platform.git
-cd evolve-payments-platform
+git clone https://github.com/arnesssr/-evolve-platform.git
+cd "-evolve-platform"
 ```
 
 ### 2. Create and activate a virtual environment
@@ -126,7 +126,7 @@ python manage.py test
 
 ## 📁 Project Structure
 ```
-evolve-payments-platform/
+-evolve-platform/
 ├── EvolvePayments/     # Main Django project settings
 ├── myapp/              # Main application
 │   ├── models.py       # Database models
