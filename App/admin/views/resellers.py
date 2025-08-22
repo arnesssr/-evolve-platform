@@ -50,13 +50,8 @@ class AdminResellerExportView(LoginRequiredMixin, AdminRequiredMixin, View):
             return HttpResponseBadRequest('Invalid filters')
         svc = AdminResellerService()
         rows = svc.export_rows(form.cleaned_data)
-        # naive CSV for scaffold; replace with utils exporter if present
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="resellers.csv"'
-        response.write('id,name,email,company,commission_tier,total_earnings,sales_count,status,joined\n')
-        for r in rows:
-            response.write(f"{r.get('id','')},{r.get('name','')},{r.get('email','')},{r.get('company','')},{r.get('commission_tier','')},{r.get('total_earnings','')},{r.get('sales_count','')},{r.get('status','')},{r.get('joined','')}\n")
-        return response
+        from App.admin.utils.data_export import export_resellers_to_csv
+        return export_resellers_to_csv(rows)
 
 
 class AdminResellerBulkActionView(LoginRequiredMixin, AdminRequiredMixin, View):
