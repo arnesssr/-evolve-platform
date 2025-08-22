@@ -5,6 +5,11 @@ from typing import Any, Dict, List, Tuple
 
 from App.admin.repositories.resellers_repository import AdminResellersRepository
 from App.reseller.earnings.services.reseller_service import ResellerService
+from App.reseller.earnings.services.payout_service import PayoutService
+from App.reseller.earnings.models.reseller import Reseller
+from django.core.mail import send_mail
+from django.conf import settings
+from decimal import Decimal
 
 
 class AdminResellerService:
@@ -84,20 +89,49 @@ class AdminResellerService:
 
     def process_payout(self, reseller_id: int, params: Dict[str, Any]) -> Any:
         """Process payout via domain earnings/payout service.
-        Placeholder: this will integrate with payout_service.
+        Uses PayoutService.request_payout; scheduling info is stored in payment_details for now.
         """
-        # TODO: Implement via App.reseller.earnings.services.payout_service
-        return None
+        reseller = Reseller.objects.select_related('user').get(id=reseller_id)
+        amount_raw = params.get('amount') or reseller.get_available_balance()
+        amount = Decimal(str(amount_raw)) if amount_raw is not None else Decimal('0.00')
+        payment_method = params.get('payment_method') or 'bank_transfer'
+        details = {
+            'schedule': params.get('schedule') or 'immediate',
+            'scheduled_date': str(params.get('scheduled_date') or ''),
+            'scheduled_time': str(params.get('scheduled_time') or ''),
+            'notes': params.get('notes') or '',
+        }
+        payout_svc = PayoutService()
+        payout = payout_svc.request_payout(reseller, amount, payment_method, details)
+        return payout
 
     def send_message(self, reseller_ids: List[int], channel: str, payload: Dict[str, Any]) -> None:
-        """Send message via email/SMS providers (placeholder)."""
-        # TODO: integrate email/SMS; for now, no-op
+        """Send message via email/SMS providers.
+        Currently supports email using Django's send_mail; SMS is a TODO.
+        reseller_ids may be a list of ints or a comma-separated string.
+        """
+        if isinstance(reseller_ids, str):
+            ids = [int(x) for x in reseller_ids.split(',') if x.strip().isdigit()]
+        else:
+            ids = reseller_ids or []
+        if not ids:
+            return
+        qs = Reseller.objects.select_related('user').filter(id__in=ids)
+        emails = [r.user.email for r in qs if getattr(r.user, 'email', None)]
+        subject = payload.get('subject') or 'Message from Platform Admin'
+        body = payload.get('body') or ''
+        if channel == 'email' and emails and body:
+            send_mail(subject, body, getattr(settings, 'EMAIL_HOST_USER', None), emails, fail_silently=True)
+        # TODO: implement SMS via provider (e.g., SMSLeopard) when integrated
         return None
 
     def export_rows(self, filters: Dict[str, Any]):
         """Yield row dicts for CSV export (use same filters as list)."""
         rows, _ = self.repo.query_resellers(filters, page=1, page_size=10000)
         return rows
+
+    def get_chart_series(self, reseller_id: int) -> Dict[str, Any]:
+        return self.repo.get_chart_series(reseller_id)
 
     def handle_bulk_action(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Perform bulk action across reseller_ids."""
