@@ -141,22 +141,28 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for s in reseller.sales %}
                         <tr>
-                            <td>TechCorp Solutions</td>
-                            <td>Enterprise Plan</td>
-                            <td class="fw-bold">$29,400</td>
-                            <td class="text-success fw-bold">$1,470</td>
-                            <td>Oct 15, 2024</td>
-                            <td><span class="badge bg-warning">Pending</span></td>
+                            <td>{{ s.business }}</td>
+                            <td>{{ s.plan }}</td>
+                            <td class="fw-bold">${{ s.sale_amount|floatformat:2 }}</td>
+                            <td class="text-success fw-bold">${{ s.commission|floatformat:2 }}</td>
+                            <td>{{ s.date|date:'M j, Y' }}</td>
+                            <td>
+                                {% if s.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif s.status == 'paid' %}
+                                    <span class="badge bg-success">Paid</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ s.status|capfirst }}</span>
+                                {% endif %}
+                            </td>
                         </tr>
+                        {% empty %}
                         <tr>
-                            <td>HealthCare Plus</td>
-                            <td>Professional Plan</td>
-                            <td class="fw-bold">$7,200</td>
-                            <td class="text-success fw-bold">$360</td>
-                            <td>Oct 12, 2024</td>
-                            <td><span class="badge bg-success">Paid</span></td>
+                            <td colspan="6" class="text-center text-muted">No recent sales.</td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -193,27 +199,17 @@
         <div class="content-card mb-4">
             <h6 class="fw-bold mb-3">Recent Activity</h6>
             <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker bg-success"></div>
-                    <div class="timeline-content">
-                        <small class="text-muted">2 hours ago</small>
-                        <div>New sale: TechCorp Solutions</div>
-                    </div>
-                </div>
+                {% for ev in reseller.activity %}
                 <div class="timeline-item">
                     <div class="timeline-marker bg-info"></div>
                     <div class="timeline-content">
-                        <small class="text-muted">1 day ago</small>
-                        <div>Commission approved</div>
+                        <small class="text-muted">{{ ev.ts|timesince }} ago</small>
+                        <div>{{ ev.text }}</div>
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker bg-warning"></div>
-                    <div class="timeline-content">
-                        <small class="text-muted">3 days ago</small>
-                        <div>Updated commission tier</div>
-                    </div>
-                </div>
+                {% empty %}
+                <div class="text-muted">No recent activity.</div>
+                {% endfor %}
             </div>
         </div>
         
@@ -346,13 +342,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Performance Chart
     const ctx = document.getElementById('performanceChart').getContext('2d');
+    const labels = {{ reseller.chart_series.labels|default:"[]"|safe }};
+    const values = {{ reseller.chart_series.values|default:"[]"|safe }};
     new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            labels: labels,
             datasets: [{
                 label: 'Sales Count',
-                data: [2, 3, 1, 4, 2, 5, 3, 4, 2, 4],
+                data: values,
                 borderColor: 'rgb(59, 130, 246)',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,

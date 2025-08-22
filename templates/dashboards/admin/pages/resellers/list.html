@@ -32,10 +32,10 @@
 {% block content %}
 <!-- Reseller Statistics -->
 <div class="row mb-4">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Resellers" value="47" icon="fa-user-tie" color="primary" change="+3" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Active Resellers" value="38" icon="fa-check-circle" color="success" change="+2" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Commission" value="$84,750" icon="fa-percentage" color="info" change="+15.3%" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Top Performer" value="John Marketing" icon="fa-trophy" color="warning" change="$8,450" trend="up" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Resellers" value=metrics.total_resellers icon="fa-user-tie" color="primary" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Active Resellers" value=metrics.active_resellers icon="fa-check-circle" color="success" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Total Commission" value=metrics.total_commission icon="fa-percentage" color="info" %}
+    {% include 'dashboards/admin/components/metric-card.html' with title="Top Performer" value=metrics.top_performer icon="fa-trophy" color="warning" %}
 </div>
 
 <!-- Filters Section -->
@@ -85,7 +85,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">All Resellers</h5>
         <div class="d-flex align-items-center gap-3">
-            <small class="text-muted">Showing <span id="tableInfo">0</span> results</small>
+            <small class="text-muted">Showing <span id="tableInfo">{{ total_count }}</span> results</small>
         </div>
     </div>
     
@@ -109,10 +109,11 @@
                 </tr>
             </thead>
             <tbody>
+                {% for row in resellers %}
                 <tr>
                     <td>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="1">
+                            <input class="form-check-input row-checkbox" type="checkbox" value="{{ row.id }}">
                         </div>
                     </td>
                     <td>
@@ -123,93 +124,47 @@
                                 </div>
                             </div>
                             <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">John Marketing</h6>
-                                <small class="text-muted">john@marketingpro.com</small>
+                                <h6 class="mb-0">{{ row.name }}</h6>
+                                <small class="text-muted">{{ row.email }}</small>
                             </div>
                         </div>
                     </td>
                     <td>
                         <div>
-                            <div class="fw-medium text-success">Excellent</div>
+                            <div class="fw-medium">{{ row.performance_segment }}</div>
                             <div class="progress" style="height: 4px;">
-                                <div class="progress-bar bg-success" style="width: 95%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ row.performance_score }}%"></div>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-warning">Premium (10%)</span>
+                        <span class="badge bg-primary">{{ row.commission_tier }}</span>
                     </td>
-                    <td class="fw-bold text-success">$8,450</td>
+                    <td class="fw-bold text-success">${{ row.total_earnings|floatformat:2 }}</td>
                     <td>
                         <div>
-                            <div class="fw-medium">23 sales</div>
-                            <small class="text-muted">This month: 4</small>
+                            <div class="fw-medium">{{ row.sales_count }} sales</div>
+                            <small class="text-muted">This month: {{ row.sales_this_month }}</small>
                         </div>
                     </td>
                     <td>
-                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
+                        {% include 'dashboards/admin/components/status-badge.html' with status=row.status text=row.status|capfirst %}
                     </td>
                     <td>
                         <div>
-                            <div>Jan 15, 2024</div>
-                            <small class="text-muted">10 months ago</small>
+                            <div>{{ row.joined|date:'M j, Y' }}</div>
+                            <small class="text-muted">{{ row.joined|timesince }} ago</small>
                         </div>
                     </td>
                     <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,suspend,delete" entity_type="reseller" entity_id="1" %}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'platform_admin:resellers-detail' row.id %}">View</a>
                     </td>
                 </tr>
-                
+                {% empty %}
                 <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="2">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user-tie text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">Sarah Sales</h6>
-                                <small class="text-muted">sarah@salesforce.net</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium text-primary">Good</div>
-                            <div class="progress" style="height: 4px;">
-                                <div class="progress-bar bg-primary" style="width: 78%"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-primary">Standard (5%)</span>
-                    </td>
-                    <td class="fw-bold text-success">$5,230</td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">18 sales</div>
-                            <small class="text-muted">This month: 3</small>
-                        </div>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
-                    </td>
-                    <td>
-                        <div>
-                            <div>Mar 8, 2024</div>
-                            <small class="text-muted">7 months ago</small>
-                        </div>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,upgrade,message" entity_type="reseller" entity_id="2" %}
-                    </td>
+                    <td colspan="9" class="text-center text-muted">No resellers found.</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
