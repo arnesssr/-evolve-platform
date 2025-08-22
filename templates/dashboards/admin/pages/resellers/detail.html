@@ -280,8 +280,13 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Save Changes</button>
+                <form method="post" action="{% url 'platform_admin:reseller-edit' reseller.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="name" value="{{ reseller.name }}" />
+                    <input type="hidden" name="email" value="{{ reseller.email }}" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
             </div>
         </div>
     </div>

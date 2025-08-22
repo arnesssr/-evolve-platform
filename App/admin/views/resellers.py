@@ -9,6 +9,7 @@ from App.admin.forms.resellers import (
     ResellerCreateForm,
     ResellerEditForm,
     ResellerBulkActionForm,
+    SuspendForm,
     PayoutForm,
     MessageForm,
 )
@@ -91,8 +92,10 @@ class AdminResellerEditView(LoginRequiredMixin, AdminRequiredMixin, View):
 
 class AdminResellerSuspendView(LoginRequiredMixin, AdminRequiredMixin, View):
     def post(self, request, reseller_id):
-        # could reuse BulkActionForm or a dedicated SuspendForm if needed
-        reason = request.POST.get('reason')
+        form = SuspendForm(request.POST)
+        if not form.is_valid():
+            return HttpResponseBadRequest('Invalid suspend form')
+        reason = form.cleaned_data.get('reason')
         svc = AdminResellerService()
         svc.suspend_reseller(reseller_id, reason=reason)
         return redirect(reverse('platform_admin:resellers-detail', kwargs={'reseller_id': reseller_id}))
