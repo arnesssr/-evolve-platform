@@ -51,6 +51,9 @@ class AdminResellerExportView(LoginRequiredMixin, AdminRequiredMixin, View):
         svc = AdminResellerService()
         rows = svc.export_rows(form.cleaned_data)
         from App.admin.utils.data_export import export_resellers_to_csv
+        # Audit export
+        from App.admin.services.audit_service import AuditService
+        AuditService().log(action='export', actor_id=request.user.id if request.user.is_authenticated else None, target_type='reseller', target_id='list', details={'filters': form.cleaned_data})
         return export_resellers_to_csv(rows)
 
 
@@ -61,7 +64,7 @@ class AdminResellerBulkActionView(LoginRequiredMixin, AdminRequiredMixin, View):
             return HttpResponseBadRequest('Invalid bulk action')
         svc = AdminResellerService()
         result = svc.handle_bulk_action(form.cleaned_data)
-        # Redirect back to list for scaffold
+        # Redirect back to list
         return redirect(reverse('platform_admin:resellers-list'))
 
 
@@ -92,14 +95,14 @@ class AdminResellerSuspendView(LoginRequiredMixin, AdminRequiredMixin, View):
             return HttpResponseBadRequest('Invalid suspend form')
         reason = form.cleaned_data.get('reason')
         svc = AdminResellerService()
-        svc.suspend_reseller(reseller_id, reason=reason)
+        svc.suspend_reseller(reseller_id, reason=reason, actor_id=request.user.id if request.user.is_authenticated else None, meta={'ip': request.META.get('REMOTE_ADDR')})
         return redirect(reverse('platform_admin:resellers-detail', kwargs={'reseller_id': reseller_id}))
 
 
 class AdminResellerResumeView(LoginRequiredMixin, AdminRequiredMixin, View):
     def post(self, request, reseller_id):
         svc = AdminResellerService()
-        svc.resume_reseller(reseller_id)
+        svc.resume_reseller(reseller_id, actor_id=request.user.id if request.user.is_authenticated else None, meta={'ip': request.META.get('REMOTE_ADDR')})
         return redirect(reverse('platform_admin:resellers-detail', kwargs={'reseller_id': reseller_id}))
 
 

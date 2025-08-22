@@ -7,6 +7,7 @@ from App.admin.repositories.resellers_repository import AdminResellersRepository
 from App.reseller.earnings.services.reseller_service import ResellerService
 from App.reseller.earnings.services.payout_service import PayoutService
 from App.reseller.earnings.models.reseller import Reseller
+from App.admin.services.audit_service import AuditService
 from django.core.mail import send_mail
 from django.conf import settings
 from decimal import Decimal
@@ -75,17 +76,16 @@ class AdminResellerService:
         }
         self.domain_reseller.update_profile(reseller_id, profile_data)
 
-    def suspend_reseller(self, reseller_id: int, reason: str = None) -> None:
-        """Suspend reseller via domain service and audit.
-        For now, we mark is_active False via domain service.
-        """
+    def suspend_reseller(self, reseller_id: int, reason: str = None, *, actor_id: int | None = None, meta: Dict[str, Any] | None = None) -> None:
+        """Suspend reseller via domain service and audit."""
         self.domain_reseller.deactivate_reseller(reseller_id)
-        # TODO: write audit log with reason
+        # Audit
+        AuditService().log(action='suspend', actor_id=actor_id, target_type='reseller', target_id=reseller_id, details={'reason': reason, **(meta or {})})
 
-    def resume_reseller(self, reseller_id: int) -> None:
+    def resume_reseller(self, reseller_id: int, *, actor_id: int | None = None, meta: Dict[str, Any] | None = None) -> None:
         """Resume reseller via domain service and audit."""
         self.domain_reseller.activate_reseller(reseller_id)
-        # TODO: audit log
+        AuditService().log(action='resume', actor_id=actor_id, target_type='reseller', target_id=reseller_id, details=(meta or {}))
 
     def process_payout(self, reseller_id: int, params: Dict[str, Any]) -> Any:
         """Process payout via domain earnings/payout service.
@@ -103,6 +103,7 @@ class AdminResellerService:
         }
         payout_svc = PayoutService()
         payout = payout_svc.request_payout(reseller, amount, payment_method, details)
+        AuditService().log(action='payout', actor_id=None, target_type='reseller', target_id=reseller_id, details={'amount': str(amount), 'payment_method': payment_method, **details})
         return payout
 
     def send_message(self, reseller_ids: List[int], channel: str, payload: Dict[str, Any]) -> None:
@@ -123,6 +124,7 @@ class AdminResellerService:
         if channel == 'email' and emails and body:
             send_mail(subject, body, getattr(settings, 'EMAIL_HOST_USER', None), emails, fail_silently=True)
         # TODO: implement SMS via provider (e.g., SMSLeopard) when integrated
+        AuditService().log(action='message', actor_id=None, target_type='reseller', target_id=','.join(map(str, ids)), details={'channel': channel, 'subject': subject})
         return None
 
     def export_rows(self, filters: Dict[str, Any]):
