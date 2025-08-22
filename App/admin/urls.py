@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'platform_admin'
@@ -11,8 +11,8 @@ urlpatterns = [
     path('businesses/list/', views.businesses_list, name='businesses-list'),
     path('businesses/detail/<int:user_id>/', views.businesses_detail, name='businesses-detail'),
 
-    path('resellers/list/', views.resellers_list, name='resellers-list'),
-    path('resellers/detail/<int:user_id>/', views.resellers_detail, name='resellers-detail'),
+    # Resellers (delegate to modular urls)
+    path('', include('App.admin.urls.resellers')),
 
     path('admins/list/', views.admins_list, name='admins-list'),
     path('admins/detail/<int:user_id>/', views.admins_detail, name='admins-detail'),
