@@ -3,71 +3,113 @@ from typing import Any, Dict, List, Tuple
 # NOTE: This service orchestrates admin operations and delegates business logic to domain services
 # under App/reseller/... It must not depend on request/response objects.
 
+from App.admin.repositories.resellers_repository import AdminResellersRepository
+from App.reseller.earnings.services.reseller_service import ResellerService
+
+
 class AdminResellerService:
+    def __init__(self) -> None:
+        self.repo = AdminResellersRepository()
+        self.domain_reseller = ResellerService()
+
     def list_resellers(self, filters: Dict[str, Any], page: int = 1, page_size: int = 25) -> Tuple[List[Dict[str, Any]], int]:
-        """Return a list of resellers and total count based on filters.
-        Placeholder implementation for scaffold.
-        """
-        # TODO: delegate to App.admin.repositories.resellers_repository.query_resellers
-        rows = []
-        total = 0
-        return rows, total
+        """Return a list of resellers and total count based on filters."""
+        return self.repo.query_resellers(filters, page=page, page_size=page_size)
 
     def compute_metrics(self) -> Dict[str, Any]:
         """Compute top-of-page metrics for list view."""
-        # TODO: delegate to repositories.compute_admin_metrics
-        return {
-            'total_resellers': 0,
-            'active_resellers': 0,
-            'total_commission': 0,
-            'top_performer': None,
-        }
+        return self.repo.compute_admin_metrics()
 
     def get_reseller_detail(self, reseller_id: int) -> Dict[str, Any]:
         """Return a detail view model for a reseller."""
-        # TODO: aggregate from repositories: overview, commission summary, sales, activity, chart series
-        return {
-            'id': reseller_id,
-            'name': 'Reseller',
-        }
+        overview = self.repo.get_reseller_overview(reseller_id)
+        commission_summary = self.repo.get_commission_summary(reseller_id)
+        sales = self.repo.get_reseller_sales(reseller_id)
+        activity = self.repo.get_activity_timeline(reseller_id)
+        chart = self.repo.get_chart_series(reseller_id)
+        vm: Dict[str, Any] = overview.copy()
+        vm.update({
+            'pending_commission': commission_summary.get('pending'),
+            'monthly_commission': commission_summary.get('monthly_commission'),
+            'yearly_commission': commission_summary.get('yearly_commission'),
+            'sales': sales,
+            'activity': activity,
+            'chart_series': chart,
+        })
+        return vm
 
     def create_reseller(self, data: Dict[str, Any]) -> int:
-        """Create reseller via domain service and return new reseller ID."""
-        # TODO: call domain create
-        return 1
+        """Create reseller via domain service and return new reseller ID.
+        NOTE: This expects a User to exist or to be created outside. For scaffold, we assume
+        a user has already been created and provided as part of data (e.g., user_id).
+        """
+        user_id = data.get('user_id')
+        if not user_id:
+            # In a real flow, we might create a user here, but admin may want explicit control
+            raise ValueError('user_id is required to create a reseller profile')
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.get(id=user_id)
+        profile_data = {
+            'company_name': data.get('company'),
+            'phone_number': data.get('phone'),
+            'paypal_email': data.get('paypal_email'),
+            # Map tier/status if applicable; domain tiers are bronze/silver/gold/platinum
+        }
+        reseller = self.domain_reseller.create_reseller_profile(user, profile_data)
+        return reseller.id
 
     def update_reseller(self, reseller_id: int, data: Dict[str, Any]) -> None:
         """Update reseller via domain service."""
-        # TODO
-        return None
+        # Map allowed profile fields into domain update
+        profile_data = {
+            'company_name': data.get('company'),
+            'phone_number': data.get('phone'),
+            'company_website': data.get('website'),
+            'alternate_email': data.get('email'),
+        }
+        self.domain_reseller.update_profile(reseller_id, profile_data)
 
     def suspend_reseller(self, reseller_id: int, reason: str = None) -> None:
-        """Suspend reseller via domain service and audit."""
-        # TODO
-        return None
+        """Suspend reseller via domain service and audit.
+        For now, we mark is_active False via domain service.
+        """
+        self.domain_reseller.deactivate_reseller(reseller_id)
+        # TODO: write audit log with reason
 
     def resume_reseller(self, reseller_id: int) -> None:
         """Resume reseller via domain service and audit."""
-        # TODO
-        return None
+        self.domain_reseller.activate_reseller(reseller_id)
+        # TODO: audit log
 
     def process_payout(self, reseller_id: int, params: Dict[str, Any]) -> Any:
-        """Process payout via domain earnings/payout service."""
-        # TODO
+        """Process payout via domain earnings/payout service.
+        Placeholder: this will integrate with payout_service.
+        """
+        # TODO: Implement via App.reseller.earnings.services.payout_service
         return None
 
     def send_message(self, reseller_ids: List[int], channel: str, payload: Dict[str, Any]) -> None:
-        """Send message via email/SMS providers."""
-        # TODO
+        """Send message via email/SMS providers (placeholder)."""
+        # TODO: integrate email/SMS; for now, no-op
         return None
 
     def export_rows(self, filters: Dict[str, Any]):
         """Yield row dicts for CSV export (use same filters as list)."""
-        # TODO: re-use list_resellers
-        return []
+        rows, _ = self.repo.query_resellers(filters, page=1, page_size=10000)
+        return rows
 
     def handle_bulk_action(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Perform bulk action across reseller_ids."""
-        # TODO: route to appropriate method(s)
-        return {'status': 'ok'}
+        action = data.get('action')
+        ids_str = data.get('reseller_ids', '')
+        ids = [int(x) for x in ids_str.split(',') if x.strip().isdigit()]
+        if action == 'suspend':
+            for rid in ids:
+                self.suspend_reseller(rid)
+        elif action == 'resume':
+            for rid in ids:
+                self.resume_reseller(rid)
+        # set_tier and message can be implemented later
+        return {'status': 'ok', 'processed': len(ids)}
 
