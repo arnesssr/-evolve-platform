@@ -26,6 +26,7 @@
 {% endblock %}
 
 {% block content %}
+{% include 'dashboards/admin/components/catalog-tabs.html' with active='catalog-plan-form' %}
 <form id="planForm" method="post">
     {% csrf_token %}
     

@@ -1,6 +1,5 @@
 <!-- Status Badge Component -->
-<!-- Usage: {% include 'dashboards/admin/components/status-badge.html' with status=item.status type='success' %} -->
-
+{% comment %} Usage: {% include 'dashboards/admin/components/status-badge.html' with status=item.status type='success' %} {% endcomment %}
 {% if status %}
 <span class="badge bg-{{ type|default:'secondary' }} bg-opacity-{{ opacity|default:'100' }} 
             {% if size %}badge-{{ size }}{% endif %} 
@@ -9,7 +8,7 @@
     {% if icon %}
     <i class="fas {{ icon }} me-1"></i>
     {% endif %}
-    {{ label|default:status }}
+    {{ label|default:text|default:status }}
 </span>
 {% endif %}
 

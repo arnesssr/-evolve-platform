@@ -1,0 +1,25 @@
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'system-status' %}active{% endif %}" href="{% url 'platform_admin:system-status' %}">
+        <i class="fas fa-server me-1"></i> Status
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'system-logs' %}active{% endif %}" href="{% url 'platform_admin:system-logs' %}">
+        <i class="fas fa-file-alt me-1"></i> Logs
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'system-backup' %}active{% endif %}" href="{% url 'platform_admin:system-backup' %}">
+        <i class="fas fa-database me-1"></i> Backup
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'system-maintenance' %}active{% endif %}" href="{% url 'platform_admin:system-maintenance' %}">
+        <i class="fas fa-tools me-1"></i> Maintenance
+      </a>
+    </li>
+  </ul>
+</nav>
+

@@ -1,6 +1,5 @@
 <!-- Action Dropdown Component -->
-<!-- Usage: {% include 'dashboards/admin/components/action-dropdown.html' with actions=action_list %} -->
-
+{% comment %} Usage: {% include 'dashboards/admin/components/action-dropdown.html' with actions=action_list %} {% endcomment %}
 <div class="dropdown {% if inline %}d-inline-block{% endif %}">
     <button class="btn btn-{{ size|default:'sm' }} btn-{{ style|default:'light' }} {% if custom_class %}{{ custom_class }}{% endif %}" 
             type="button" 

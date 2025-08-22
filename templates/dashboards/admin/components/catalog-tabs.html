@@ -1,0 +1,25 @@
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'catalog-products' %}active{% endif %}" href="{% url 'platform_admin:products-list' %}">
+        <i class="fas fa-box me-1"></i> Products
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'catalog-product-form' %}active{% endif %}" href="{% url 'platform_admin:products-form' %}">
+        <i class="fas fa-plus me-1"></i> New Product
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'catalog-plans' %}active{% endif %}" href="{% url 'platform_admin:plans-list' %}">
+        <i class="fas fa-layer-group me-1"></i> Plans
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'catalog-plan-form' %}active{% endif %}" href="{% url 'platform_admin:plans-form' %}">
+        <i class="fas fa-plus-circle me-1"></i> New Plan
+      </a>
+    </li>
+  </ul>
+</nav>
+

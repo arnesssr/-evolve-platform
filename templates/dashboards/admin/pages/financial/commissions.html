@@ -13,7 +13,9 @@
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    {% include 'dashboards/admin/forms/date-range.html' with label="Date Range" compact=True %}
+<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Date range">
+        <i class="fas fa-calendar-alt"></i>
+      </button>
     <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#bulkPayoutModal">
         <i class="fas fa-money-bill-wave me-2"></i>Bulk Payout
     </button>
@@ -26,6 +28,43 @@
 
 {% block extra_css %}
 <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  {% include 'dashboards/admin/components/financial-tabs.html' with active='financial-commissions' %}
+  <div class="d-flex justify-content-between align-items-start mt-2">
+    <div class="flex-grow-1">
+      <div class="collapse" id="finHeaderDetails">
+        <h1 class="page-title">Commission Management</h1>
+        <p class="page-subtitle">Manage reseller commissions and payouts</p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'platform_admin:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Commissions</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#finHeaderDetails" aria-expanded="false" aria-controls="finHeaderDetails" title="Toggle header">
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="page-actions d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Date range">
+          <i class="fas fa-calendar-alt"></i>
+        </button>
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#bulkPayoutModal">
+          <i class="fas fa-money-bill-wave me-2"></i>Bulk Payout
+        </button>
+        {% include 'dashboards/admin/components/export-button.html' with export_type="commissions" %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approveCommissionModal">
+          <i class="fas fa-check me-2"></i>Approve Selected
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -389,6 +428,7 @@
 <!-- Include Modals -->
 {% include 'dashboards/admin/modals/approve-commission.html' %}
 {% include 'dashboards/admin/modals/process-payout.html' %}
+{% include 'dashboards/admin/modals/date-range.html' %}
 
 <!-- Custom Modal for Commission Details -->
 <div class="modal fade" id="viewCommissionModal" tabindex="-1">

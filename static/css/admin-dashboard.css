@@ -445,3 +445,65 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Layout overflow fixes */
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.admin-wrapper, .admin-main, .admin-content {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+.content-card {
+    overflow-x: hidden;
+}
+
+/* Tabs should wrap or scroll on small screens */
+.page-tabs .nav-tabs {
+    flex-wrap: wrap;
+}
+@media (max-width: 576px) {
+    .page-tabs .nav-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+    .page-tabs .nav-item {
+        flex: 0 0 auto;
+    }
+}
+
+/* Ensure charts and tables fit within containers */
+.chart-container, canvas {
+    max-width: 100% !important;
+}
+img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+.table {
+    width: 100%;
+}
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Normalize Bootstrap row inside admin content to avoid horizontal overflow */
+.admin-content .row,
+.content-card .row,
+.dataTables_wrapper .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+.admin-content .row > [class^="col-"],
+.admin-content .row > [class*=" col-"],
+.content-card .row > [class^="col-"],
+.content-card .row > [class*=" col-"],
+.dataTables_wrapper .row > [class^="col-"],
+.dataTables_wrapper .row > [class*=" col-"] {
+    min-width: 0;
+}

@@ -3,5 +3,6 @@
 {% block page_title %}System Status{% endblock %}
 {% block breadcrumb_items %}<li class="breadcrumb-item"><a href="{% url 'platform_admin:dashboard' %}">Dashboard</a></li><li class="breadcrumb-item active">System</li>{% endblock %}
 {% block content %}
+{% include 'dashboards/admin/components/system-tabs.html' with active='system-status' %}
 <div class="content-card"><p>Status placeholder. Show health checks here.</p></div>
 {% endblock %}

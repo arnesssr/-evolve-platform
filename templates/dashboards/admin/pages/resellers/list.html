@@ -12,6 +12,9 @@
 
 {% block page_actions %}
 <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Date range">
+        <i class="fas fa-calendar-alt"></i>
+    </button>
     {% include 'dashboards/admin/components/export-button.html' with export_type="resellers" %}
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
@@ -62,7 +65,12 @@
             </select>
         </div>
         <div class="col-md-3">
-            {% include 'dashboards/admin/forms/date-range.html' with label="Registration Date" %}
+            <label class="form-label">Registration Date</label>
+            <div>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Registration date range">
+                    <i class="fas fa-calendar-alt me-2"></i>Choose Range
+                </button>
+            </div>
         </div>
     </div>
     <div class="row mt-3">
@@ -213,6 +221,7 @@
 
 {% include 'dashboards/admin/modals/bulk-action.html' with entity_type="resellers" %}
 {% include 'dashboards/admin/modals/quick-create.html' with create_type="reseller" %}
+{% include 'dashboards/admin/modals/date-range.html' %}
 {% endblock %}
 
 {% block extra_js %}

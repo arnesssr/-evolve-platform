@@ -1,0 +1,15 @@
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'reports-generate' %}active{% endif %}" href="{% url 'platform_admin:reports-generate' %}">
+        <i class="fas fa-chart-bar me-1"></i> Generate
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'reports-scheduled' %}active{% endif %}" href="{% url 'platform_admin:reports-scheduled' %}">
+        <i class="fas fa-clock me-1"></i> Scheduled
+      </a>
+    </li>
+  </ul>
+</nav>
+

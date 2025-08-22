@@ -2,9 +2,16 @@ from pathlib import Path
 
 from decouple import config
 import os
+from urllib.parse import urlparse, parse_qs
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env from project root using python-decouple if present, regardless of CWD
+ENV_FILE = BASE_DIR / '.env'
+if ENV_FILE.exists():
+    from decouple import Config, RepositoryEnv
+    config = Config(RepositoryEnv(str(ENV_FILE)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,11 +51,11 @@ INSTALLED_APPS = [
     'App.reseller',
 ]
 
-#Pesapal Configurations
-PESAPAL_BASE_URL = 'https://cybqa.pesapal.com/pesapalv3'
-PESAPAL_CONSUMER_KEY = 'qkio1BGGYAXTu2JOfm7XSXNruoZsrqEW'
-PESAPAL_CONSUMER_SECRET = 'osGQ364R49cXKeOYSpaOnT++rHs='
-PESAPAL_SANDBOX = True  # Set to False in production
+# Pesapal Configurations
+PESAPAL_BASE_URL = config('PESAPAL_BASE_URL', default='https://cybqa.pesapal.com/pesapalv3')
+PESAPAL_CONSUMER_KEY = config('PESAPAL_CONSUMER_KEY', default='')
+PESAPAL_CONSUMER_SECRET = config('PESAPAL_CONSUMER_SECRET', default='')
+PESAPAL_SANDBOX = config('PESAPAL_SANDBOX', cast=bool, default=True)  # Set to False in production
 
 
 MIDDLEWARE = [
@@ -93,6 +100,36 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Switch to Postgres if DATABASE_URL is provided
+DATABASE_URL = config('DATABASE_URL', default=None)
+if DATABASE_URL:
+    parsed = urlparse(DATABASE_URL)
+    if parsed.scheme.startswith('postgres'):
+        query = parse_qs(parsed.query)
+        sslmode = (query.get('sslmode', ['require'])[0] or 'require')
+        options = {'sslmode': sslmode}
+        sslrootcert = config('DB_SSLROOTCERT', default=None)
+        if sslrootcert:
+            p = Path(sslrootcert)
+            if not p.is_absolute():
+                p = BASE_DIR / p
+            options['sslrootcert'] = str(p)
+        else:
+            ca_default = BASE_DIR / 'config' / 'aiven-ca.pem'
+            if ca_default.exists():
+                options['sslrootcert'] = str(ca_default)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': (parsed.path[1:] if parsed.path else ''),
+                'USER': parsed.username,
+                'PASSWORD': parsed.password,
+                'HOST': parsed.hostname,
+                'PORT': parsed.port or 5432,
+                'OPTIONS': options,
+            }
+        }
 
 
 # Password validation
@@ -142,11 +179,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT')
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
+EMAIL_HOST = config('EMAIL_HOST', default=None)
+EMAIL_PORT = config('EMAIL_PORT', cast=int, default=587)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default=None)
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default=None)
 
 LOGIN_URL = '/login/'
 

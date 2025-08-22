@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block title %}Dashboard Overview{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+{% block page_subtitle %}Welcome back! Here's what's happening with your platform.{% endblock %}
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -13,181 +18,123 @@
         border-left: 4px solid;
         transition: transform 0.3s ease;
     }
-
-    .stats-card:hover {
-        transform: translateY(-5px);
-    }
-
+    .stats-card:hover { transform: translateY(-5px); }
     .stats-card.primary { border-left-color: var(--primary-color); }
     .stats-card.success { border-left-color: var(--success-color); }
     .stats-card.warning { border-left-color: var(--warning-color); }
     .stats-card.danger { border-left-color: var(--danger-color); }
     .stats-card.secondary { border-left-color: var(--secondary-color); }
-
-    .stats-value {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-
-    .stats-label {
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .stats-change {
-        font-size: 0.8rem;
-        margin-top: 0.5rem;
-    }
-
+    .stats-value { font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem; }
+    .stats-label { color: #6c757d; font-size: 0.9rem; }
+    .stats-change { font-size: 0.8rem; margin-top: 0.5rem; }
     .stats-change.positive { color: var(--success-color); }
     .stats-change.negative { color: var(--danger-color); }
-
-    .chart-container {
-        background: white;
-        border-radius: 10px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        height: 400px;
-    }
+    .chart-container { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: 400px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="admin-wrapper">
-    <!-- Include the sidebar -->
-    {% include 'dashboards/admin/layouts/includes/admin-sidebar.html' %}
-    
-    <!-- Sidebar overlay for mobile -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
-    <!-- Main content area -->
-    <div class="admin-main" id="adminMain">
-        <!-- Include the header -->
-        {% include 'dashboards/admin/layouts/includes/admin-header.html' %}
-        
-        <!-- Page content -->
-        <div class="admin-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="page-title">Dashboard Overview</h1>
-                        <p class="page-subtitle">Welcome back! Here's what's happening with your platform.</p>
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card primary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-value">{{ total_users|default:1247 }}</div>
+                    <div class="stats-label">Total Users</div>
+                    <div class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i> +12.5% from last month
                     </div>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{% url 'platform_admin:dashboard' %}">Admin</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                        </ol>
-                    </nav>
                 </div>
+                <i class="fas fa-users fa-2x text-primary opacity-25"></i>
             </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-value">${{ total_revenue|default:52341 }}</div>
+                    <div class="stats-label">Total Revenue</div>
+                    <div class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i> +8.2% from last month
+                    </div>
+                </div>
+                <i class="fas fa-dollar-sign fa-2x text-success opacity-25"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-value">${{ pending_requests|default:8432 }}</div>
+                    <div class="stats-label">Pending Payouts</div>
+                    <div class="stats-change negative">
+                        <i class="fas fa-arrow-down"></i> -2.1% from last month
+                    </div>
+                </div>
+                <i class="fas fa-clock fa-2x text-warning opacity-25"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stats-card secondary">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stats-value">{{ active_users|default:342 }}</div>
+                    <div class="stats-label">Active Resellers</div>
+                    <div class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i> +15.3% from last month
+                    </div>
+                </div>
+                <i class="fas fa-handshake fa-2x text-secondary opacity-25"></i>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Statistics Cards -->
-            <div class="row g-4 mb-4">
-                <div class="col-xl-3 col-md-6">
-                    <div class="stats-card primary">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-value">{{ total_users|default:1247 }}</div>
-                                <div class="stats-label">Total Users</div>
-                                <div class="stats-change positive">
-                                    <i class="fas fa-arrow-up"></i> +12.5% from last month
-                                </div>
-                            </div>
-                            <i class="fas fa-users fa-2x text-primary opacity-25"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="stats-card success">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-value">${{ total_revenue|default:52341 }}</div>
-                                <div class="stats-label">Total Revenue</div>
-                                <div class="stats-change positive">
-                                    <i class="fas fa-arrow-up"></i> +8.2% from last month
-                                </div>
-                            </div>
-                            <i class="fas fa-dollar-sign fa-2x text-success opacity-25"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="stats-card warning">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-value">${{ pending_requests|default:8432 }}</div>
-                                <div class="stats-label">Pending Payouts</div>
-                                <div class="stats-change negative">
-                                    <i class="fas fa-arrow-down"></i> -2.1% from last month
-                                </div>
-                            </div>
-                            <i class="fas fa-clock fa-2x text-warning opacity-25"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-md-6">
-                    <div class="stats-card secondary">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="stats-value">{{ active_users|default:342 }}</div>
-                                <div class="stats-label">Active Resellers</div>
-                                <div class="stats-change positive">
-                                    <i class="fas fa-arrow-up"></i> +15.3% from last month
-                                </div>
-                            </div>
-                            <i class="fas fa-handshake fa-2x text-secondary opacity-25"></i>
-                        </div>
-                    </div>
-                </div>
+<!-- Charts Row -->
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="chart-container">
+            <h5 class="mb-3">Revenue Overview</h5>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="content-card">
+            <h5 class="mb-3">Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <a href="{% url 'platform_admin:businesses-list' %}" class="btn btn-primary">
+                    <i class="fas fa-users me-2"></i>Manage Users
+                </a>
+                <a href="{% url 'platform_admin:products-list' %}" class="btn btn-success">
+                    <i class="fas fa-box me-2"></i>Manage Products
+                </a>
+                <a href="{% url 'platform_admin:financial-payouts' %}" class="btn btn-warning">
+                    <i class="fas fa-money-bill-wave me-2"></i>Process Payouts
+                </a>
+                <a href="{% url 'platform_admin:reports-generate' %}" class="btn btn-info">
+                    <i class="fas fa-chart-bar me-2"></i>Generate Report
+                </a>
             </div>
+        </div>
+    </div>
+</div>
 
-            <!-- Charts Row -->
-            <div class="row g-4">
-                <div class="col-xl-8">
-                    <div class="chart-container">
-                        <h5 class="mb-3">Revenue Overview</h5>
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-xl-4">
-                    <div class="content-card">
-                        <h5 class="mb-3">Quick Actions</h5>
-                        <div class="d-grid gap-2">
-                            <a href="{% url 'platform_admin:businesses-list' %}" class="btn btn-primary">
-                                <i class="fas fa-users me-2"></i>Manage Users
-                            </a>
-                            <a href="{% url 'platform_admin:products-list' %}" class="btn btn-success">
-                                <i class="fas fa-box me-2"></i>Manage Products
-                            </a>
-                            <a href="{% url 'platform_admin:financial-payouts' %}" class="btn btn-warning">
-                                <i class="fas fa-money-bill-wave me-2"></i>Process Payouts
-                            </a>
-                            <a href="{% url 'platform_admin:reports-generate' %}" class="btn btn-info">
-                                <i class="fas fa-chart-bar me-2"></i>Generate Report
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Charts -->
-            <div class="row g-4 mt-1">
-                <div class="col-xl-6">
-                    <div class="chart-container">
-                        <h5 class="mb-3">User Growth</h5>
-                        <canvas id="userGrowthChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-xl-6">
-                    <div class="chart-container">
-                        <h5 class="mb-3">Commission Distribution</h5>
-                        <canvas id="commissionChart"></canvas>
-                    </div>
-                </div>
-            </div>
+<!-- Additional Charts -->
+<div class="row g-4 mt-1">
+    <div class="col-xl-6">
+        <div class="chart-container">
+            <h5 class="mb-3">User Growth</h5>
+            <canvas id="userGrowthChart"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="chart-container">
+            <h5 class="mb-3">Commission Distribution</h5>
+            <canvas id="commissionChart"></canvas>
         </div>
     </div>
 </div>
@@ -220,17 +167,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
+                        callback: function(value) { return '$' + value.toLocaleString(); }
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 
@@ -240,51 +181,14 @@ document.addEventListener('DOMContentLoaded', function() {
         type: 'bar',
         data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'New Users',
-                data: [45, 62, 58, 71, 89, 95],
-                backgroundColor: '#10b981',
-                borderRadius: 5
-            }, {
-                label: 'Active Users',
-                data: [180, 195, 210, 235, 250, 275],
-                backgroundColor: '#3e92cc',
-                borderRadius: 5
-            }]
+            datasets: [{ label: 'New Users', data: [45, 62, 58, 71, 89, 95], backgroundColor: '#10b981', borderRadius: 5 }, { label: 'Active Users', data: [180, 195, 210, 235, 250, 275], backgroundColor: '#3e92cc', borderRadius: 5 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
 
     // Commission Distribution Chart
     const commissionCtx = document.getElementById('commissionChart').getContext('2d');
-    new Chart(commissionCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Tier 1 (5%)', 'Tier 2 (10%)', 'Tier 3 (15%)', 'Tier 4 (20%)'],
-            datasets: [{
-                data: [35, 30, 25, 10],
-                backgroundColor: ['#3e92cc', '#10b981', '#f59e0b', '#ef4444'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
+    new Chart(commissionCtx, { type: 'doughnut', data: { labels: ['Tier 1 (5%)', 'Tier 2 (10%)', 'Tier 3 (15%)', 'Tier 4 (20%)'], datasets: [{ data: [35, 30, 25, 10], backgroundColor: ['#3e92cc', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
 });
 </script>
 {% endblock %}

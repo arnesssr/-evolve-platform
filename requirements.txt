@@ -11,6 +11,8 @@ python-decouple==3.8
 
 # HTTP Requests (for API integrations)
 requests==2.32.4
+# Postgres driver (psycopg 3 with binary extras; supports Python 3.13)
+psycopg[binary]>=3.1
 
 # Security: Ensure setuptools is up to date (addresses CVE vulnerabilities)
 setuptools>=70.0.0

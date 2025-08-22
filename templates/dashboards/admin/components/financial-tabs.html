@@ -1,0 +1,30 @@
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'financial-revenue' %}active{% endif %}" href="{% url 'platform_admin:financial-revenue' %}">
+        <i class="fas fa-chart-line me-1"></i> Revenue
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'financial-transactions' %}active{% endif %}" href="{% url 'platform_admin:financial-transactions' %}">
+        <i class="fas fa-receipt me-1"></i> Transactions
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'financial-invoices' %}active{% endif %}" href="{% url 'platform_admin:financial-invoices' %}">
+        <i class="fas fa-file-invoice me-1"></i> Invoices
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'financial-payouts' %}active{% endif %}" href="{% url 'platform_admin:financial-payouts' %}">
+        <i class="fas fa-money-bill-wave me-1"></i> Payouts
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'financial-commissions' %}active{% endif %}" href="{% url 'platform_admin:financial-commissions' %}">
+        <i class="fas fa-percent me-1"></i> Commissions
+      </a>
+    </li>
+  </ul>
+</nav>
+

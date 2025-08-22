@@ -26,6 +26,7 @@
 {% endblock %}
 
 {% block content %}
+{% include 'dashboards/admin/components/catalog-tabs.html' with active='catalog-product-form' %}
 <form id="productForm" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     

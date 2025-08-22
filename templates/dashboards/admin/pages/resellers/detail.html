@@ -13,6 +13,9 @@
 
 {% block page_actions %}
 <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Date range">
+        <i class="fas fa-calendar-alt"></i>
+    </button>
     <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
         <i class="fas fa-print me-2"></i>Print
     </button>
@@ -290,6 +293,7 @@
 
 {% include 'dashboards/admin/modals/process-payout.html' %}
 {% include 'dashboards/admin/modals/suspend-user.html' %}
+{% include 'dashboards/admin/modals/date-range.html' %}
 {% endblock %}
 
 {% block extra_css %}

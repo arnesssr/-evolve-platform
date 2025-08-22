@@ -1,0 +1,25 @@
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'settings-general' %}active{% endif %}" href="{% url 'platform_admin:settings-general' %}">
+        <i class="fas fa-gear me-1"></i> General
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'settings-security' %}active{% endif %}" href="{% url 'platform_admin:settings-security' %}">
+        <i class="fas fa-shield-alt me-1"></i> Security
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'settings-notifications' %}active{% endif %}" href="{% url 'platform_admin:settings-notifications' %}">
+        <i class="fas fa-bell me-1"></i> Notifications
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if active == 'settings-integrations' %}active{% endif %}" href="{% url 'platform_admin:settings-integrations' %}">
+        <i class="fas fa-plug me-1"></i> Integrations
+      </a>
+    </li>
+  </ul>
+</nav>
+

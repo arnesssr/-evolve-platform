@@ -1,6 +1,5 @@
 <!-- Metric Card Component -->
-<!-- Usage: {% include 'dashboards/admin/components/metric-card.html' with title="Total Users" value="1,234" icon="fa-users" color="primary" change="+15.3%" trend="up" %} -->
-
+{% comment %} Usage: {% include 'dashboards/admin/components/metric-card.html' with title="Total Users" value="1,234" icon="fa-users" color="primary" change="+15.3%" trend="up" %} {% endcomment %}
 <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
     <div class="card metric-card h-100">
         <div class="card-body">
@@ -12,9 +11,13 @@
                     <h6 class="text-muted mb-1">{{ title }}</h6>
                     <h3 class="mb-0 fw-bold">{{ value }}</h3>
                     {% if change %}
-                    <small class="text-{{ trend|yesno:'success,danger,muted' }}">
-                        <i class="fas fa-arrow-{{ trend|yesno:'up,down,right' }}"></i> {{ change }}
-                    </small>
+                    {% if trend == 'up' %}
+                    <small class="text-success"><i class="fas fa-arrow-up"></i> {{ change }}</small>
+                    {% elif trend == 'down' %}
+                    <small class="text-danger"><i class="fas fa-arrow-down"></i> {{ change }}</small>
+                    {% else %}
+                    <small class="text-muted"><i class="fas fa-minus"></i> {{ change }}</small>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>

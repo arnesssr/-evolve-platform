@@ -1,0 +1,18 @@
+{% comment %}
+Admin page tabs: use to provide quick navigation among a section’s subpages.
+Usage: {% include 'dashboards/admin/components/page-tabs.html' with tabs=tabs active='settings-general' %}
+Where tabs is a list of dicts: [{ key:'settings-general', label:'General', url: url('platform_admin:settings-general'), icon:'fa-gear' }, ...]
+{% endcomment %}
+<nav class="page-tabs mb-3">
+  <ul class="nav nav-tabs">
+    {% for tab in tabs %}
+    <li class="nav-item">
+      <a class="nav-link {% if tab.key == active %}active{% endif %}" href="{{ tab.url }}">
+        {% if tab.icon %}<i class="fas {{ tab.icon }} me-1"></i>{% endif %}
+        {{ tab.label }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+
