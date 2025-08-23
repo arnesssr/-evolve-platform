@@ -1,6 +1,6 @@
 # Evolve Payments Platform
 
-A B2B software marketplace and referral platform that connects software vendors with resellers, enabling commission-based sales of business software solutions across African markets.
+A B2B software marketplace and referral platform that connects software vendors with resellers, enabling commission-based sales of business software solutions.
 
 ## 🎯 What is this platform?
 
@@ -38,7 +38,7 @@ This is a referral/reseller system where:
 - **Commission Tracking**: Automated commission calculation and tracking
 - **Product Marketplace**: Vendors can list multiple software products
 - **Referral Management**: Track referrals from initial contact to successful sale
-- **African Market Focus**: Optimized for 54 African countries
+- **Global Reach**: Scalable platform architecture
 
 ## 📋 Prerequisites
 
