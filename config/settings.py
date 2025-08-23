@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from decouple import config
+from decouple import config, Csv
 import os
 from urllib.parse import urlparse, parse_qs
 
@@ -18,10 +18,10 @@ if ENV_FILE.exists():
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(0p*%$d6a=fg%(6b1%l8!in68)ad_im+&1a52_p%xwx*tr#(0$'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-(0p*%$d6a=fg%(6b1%l8!in68)ad_im+&1a52_p%xwx*tr#(0$')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=True)
 
 # SMSLeopard settings
 SMSLEOPARD_ENVIRONMENT = config('SMSLEOPARD_ENVIRONMENT')
@@ -30,11 +30,7 @@ SMSLEOPARD_API_SECRET = config('SMSLEOPARD_API_SECRET')
 SMSLEOPARD_ACCESS_TOKEN = config('SMSLEOPARD_ACCESS_TOKEN')
 
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '943bbfa896c4.ngrok-free.app'
-]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1')
 
 
 # Application definition
@@ -47,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'App',
-    'App.admin',
+    'App.admin.apps.AdminConfig',
     'App.reseller',
 ]
 
@@ -170,6 +166,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

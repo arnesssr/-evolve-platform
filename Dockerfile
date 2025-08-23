@@ -33,7 +33,7 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Collect static files (will be overridden by volume in development)
-RUN python manage.py collectstatic --noinput --settings=evolve_payments.settings || true
+RUN python manage.py collectstatic --noinput || true
 
 # Expose port
 EXPOSE 8000
