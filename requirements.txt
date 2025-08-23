@@ -9,8 +9,16 @@ Django==5.2.5
 # Environment Configuration
 python-decouple==3.8
 
+# Testing
+pytest==8.3.2
+pytest-django==4.9.0
+
 # HTTP Requests (for API integrations)
 requests==2.32.4
+
+# Django REST Framework (for APIs)
+djangorestframework==3.14.0
+
 # Postgres driver (psycopg 3 with binary extras; supports Python 3.13)
 psycopg[binary]>=3.1
 

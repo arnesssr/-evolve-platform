@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Override file for local Postgres development
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.postgres.yml up
+
+services:
+  web:
+    environment:
+      - DEBUG=1
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/evolve_payments
+    depends_on:
+      - db
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    environment:
+      - POSTGRES_DB=evolve_payments
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+  redis:
+    # Keep redis as-is
