@@ -38,12 +38,17 @@
 
 <!-- Filters Section -->
 <div class="content-card mb-4">
-    <h5 class="mb-3">Filters & Search</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Filters & Search</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal">
+            <i class="fas fa-calendar-alt me-1"></i> Date range
+        </button>
+    </div>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             {% include 'dashboards/admin/forms/user-filter.html' with filter_type="business" %}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <label for="subscriptionFilter" class="form-label">Subscription Status</label>
             <select id="subscriptionFilter" class="form-select">
                 <option value="">All Subscriptions</option>
@@ -53,7 +58,7 @@
                 <option value="suspended">Suspended</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <label for="industryFilter" class="form-label">Industry</label>
             <select id="industryFilter" class="form-select">
                 <option value="">All Industries</option>
@@ -65,9 +70,6 @@
                 <option value="technology">Technology</option>
             </select>
         </div>
-        <div class="col-md-3">
-            {% include 'dashboards/admin/forms/date-range.html' with label="Registration Date" %}
-        </div>
     </div>
     <div class="row mt-3">
         <div class="col-12">
@@ -75,6 +77,8 @@
         </div>
     </div>
 </div>
+
+{% include 'dashboards/admin/modals/date-range.html' %}
 
 <!-- Business List Table -->
 <div class="content-card">
@@ -92,8 +96,6 @@
             </div>
         </div>
     </div>
-    
-    {% include 'dashboards/admin/components/data-table.html' with table_id="businessesTable" %}
     
     <div class="table-responsive">
         <table id="businessesTable" class="table table-hover align-middle">
