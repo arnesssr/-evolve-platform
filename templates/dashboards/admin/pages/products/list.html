@@ -15,52 +15,20 @@
     <button class="btn btn-outline-primary" onclick="exportProducts()">
         <i class="fas fa-download me-2"></i>Export
     </button>
-    <a href="{% url 'platform_admin:products-form' %}" class="btn btn-primary">
+    <a href="{% url 'platform_admin:products-list' %}" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>Add Product
     </a>
+    <button type="button" class="btn btn-success" onclick="showQuickCreateModal('product')">
+        <i class="fas fa-bolt me-2"></i>Quick Create
+    </button>
 </div>
 {% endblock %}
 
 {% block content %}
 {% include 'dashboards/admin/components/catalog-tabs.html' with active='catalog-products' %}
 <!-- Summary Cards -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="metric-card">
-            <div class="metric-value">{{ total_products|default:"847" }}</div>
-            <div class="metric-label">Total Products</div>
-            <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +12 this month
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="metric-card">
-            <div class="metric-value">{{ active_products|default:"742" }}</div>
-            <div class="metric-label">Active Products</div>
-            <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +8 this week
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="metric-card">
-            <div class="metric-value">{{ total_categories|default:"28" }}</div>
-            <div class="metric-label">Categories</div>
-            <div class="metric-change neutral">
-                <i class="fas fa-minus"></i> No change
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="metric-card">
-            <div class="metric-value">${{ avg_commission|default:"45.50" }}</div>
-            <div class="metric-label">Avg Commission</div>
-            <div class="metric-change positive">
-                <i class="fas fa-arrow-up"></i> +2.3%
-            </div>
-        </div>
-    </div>
+<div class="content-card mb-4">
+  <small class="text-muted">No KPI data available.</small>
 </div>
 
 <!-- Filters and Search -->
@@ -95,9 +63,6 @@
             <label for="vendorFilter" class="form-label">Vendor</label>
             <select class="form-select" id="vendorFilter">
                 <option value="">All Vendors</option>
-                <option value="vendor1">TechCorp Solutions</option>
-                <option value="vendor2">Digital Marketing Pro</option>
-                <option value="vendor3">Creative Studio</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -138,183 +103,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
-                        <input type="checkbox" class="form-check-input row-select">
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{% static 'images/products/crm-pro.png' %}" alt="CRM Pro" 
-                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
-                            <div>
-                                <div class="fw-semibold">CRM Pro Suite</div>
-                                <small class="text-muted">Customer relationship management</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="badge bg-primary">Software</span></td>
-                    <td>TechCorp Solutions</td>
-                    <td class="fw-semibold text-success">$85.00</td>
-                    <td>1,247</td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>Dec 15, 2023</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                    data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=1">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="viewProduct(1)">
-                                    <i class="fas fa-eye me-2"></i>View Details
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="toggleProductStatus(1, 'suspend')">
-                                    <i class="fas fa-pause me-2"></i>Suspend
-                                </a></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(1)">
-                                    <i class="fas fa-trash me-2"></i>Delete
-                                </a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <input type="checkbox" class="form-check-input row-select">
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{% static 'images/products/email-marketing.png' %}" alt="Email Marketing Tool" 
-                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
-                            <div>
-                                <div class="fw-semibold">Email Marketing Master</div>
-                                <small class="text-muted">Advanced email automation</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="badge bg-info">Marketing</span></td>
-                    <td>Digital Marketing Pro</td>
-                    <td class="fw-semibold text-success">$65.00</td>
-                    <td>892</td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>Dec 12, 2023</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                    data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=2">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="viewProduct(2)">
-                                    <i class="fas fa-eye me-2"></i>View Details
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="toggleProductStatus(2, 'suspend')">
-                                    <i class="fas fa-pause me-2"></i>Suspend
-                                </a></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(2)">
-                                    <i class="fas fa-trash me-2"></i>Delete
-                                </a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <input type="checkbox" class="form-check-input row-select">
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{% static 'images/products/design-suite.png' %}" alt="Design Suite" 
-                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
-                            <div>
-                                <div class="fw-semibold">Creative Design Suite</div>
-                                <small class="text-muted">Professional design tools</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="badge bg-warning">Design</span></td>
-                    <td>Creative Studio</td>
-                    <td class="fw-semibold text-success">$120.00</td>
-                    <td>456</td>
-                    <td><span class="status-badge pending">Pending Review</span></td>
-                    <td>Dec 10, 2023</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                    data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=3">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="viewProduct(3)">
-                                    <i class="fas fa-eye me-2"></i>View Details
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-success" href="#" onclick="toggleProductStatus(3, 'approve')">
-                                    <i class="fas fa-check me-2"></i>Approve
-                                </a></li>
-                                <li><a class="dropdown-item text-warning" href="#" onclick="toggleProductStatus(3, 'reject')">
-                                    <i class="fas fa-times me-2"></i>Reject
-                                </a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <input type="checkbox" class="form-check-input row-select">
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <img src="{% static 'images/products/accounting.png' %}" alt="Accounting Software" 
-                                 class="product-thumbnail me-3" style="width: 40px; height: 40px; border-radius: 8px;">
-                            <div>
-                                <div class="fw-semibold">Business Accounting Pro</div>
-                                <small class="text-muted">Complete accounting solution</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td><span class="badge bg-success">Business Tools</span></td>
-                    <td>FinTech Solutions</td>
-                    <td class="fw-semibold text-success">$95.00</td>
-                    <td>678</td>
-                    <td><span class="status-badge suspended">Suspended</span></td>
-                    <td>Dec 8, 2023</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
-                                    data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'platform_admin:products-form' %}?id=4">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="viewProduct(4)">
-                                    <i class="fas fa-eye me-2"></i>View Details
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-success" href="#" onclick="toggleProductStatus(4, 'activate')">
-                                    <i class="fas fa-play me-2"></i>Activate
-                                </a></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteProduct(4)">
-                                    <i class="fas fa-trash me-2"></i>Delete
-                                </a></li>
-                            </ul>
-                        </div>
-                    </td>
+                    <td colspan="9" class="text-center text-muted">No data available</td>
                 </tr>
             </tbody>
         </table>
@@ -323,7 +112,7 @@
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-3">
         <div class="text-muted">
-            Showing 1-4 of 847 products
+            No products to display.
         </div>
         <nav>
             <ul class="pagination pagination-sm mb-0">
@@ -374,6 +163,7 @@
 
 <!-- Product Details Modal -->
 {% include 'dashboards/admin/modals/product-details.html' %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_product=True show_promo=True %}
 {% endblock %}
 
 {% block extra_js %}

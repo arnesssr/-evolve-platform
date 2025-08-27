@@ -35,8 +35,11 @@
                 <i class="fas fa-envelope me-2"></i>Send Message
             </a></li>
         </ul>
-    </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editResellerModal">
+</div>
+    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('commission')">
+        <i class="fas fa-plus me-2"></i>New Commission
+    </button>
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editResellerModal">
         <i class="fas fa-edit me-2"></i>Edit Reseller
     </button>
 </div>
@@ -295,6 +298,7 @@
 {% include 'dashboards/admin/modals/process-payout.html' %}
 {% include 'dashboards/admin/modals/suspend-user.html' %}
 {% include 'dashboards/admin/modals/date-range.html' %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_commission=True %}
 {% endblock %}
 
 {% block extra_css %}
@@ -377,6 +381,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const qcEl = document.getElementById('quickCreateModal');
+  if (qcEl) {
+    qcEl.addEventListener('shown.bs.modal', function() {
+      const selected = document.querySelector('#quickCreateModal input[name="createType"]:checked');
+      if (selected && selected.value === 'commission') {
+        const resellerSel = document.querySelector('#quickCreateModal select[name="reseller_id"]');
+        if (resellerSel) {
+          const rid = "{{ reseller.id }}";
+          const rname = "{{ reseller.name|escapejs }}";
+          if (rid) {
+            let opt = Array.from(resellerSel.options).find(o => o.value === rid);
+            if (!opt) {
+              opt = new Option(rname, rid, true, true);
+              resellerSel.add(opt);
+            } else {
+              resellerSel.value = rid;
+            }
+          }
+        }
+      }
+    });
+  }
 });
 </script>
 {% endblock %}

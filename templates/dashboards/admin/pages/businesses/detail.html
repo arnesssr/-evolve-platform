@@ -33,6 +33,9 @@
             </a></li>
         </ul>
     </div>
+    <button type="button" class="btn btn-outline-primary" onclick="showQuickCreateModal('user')">
+        <i class="fas fa-user-plus me-2"></i>New User
+    </button>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editBusinessModal">
         <i class="fas fa-edit me-2"></i>Edit Business
     </button>
@@ -294,6 +297,7 @@
 {% include 'dashboards/admin/modals/suspend-user.html' %}
 {% include 'dashboards/admin/modals/process-payout.html' %}
 {% include 'dashboards/admin/modals/user-details.html' %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
 
 <!-- Custom Modals for Business -->
 <div class="modal fade" id="editBusinessModal" tabindex="-1">
@@ -438,6 +442,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const qcEl = document.getElementById('quickCreateModal');
+  if (qcEl) {
+    qcEl.addEventListener('shown.bs.modal', function() {
+      const selected = document.querySelector('#quickCreateModal input[name="createType"]:checked');
+      if (selected && selected.value === 'user') {
+        const userTypeSel = document.querySelector('#quickCreateModal select[name="user_type"]');
+        if (userTypeSel) { userTypeSel.value = 'business'; }
+        const companyInput = document.querySelector('#quickCreateModal input[name="company"]');
+        if (companyInput) { companyInput.value = "{{ business.company_name|default_if_none:'' }}"; }
+      }
+    });
+  }
 });
 </script>
 {% endblock %}

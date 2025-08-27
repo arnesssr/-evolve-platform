@@ -13,7 +13,7 @@
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    {% include 'dashboards/admin/forms/date-range.html' with label="Date Range" compact=True %}
+    <!-- Keep action buttons; move date-range to compact filter bar below -->
     <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#customAnalyticsModal">
         <i class="fas fa-cog me-2"></i>Custom Analytics
     </button>
@@ -26,19 +26,28 @@
 
 {% block extra_css %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* Compact vertical rhythm for the analytics page */
+  .analytics-page .content-card { padding: 1rem; margin-bottom: 0.75rem; }
+  .analytics-page .row.mb-4 { margin-bottom: 0.75rem !important; }
+  .analytics-page .row.mb-3 { margin-bottom: 0.5rem !important; }
+  .analytics-page .content-card h5 { margin-bottom: 0.75rem !important; }
+  .analytics-page .table { margin-bottom: 0; }
+  .analytics-page .chart-container { height: auto; }
+</style>
 {% endblock %}
 
 {% block content %}
+<div class="analytics-page">
+{% include 'dashboards/admin/components/filter-bar.html' with show_search=False offcanvas_id=None show_date_range=True %}
+
 <!-- Key Performance Indicators -->
-<div class="row mb-4">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Revenue" value="$1,284,750" icon="fa-dollar-sign" color="success" change="+18.5%" trend="up" subtitle="All time total" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Active Businesses" value="156" icon="fa-building" color="primary" change="+12" trend="up" subtitle="Currently active" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Active Resellers" value="89" icon="fa-user-tie" color="info" change="+8" trend="up" subtitle="Currently active" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Avg. Monthly Growth" value="14.2%" icon="fa-trending-up" color="warning" change="+2.1%" trend="up" subtitle="Platform growth" %}
+<div class="content-card">
+  <small class="text-muted">No KPI data available.</small>
 </div>
 
 <!-- Revenue & Growth Charts -->
-<div class="row mb-4">
+<div class="row mb-3">
     <!-- Revenue Trends -->
     <div class="col-lg-8">
         <div class="content-card">
@@ -51,7 +60,9 @@
                     <button type="button" class="btn btn-outline-primary" data-period="1month">1M</button>
                 </div>
             </div>
-            <canvas id="revenueGrowthChart" height="100"></canvas>
+            <div class="chart-container" style="height: 320px;">
+                <canvas id="revenueGrowthChart"></canvas>
+            </div>
         </div>
     </div>
     
@@ -61,39 +72,19 @@
             <h5 class="mb-4">Business Acquisition</h5>
             <canvas id="businessGrowthChart" height="200"></canvas>
             
-            <div class="mt-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                        <span class="text-muted">This Month</span>
-                    </div>
-                    <span class="fw-bold">+12</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                        <span class="text-muted">Last Month</span>
-                    </div>
-                    <span class="fw-bold">+8</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                        <span class="text-muted">Avg. Monthly</span>
-                    </div>
-                    <span class="fw-bold">+9.5</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-info rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                        <span class="text-muted">Growth Rate</span>
-                    </div>
-                    <span class="fw-bold">+8.3%</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
+
+<!-- Show more analytics toggle -->
+<div class="d-flex justify-content-center my-2">
+  <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#analyticsMore" aria-expanded="false" aria-controls="analyticsMore" id="analyticsMoreToggle">
+    Show more analytics
+  </button>
+</div>
+
+<!-- Collapsible extra analytics -->
+<div id="analyticsMore" class="collapse">
 
 <!-- Business & Plan Analytics -->
 <div class="row mb-4">
@@ -103,38 +94,6 @@
             <h5 class="mb-4">Plan Distribution</h5>
             <canvas id="planDistributionChart" height="200"></canvas>
             
-            <div class="mt-4">
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <div class="text-center">
-                            <div class="fw-bold fs-4 text-success">47</div>
-                            <div class="text-muted">Enterprise</div>
-                            <div class="small text-success">30.1%</div>
-                        </div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="text-center">
-                            <div class="fw-bold fs-4 text-primary">68</div>
-                            <div class="text-muted">Professional</div>
-                            <div class="small text-primary">43.6%</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <div class="fw-bold fs-4 text-info">41</div>
-                            <div class="text-muted">Basic</div>
-                            <div class="small text-info">26.3%</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <div class="fw-bold fs-4 text-secondary">Total</div>
-                            <div class="text-muted">156</div>
-                            <div class="small text-muted">100%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     
@@ -142,89 +101,13 @@
     <div class="col-lg-6">
         <div class="content-card">
             <h5 class="mb-4">Industry Breakdown</h5>
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-laptop-code text-primary me-2"></i>
-                        <span>Technology</span>
-                    </div>
-                    <span class="fw-bold">42</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-primary" style="width: 27%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-hospital text-success me-2"></i>
-                        <span>Healthcare</span>
-                    </div>
-                    <span class="fw-bold">28</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-success" style="width: 18%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-store text-warning me-2"></i>
-                        <span>Retail</span>
-                    </div>
-                    <span class="fw-bold">25</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-warning" style="width: 16%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-industry text-info me-2"></i>
-                        <span>Manufacturing</span>
-                    </div>
-                    <span class="fw-bold">19</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-info" style="width: 12%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-graduation-cap text-secondary me-2"></i>
-                        <span>Education</span>
-                    </div>
-                    <span class="fw-bold">15</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-secondary" style="width: 10%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-0">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-ellipsis-h text-muted me-2"></i>
-                        <span>Others</span>
-                    </div>
-                    <span class="fw-bold">27</span>
-                </div>
-                <div class="progress" style="height: 8px;">
-                    <div class="progress-bar bg-muted" style="width: 17%"></div>
-                </div>
-            </div>
+            <p class="text-muted mb-0">No industry data available.</p>
         </div>
     </div>
 </div>
 
 <!-- Reseller & Commission Analytics -->
-<div class="row mb-4">
+<div class="row mb-3">
     <!-- Reseller Performance -->
     <div class="col-lg-8">
         <div class="content-card">
@@ -246,70 +129,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user text-white"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">John Marketing</div>
-                                        <small class="text-muted">Premium Partner</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="fw-bold">23</td>
-                            <td class="text-success fw-bold">$89,450</td>
-                            <td class="text-primary fw-bold">$13,418</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" style="width: 95%"></div>
-                                </div>
-                                <small class="text-muted">95% target</small>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user text-white"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">Sarah Sales</div>
-                                        <small class="text-muted">Gold Partner</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="fw-bold">18</td>
-                            <td class="text-success fw-bold">$67,200</td>
-                            <td class="text-primary fw-bold">$10,080</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" style="width: 87%"></div>
-                                </div>
-                                <small class="text-muted">87% target</small>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user text-white"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">Mike Partners</div>
-                                        <small class="text-muted">Silver Partner</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="fw-bold">14</td>
-                            <td class="text-success fw-bold">$52,300</td>
-                            <td class="text-primary fw-bold">$7,845</td>
-                            <td>
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-warning" style="width: 72%"></div>
-                                </div>
-                                <small class="text-muted">72% target</small>
-                            </td>
+                            <td colspan="5" class="text-center text-muted">No data available</td>
                         </tr>
                     </tbody>
                 </table>
@@ -323,28 +143,12 @@
             <h5 class="mb-4">Commission Overview</h5>
             <canvas id="commissionChart" height="200"></canvas>
             
-            <div class="mt-4">
-                <div class="row text-center">
-                    <div class="col-6 mb-3">
-                        <div class="fw-bold fs-4 text-success">$84,750</div>
-                        <div class="text-muted small">Total Paid</div>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <div class="fw-bold fs-4 text-warning">$12,450</div>
-                        <div class="text-muted small">Pending</div>
-                    </div>
-                    <div class="col-12">
-                        <div class="fw-bold fs-4 text-primary">$97,200</div>
-                        <div class="text-muted small">Total Earned</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <!-- User Activity & Engagement -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
         <div class="content-card">
             <h5 class="mb-4">User Activity & Engagement</h5>
@@ -354,33 +158,8 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="row">
-                        <div class="col-md-6 col-lg-12 mb-3">
-                            <div class="text-center border rounded p-3">
-                                <div class="fw-bold fs-3 text-primary">2,847</div>
-                                <div class="text-muted">Daily Active Users</div>
-                                <div class="small text-success">+12.5% vs yesterday</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-12 mb-3">
-                            <div class="text-center border rounded p-3">
-                                <div class="fw-bold fs-3 text-info">18,492</div>
-                                <div class="text-muted">Monthly Active</div>
-                                <div class="small text-success">+8.3% vs last month</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-12 mb-3">
-                            <div class="text-center border rounded p-3">
-                                <div class="fw-bold fs-3 text-success">4.2</div>
-                                <div class="text-muted">Avg. Session Time</div>
-                                <div class="small text-muted">Hours per session</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-12">
-                            <div class="text-center border rounded p-3">
-                                <div class="fw-bold fs-3 text-warning">92.3%</div>
-                                <div class="text-muted">User Retention</div>
-                                <div class="small text-success">+1.2% improvement</div>
-                            </div>
+                        <div class="col-12">
+                            <p class="text-muted mb-0">No user metrics data available.</p>
                         </div>
                     </div>
                 </div>
@@ -390,76 +169,13 @@
 </div>
 
 <!-- Geographic & Device Analytics -->
-<div class="row">
+<div class="row mb-2">
     <!-- Geographic Distribution -->
     <div class="col-lg-6">
         <div class="content-card">
             <h5 class="mb-4">Geographic Distribution</h5>
             
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-flag-usa text-primary me-2"></i>
-                        <span>United States</span>
-                    </div>
-                    <span class="fw-bold">45.2%</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-primary" style="width: 45%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-globe text-success me-2"></i>
-                        <span>Canada</span>
-                    </div>
-                    <span class="fw-bold">18.7%</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-success" style="width: 19%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-globe text-warning me-2"></i>
-                        <span>United Kingdom</span>
-                    </div>
-                    <span class="fw-bold">12.4%</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-warning" style="width: 12%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-globe text-info me-2"></i>
-                        <span>Australia</span>
-                    </div>
-                    <span class="fw-bold">8.9%</span>
-                </div>
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar bg-info" style="width: 9%"></div>
-                </div>
-            </div>
-            
-            <div class="mb-0">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-globe text-secondary me-2"></i>
-                        <span>Others</span>
-                    </div>
-                    <span class="fw-bold">14.8%</span>
-                </div>
-                <div class="progress" style="height: 8px;">
-                    <div class="progress-bar bg-secondary" style="width: 15%"></div>
-                </div>
-            </div>
+            <p class="text-muted mb-0">No geographic data available.</p>
         </div>
     </div>
     
@@ -468,79 +184,17 @@
         <div class="content-card">
             <h5 class="mb-4">Device & Browser Usage</h5>
             
-            <div class="row mb-4">
-                <div class="col-6">
-                    <h6 class="text-muted">Device Type</h6>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fas fa-desktop text-primary me-1"></i> Desktop</span>
-                            <span class="fw-bold">62.3%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 62%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fas fa-mobile-alt text-success me-1"></i> Mobile</span>
-                            <span class="fw-bold">28.9%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 29%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fas fa-tablet-alt text-warning me-1"></i> Tablet</span>
-                            <span class="fw-bold">8.8%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-warning" style="width: 9%"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-6">
-                    <h6 class="text-muted">Browser</h6>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fab fa-chrome text-warning me-1"></i> Chrome</span>
-                            <span class="fw-bold">58.4%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-warning" style="width: 58%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fab fa-firefox text-danger me-1"></i> Firefox</span>
-                            <span class="fw-bold">23.1%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-danger" style="width: 23%"></div>
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <div class="d-flex justify-content-between">
-                            <span><i class="fab fa-safari text-info me-1"></i> Safari</span>
-                            <span class="fw-bold">18.5%</span>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-info" style="width: 18%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center">
-                <canvas id="deviceBrowserChart" height="120"></canvas>
-            </div>
+            <p class="text-muted mb-0">No device/browser data available.</p>
         </div>
     </div>
 </div>
 
+</div>
+
 <!-- Modals -->
 {% include 'dashboards/admin/modals/generate-report.html' with report_type="analytics" %}
+{% include 'dashboards/admin/modals/date-range.html' %}
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -548,6 +202,25 @@
 $(document).ready(function() {
     // Initialize charts
     initializeAnalyticsCharts();
+    // Initialize 'More analytics' collapse toggle and persist state
+    const more = document.getElementById('analyticsMore');
+    const toggleBtn = document.getElementById('analyticsMoreToggle');
+    if (more && toggleBtn) {
+        const instance = new bootstrap.Collapse(more, { toggle: false });
+        const saved = localStorage.getItem('analyticsMoreOpen') === 'true';
+        if (saved) {
+            instance.show();
+            toggleBtn.textContent = 'Hide extra analytics';
+        }
+        more.addEventListener('shown.bs.collapse', function() {
+            toggleBtn.textContent = 'Hide extra analytics';
+            localStorage.setItem('analyticsMoreOpen', 'true');
+        });
+        more.addEventListener('hidden.bs.collapse', function() {
+            toggleBtn.textContent = 'Show more analytics';
+            localStorage.setItem('analyticsMoreOpen', 'false');
+        });
+    }
 });
 
 function initializeAnalyticsCharts() {
@@ -556,17 +229,17 @@ function initializeAnalyticsCharts() {
     new Chart(revenueCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: [],
             datasets: [{
                 label: 'Revenue',
-                data: [45000, 52000, 48000, 61000, 67000, 73000, 78000, 84000, 91000, 98000, 105000, 112000],
+                data: [],
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 tension: 0.4,
                 fill: true
             }, {
                 label: 'Growth Rate',
-                data: [0, 15.6, -7.7, 27.1, 9.8, 9.0, 6.8, 7.7, 8.3, 7.7, 7.1, 6.7],
+                data: [],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
@@ -607,9 +280,9 @@ function initializeAnalyticsCharts() {
     new Chart(planCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Enterprise', 'Professional', 'Basic'],
+            labels: [],
             datasets: [{
-                data: [47, 68, 41],
+                data: [],
                 backgroundColor: ['#10b981', '#3b82f6', '#06b6d4']
             }]
         },
@@ -622,12 +295,12 @@ function initializeAnalyticsCharts() {
     // User Activity Chart
     const activityCtx = document.getElementById('userActivityChart').getContext('2d');
     new Chart(activityCtx, {
-        type: 'area',
+        type: 'line',
         data: {
-            labels: Array.from({length: 24}, (_, i) => i + ':00'),
+            labels: [],
             datasets: [{
                 label: 'Active Users',
-                data: [120, 89, 67, 45, 32, 28, 35, 67, 125, 189, 234, 278, 312, 298, 267, 234, 201, 178, 156, 143, 134, 128, 125, 118],
+                data: [],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,

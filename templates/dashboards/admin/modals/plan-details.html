@@ -1,0 +1,86 @@
+<!-- Plan Details Modal -->
+<div class="modal fade" id="planDetailsModal" tabindex="-1" aria-labelledby="planDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="planDetailsModalLabel">
+          <i class="fas fa-file-invoice-dollar me-2"></i>Plan Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label class="form-label">Plan Name</label>
+              <input type="text" class="form-control" id="pl_name" value="Professional Plan" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" id="pl_description" rows="3" readonly>Best for growing businesses</textarea>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Billing Interval</label>
+                <input type="text" class="form-control" id="pl_interval" value="Monthly" readonly>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Status</label>
+                <div>
+                  <span class="badge bg-success" id="pl_status">Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 text-center h-100 d-flex flex-column justify-content-center">
+              <div class="text-muted small">Price</div>
+              <div class="fw-bold fs-4 text-success" id="pl_price">$49.00</div>
+              <div class="text-muted" id="pl_currency">USD</div>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+              <div class="text-muted small">Subscribers</div>
+              <div class="fw-bold" id="pl_subscribers">1,247</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+              <div class="text-muted small">Monthly Revenue</div>
+              <div class="fw-bold text-success" id="pl_revenue">$61,103</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100">
+              <div class="text-muted small">Created</div>
+              <div class="fw-bold" id="pl_created">Dec 1, 2023</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h6 class="mb-2">Included Features</h6>
+          <ul class="list-unstyled mb-0" id="pl_features">
+            <li><i class="fas fa-check text-success me-2"></i>Up to 50 products</li>
+            <li><i class="fas fa-check text-success me-2"></i>Advanced analytics</li>
+            <li><i class="fas fa-check text-success me-2"></i>Priority support</li>
+            <li><i class="fas fa-check text-success me-2"></i>Custom branding</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="{% url 'platform_admin:plans-form' %}" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i>Edit Plan
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+

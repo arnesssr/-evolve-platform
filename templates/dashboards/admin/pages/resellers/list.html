@@ -19,8 +19,8 @@
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
     </button>
-    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('user')">
-        <i class="fas fa-plus me-2"></i>Add Reseller
+    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('commission')">
+        <i class="fas fa-plus me-2"></i>New Commission
     </button>
 </div>
 {% endblock %}
@@ -38,38 +38,40 @@
     {% include 'dashboards/admin/components/metric-card.html' with title="Top Performer" value=metrics.top_performer icon="fa-trophy" color="warning" %}
 </div>
 
-<!-- Compact Search & Filters Toolbar -->
-<div class="content-card mb-3">
-    <form id="resellerToolbar" method="get" class="row g-2 align-items-center">
-        <div class="col-12 col-lg-5">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search text-muted"></i></span>
-                <input type="search" class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search resellers (name, email, company)…">
-            </div>
-        </div>
-        <div class="col-6 col-lg-2">
-            <select class="form-select" name="status">
-                <option value="">Status: All</option>
-                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
-                <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>Suspended</option>
-                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
-            </select>
-        </div>
-        <div class="col-6 col-lg-2">
-            <select class="form-select" name="commission_tier">
-                <option value="">Tier: All</option>
-                <option value="premium" {% if request.GET.commission_tier == 'premium' %}selected{% endif %}>Premium</option>
-                <option value="standard" {% if request.GET.commission_tier == 'standard' %}selected{% endif %}>Standard</option>
-                <option value="basic" {% if request.GET.commission_tier == 'basic' %}selected{% endif %}>Basic</option>
-            </select>
-        </div>
-        <div class="col-12 col-lg-3 d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#dateRangeModal" title="Filter by date range">
-                <i class="fas fa-calendar-alt me-2"></i>Date Range
-            </button>
-            <button type="submit" class="btn btn-primary d-none" id="toolbarSubmit">Apply</button>
-        </div>
+{% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search resellers (name, email, company)…' offcanvas_id='resellerFilters' show_date_range=True %}
+
+<!-- Offcanvas: Reseller Filters -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="resellerFilters" aria-labelledby="resellerFiltersLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="resellerFiltersLabel">Filters</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form method="get" class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label small fw-medium" for="resellerStatus">Status</label>
+        <select class="form-select form-select-sm" id="resellerStatus" name="status">
+          <option value="" {% if not request.GET.status %}selected{% endif %}>All</option>
+          <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+          <option value="suspended" {% if request.GET.status == 'suspended' %}selected{% endif %}>Suspended</option>
+          <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-medium" for="resellerTier">Commission Tier</label>
+        <select class="form-select form-select-sm" id="resellerTier" name="commission_tier">
+          <option value="" {% if not request.GET.commission_tier %}selected{% endif %}>All</option>
+          <option value="premium" {% if request.GET.commission_tier == 'premium' %}selected{% endif %}>Premium</option>
+          <option value="standard" {% if request.GET.commission_tier == 'standard' %}selected{% endif %}>Standard</option>
+          <option value="basic" {% if request.GET.commission_tier == 'basic' %}selected{% endif %}>Basic</option>
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <a href="{{ request.path }}" class="btn btn-light w-50">Clear</a>
+        <button type="submit" class="btn btn-primary w-50">Apply</button>
+      </div>
     </form>
+  </div>
 </div>
 
 <!-- Resellers Table -->
@@ -164,7 +166,7 @@
 </div>
 
 {% include 'dashboards/admin/modals/bulk-action.html' with entity_type="resellers" %}
-{% include 'dashboards/admin/modals/quick-create.html' with create_type="reseller" %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_commission=True %}
 {% include 'dashboards/admin/modals/date-range.html' %}
 {% endblock %}
 
@@ -187,16 +189,21 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     });
 
-    // Auto-submit toolbar on change
-    const form = document.getElementById('resellerToolbar');
-    if (form) {
-        form.addEventListener('change', function(e) {
-            if (e.target && (e.target.matches('select') || e.target.matches('input[type="search"]'))) {
-                form.requestSubmit();
-            }
-        });
-        // Submit on Enter in search field (default), debounce on typing if needed
-    }
+    // Search: initialize from ?q= and wire live search
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q');
+        const searchInput = document.querySelector('[data-search]');
+        if (q) {
+            table.search(q).draw();
+            if (searchInput) searchInput.value = q;
+        }
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                table.search(this.value).draw();
+            });
+        }
+    })();
 });
 </script>
 {% endblock %}

@@ -2,7 +2,16 @@
 {% block title %}System Status{% endblock %}
 {% block page_title %}System Status{% endblock %}
 {% block breadcrumb_items %}<li class="breadcrumb-item"><a href="{% url 'platform_admin:dashboard' %}">Dashboard</a></li><li class="breadcrumb-item active">System</li>{% endblock %}
+{% block page_actions %}
+<div class="d-flex gap-2">
+  <button type="button" class="btn btn-success" onclick="showQuickCreateModal('announcement')">
+    <i class="fas fa-bullhorn me-2"></i>New Announcement
+  </button>
+</div>
+{% endblock %}
+
 {% block content %}
 {% include 'dashboards/admin/components/system-tabs.html' with active='system-status' %}
 <div class="content-card"><p>Status placeholder. Show health checks here.</p></div>
+{% include 'dashboards/admin/modals/quick-create.html' with show_announcement=True %}
 {% endblock %}

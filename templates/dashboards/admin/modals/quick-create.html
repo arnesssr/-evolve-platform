@@ -13,10 +13,11 @@
                 <!-- Creation Type Selection -->
                 <div class="creation-type mb-4">
                     <label class="form-label fw-bold">What would you like to create?</label>
-                    <div class="row g-3">
+                    <div class="row g-3" id="quickCreateOptions">
+                        {% if show_user %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
-                                <input class="form-check-input" type="radio" name="createType" id="createUser" value="user" checked onchange="updateCreateForm()">
+                                <input class="form-check-input" type="radio" name="createType" id="createUser" value="user" onchange="updateCreateForm()">
                                 <label class="form-check-label" for="createUser">
                                     <i class="fas fa-user text-primary me-2"></i>
                                     <strong>User Account</strong><br>
@@ -24,6 +25,8 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if show_product %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
                                 <input class="form-check-input" type="radio" name="createType" id="createProduct" value="product" onchange="updateCreateForm()">
@@ -34,6 +37,8 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if show_plan %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
                                 <input class="form-check-input" type="radio" name="createType" id="createPlan" value="plan" onchange="updateCreateForm()">
@@ -44,6 +49,8 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if show_commission %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
                                 <input class="form-check-input" type="radio" name="createType" id="createCommission" value="commission" onchange="updateCreateForm()">
@@ -54,6 +61,8 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if show_promo %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
                                 <input class="form-check-input" type="radio" name="createType" id="createPromo" value="promo" onchange="updateCreateForm()">
@@ -64,6 +73,8 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
+                        {% if show_announcement %}
                         <div class="col-md-4">
                             <div class="form-check creation-option">
                                 <input class="form-check-input" type="radio" name="createType" id="createAnnouncement" value="announcement" onchange="updateCreateForm()">
@@ -74,7 +85,13 @@
                                 </label>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
+                    {% if not show_user and not show_product and not show_plan and not show_commission and not show_promo and not show_announcement %}
+                    <div class="alert alert-light border mt-2 mb-0" role="alert" id="noQuickCreateActions">
+                        No quick create actions available on this page.
+                    </div>
+                    {% endif %}
                 </div>
                 
                 <!-- Dynamic Form Container -->
@@ -143,31 +160,58 @@
 </style>
 
 <script>
-let currentCreateType = 'user';
+let currentCreateType = null;
 
-function showQuickCreateModal(defaultType = 'user') {
-    currentCreateType = defaultType;
-    
-    // Set the default selection
-    document.getElementById('create' + defaultType.charAt(0).toUpperCase() + defaultType.slice(1)).checked = true;
-    
-    // Update the form
+function getAvailableTypes() {
+    return Array.from(document.querySelectorAll('#quickCreateModal input[name="createType"]')).map(r => r.value);
+}
+
+function showQuickCreateModal(defaultType = null) {
+    const modalEl = document.getElementById('quickCreateModal');
+    const modal = new bootstrap.Modal(modalEl);
+
+    const types = getAvailableTypes();
+    if (types.length === 0) {
+        // No actions available -> show modal with disabled buttons and a notice
+        document.getElementById('createFormContainer').innerHTML = '<div class="alert alert-light border">No quick create actions are available on this page.</div>';
+        document.getElementById('createBtn').disabled = true;
+        document.getElementById('draftBtn').disabled = true;
+        modal.show();
+        return;
+    }
+
+    let targetType = defaultType && types.includes(defaultType) ? defaultType : types[0];
+    const radio = document.getElementById('create' + targetType.charAt(0).toUpperCase() + targetType.slice(1));
+    if (radio) {
+        radio.checked = true;
+    }
+    currentCreateType = targetType;
+
     updateCreateForm();
-    
-    const modal = new bootstrap.Modal(document.getElementById('quickCreateModal'));
     modal.show();
 }
 
 function updateCreateForm() {
-    const selectedType = document.querySelector('input[name="createType"]:checked').value;
-    currentCreateType = selectedType;
-    
+    const checked = document.querySelector('#quickCreateModal input[name="createType"]:checked');
     const container = document.getElementById('createFormContainer');
     const createBtn = document.getElementById('createBtn');
-    
-    // Update create button text
-    createBtn.innerHTML = `<i class="fas fa-plus me-1"></i>Create ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}`;
-    
+    const draftBtn = document.getElementById('draftBtn');
+
+    if (!checked) {
+        container.innerHTML = '<div class="alert alert-light border">No quick create actions are available on this page.</div>';
+        createBtn.disabled = true;
+        draftBtn.disabled = true;
+        return;
+    }
+
+    const selectedType = checked.value;
+    currentCreateType = selectedType;
+
+    // Update create button text and enable buttons
+    createBtn.disabled = false;
+    draftBtn.disabled = false;
+    createBtn.innerHTML = `<i class=\"fas fa-plus me-1\"></i>Create ${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}`;
+
     // Generate form based on type
     switch (selectedType) {
         case 'user':
@@ -214,9 +258,9 @@ function getUserForm() {
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">User Type *</label>
-                    <select class="form-select" name="user_type" required>
+<select class="form-select" name="user_type" required>
                         <option value="business">Business User</option>
-                        <option value="reseller" selected>Reseller</option>
+                        <option value="reseller">Reseller</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
@@ -231,13 +275,13 @@ function getUserForm() {
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="send_welcome_email" checked>
+<input class="form-check-input" type="checkbox" name="send_welcome_email">
                         <label class="form-check-label">Send welcome email</label>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="account_active" checked>
+<input class="form-check-input" type="checkbox" name="account_active">
                         <label class="form-check-label">Account active</label>
                     </div>
                 </div>
@@ -278,7 +322,7 @@ function getProductForm() {
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Commission Rate (%)</label>
-                    <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100" value="15">
+<input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100">
                 </div>
             </div>
         </div>
@@ -287,7 +331,7 @@ function getProductForm() {
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="active" checked>
+<input class="form-check-input" type="checkbox" name="active">
                         <label class="form-check-label">Product active</label>
                     </div>
                 </div>
@@ -394,7 +438,7 @@ function getCommissionForm() {
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Commission Rate (%)</label>
-                    <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100" value="15">
+<input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Commission Amount ($)</label>
@@ -468,9 +512,9 @@ function getAnnouncementForm() {
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Priority</label>
-                    <select class="form-select" name="priority">
+<select class="form-select" name="priority">
                         <option value="low">Low</option>
-                        <option value="normal" selected>Normal</option>
+                        <option value="normal">Normal</option>
                         <option value="high">High</option>
                         <option value="urgent">Urgent</option>
                     </select>
@@ -490,9 +534,9 @@ function getAnnouncementForm() {
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Display Duration</label>
-                    <select class="form-select" name="display_duration">
+<select class="form-select" name="display_duration">
                         <option value="1">1 Day</option>
-                        <option value="7" selected>1 Week</option>
+                        <option value="7">1 Week</option>
                         <option value="30">1 Month</option>
                         <option value="0">Until manually removed</option>
                     </select>
@@ -505,7 +549,7 @@ function getAnnouncementForm() {
                 </div>
                 <div class="col-md-6">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="show_popup" checked>
+<input class="form-check-input" type="checkbox" name="show_popup">
                         <label class="form-check-label">Show as popup</label>
                     </div>
                 </div>
@@ -621,6 +665,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize form on load
 document.addEventListener('DOMContentLoaded', function() {
+    // If no selection, pick the first available option
+    const checked = document.querySelector('#quickCreateModal input[name="createType"]:checked');
+    if (!checked) {
+        const first = document.querySelector('#quickCreateModal input[name="createType"]');
+        if (first) first.checked = true;
+    }
     updateCreateForm();
 });
 </script>

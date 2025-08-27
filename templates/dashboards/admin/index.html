@@ -8,6 +8,14 @@
 <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
 {% endblock %}
 
+{% block page_actions %}
+<div class="d-flex gap-2">
+  <button type="button" class="btn btn-success" onclick="showQuickCreateModal('user')">
+    <i class="fas fa-bolt me-2"></i>Quick Create
+  </button>
+</div>
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .stats-card {
@@ -40,11 +48,9 @@
         <div class="stats-card primary">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stats-value">{{ total_users|default:1247 }}</div>
+<div class="stats-value">{{ total_users|default:0 }}</div>
                     <div class="stats-label">Total Users</div>
-                    <div class="stats-change positive">
-                        <i class="fas fa-arrow-up"></i> +12.5% from last month
-                    </div>
+                    <div class="stats-change text-muted">No trend data</div>
                 </div>
                 <i class="fas fa-users fa-2x text-primary opacity-25"></i>
             </div>
@@ -54,11 +60,9 @@
         <div class="stats-card success">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stats-value">${{ total_revenue|default:52341 }}</div>
+<div class="stats-value">${{ total_revenue|default:0 }}</div>
                     <div class="stats-label">Total Revenue</div>
-                    <div class="stats-change positive">
-                        <i class="fas fa-arrow-up"></i> +8.2% from last month
-                    </div>
+                    <div class="stats-change text-muted">No trend data</div>
                 </div>
                 <i class="fas fa-dollar-sign fa-2x text-success opacity-25"></i>
             </div>
@@ -68,11 +72,9 @@
         <div class="stats-card warning">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stats-value">${{ pending_requests|default:8432 }}</div>
+<div class="stats-value">${{ pending_requests|default:0 }}</div>
                     <div class="stats-label">Pending Payouts</div>
-                    <div class="stats-change negative">
-                        <i class="fas fa-arrow-down"></i> -2.1% from last month
-                    </div>
+                    <div class="stats-change text-muted">No trend data</div>
                 </div>
                 <i class="fas fa-clock fa-2x text-warning opacity-25"></i>
             </div>
@@ -82,11 +84,9 @@
         <div class="stats-card secondary">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stats-value">{{ active_users|default:342 }}</div>
+<div class="stats-value">{{ active_users|default:0 }}</div>
                     <div class="stats-label">Active Resellers</div>
-                    <div class="stats-change positive">
-                        <i class="fas fa-arrow-up"></i> +15.3% from last month
-                    </div>
+                    <div class="stats-change text-muted">No trend data</div>
                 </div>
                 <i class="fas fa-handshake fa-2x text-secondary opacity-25"></i>
             </div>
@@ -138,6 +138,7 @@
         </div>
     </div>
 </div>
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True show_product=True show_announcement=True %}
 {% endblock %}
 
 {% block extra_js %}
@@ -150,10 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(revenueCtx, {
         type: 'line',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: [],
             datasets: [{
                 label: 'Revenue ($)',
-                data: [12000, 15000, 13000, 18000, 22000, 25000, 28000, 32000, 29000, 35000, 38000, 42000],
+                data: [],
                 borderColor: '#3e92cc',
                 backgroundColor: 'rgba(62, 146, 204, 0.1)',
                 tension: 0.4,
@@ -180,15 +181,15 @@ document.addEventListener('DOMContentLoaded', function() {
     new Chart(userGrowthCtx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{ label: 'New Users', data: [45, 62, 58, 71, 89, 95], backgroundColor: '#10b981', borderRadius: 5 }, { label: 'Active Users', data: [180, 195, 210, 235, 250, 275], backgroundColor: '#3e92cc', borderRadius: 5 }]
+            labels: [],
+            datasets: [{ label: 'New Users', data: [], backgroundColor: '#10b981', borderRadius: 5 }, { label: 'Active Users', data: [], backgroundColor: '#3e92cc', borderRadius: 5 }]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
 
     // Commission Distribution Chart
     const commissionCtx = document.getElementById('commissionChart').getContext('2d');
-    new Chart(commissionCtx, { type: 'doughnut', data: { labels: ['Tier 1 (5%)', 'Tier 2 (10%)', 'Tier 3 (15%)', 'Tier 4 (20%)'], datasets: [{ data: [35, 30, 25, 10], backgroundColor: ['#3e92cc', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+    new Chart(commissionCtx, { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#3e92cc', '#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
 });
 </script>
 {% endblock %}

@@ -180,7 +180,9 @@
         .content-card .row > [class^="col-"], .content-card .row > [class*=" col-"],
         .dataTables_wrapper .row > [class^="col-"], .dataTables_wrapper .row > [class*=" col-"] { min-width: 0; }
         .content-card { overflow-x: hidden; }
-        img, svg, video, canvas { max-width: 100%; height: auto; display: block; }
+        /* Media sizing: avoid overriding canvas height to prevent Chart.js reflow loops */
+        img, svg, video { max-width: 100%; height: auto; display: block; }
+        canvas { display: block; max-width: 100%; }
         .table { width: 100%; }
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .page-tabs .nav-tabs { flex-wrap: wrap; }
@@ -226,6 +228,38 @@
             z-index: 1055;
         }
         
+        /* Global search input styling */
+        input[data-search],
+        input[type="search"],
+        input[id^="search"],
+        .search-input {
+            border-radius: 9999px;
+            padding-left: 2.25rem; /* space for icon */
+            height: 2.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            background-size: 16px;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        input[data-search]:focus,
+        input[type="search"]:focus,
+        input[id^="search"]:focus,
+        .search-input:focus {
+            outline: 0;
+            border-color: #3e92cc;
+            box-shadow: 0 0 0 4px rgba(62, 146, 204, 0.10);
+        }
+        /* Reduce height for small controls if present */
+        .form-control-sm.search-input,
+        input.form-control-sm[data-search] {
+            height: 2.125rem;
+            padding-left: 2rem;
+            background-position: 10px center;
+        }
+
         /* Print Styles */
         @media print {
             .admin-sidebar,

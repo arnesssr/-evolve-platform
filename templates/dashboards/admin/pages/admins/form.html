@@ -19,6 +19,9 @@
     <button type="submit" form="adminForm" class="btn btn-primary">
         <i class="fas fa-save me-2"></i>{% if admin.id %}Update{% else %}Create{% endif %} Administrator
     </button>
+    <button type="button" class="btn btn-success" onclick="showQuickCreateModal('user')">
+        <i class="fas fa-bolt me-2"></i>Quick Create User
+    </button>
 </div>
 {% endblock %}
 
@@ -216,6 +219,7 @@
         </div>
     </div>
 </div>
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
 {% endblock %}
 
 {% block extra_js %}

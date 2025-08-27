@@ -1,0 +1,35 @@
+{% load app_extras %}
+<!-- Compact Filter Bar Component -->
+{% comment %} Usage: {% include 'dashboards/admin/components/filter-bar.html' with search_name='q' search_placeholder='Search businesses...' offcanvas_id='businessFilters' show_date_range=True %} {% endcomment %}
+<div class="filter-bar d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+  {% if show_search %}
+  <form method="get" class="d-flex align-items-center gap-2 flex-grow-1">
+    <div class="input-group input-group-sm" style="max-width: 520px;">
+      <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
+      <input type="search" class="form-control" data-search name="{{ search_name|default:'search' }}" placeholder="{{ search_placeholder|default:'Search...' }}" value="{{ request.GET|default_if_none:''|lookup:search_name }}" aria-label="Search" autocomplete="off" />
+      <button class="btn btn-primary" type="submit">Search</button>
+    </div>
+  </form>
+  {% endif %}
+  <div class="d-flex align-items-center gap-2">
+    {% if offcanvas_id %}
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#{{ offcanvas_id }}">
+      <i class="fas fa-sliders-h me-1"></i> Filters
+    </button>
+    {% endif %}
+    {% if show_date_range|default:True %}
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal">
+      <i class="fas fa-calendar-alt me-1"></i> Date range
+    </button>
+    {% endif %}
+    <a href="{{ request.path }}" class="btn btn-sm btn-light" title="Clear all"><i class="fas fa-undo"></i></a>
+  </div>
+</div>
+
+<style>
+.filter-bar .input-group .form-control{ min-width: 220px; }
+@media (max-width: 576px) {
+  .filter-bar{ gap: .5rem; }
+  .filter-bar .input-group{ max-width: 100%; width: 100%; }
+}
+</style>

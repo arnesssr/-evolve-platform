@@ -22,6 +22,9 @@
     <button type="submit" form="planForm" class="btn btn-primary">
         <i class="fas fa-check me-2"></i>{% if plan.id %}Update{% else %}Create{% endif %} Plan
     </button>
+    <button type="button" class="btn btn-success" onclick="showQuickCreateModal('plan')">
+        <i class="fas fa-bolt me-2"></i>Quick Create
+    </button>
 </div>
 {% endblock %}
 
@@ -403,6 +406,7 @@
         </div>
     </div>
 </form>
+{% include 'dashboards/admin/modals/quick-create.html' with show_plan=True %}
 {% endblock %}
 
 {% block extra_css %}

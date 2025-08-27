@@ -40,14 +40,8 @@
 
 {% block content %}
 <!-- Key Metrics Row -->
-<div class="row">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Users" value="2,847" icon="fa-users" color="primary" change="+12.5%" trend="up" subtitle="Active platform users" %}
-    
-    {% include 'dashboards/admin/components/metric-card.html' with title="Monthly Revenue" value="$48,329" icon="fa-dollar-sign" color="success" change="+8.2%" trend="up" subtitle="This month's earnings" %}
-    
-    {% include 'dashboards/admin/components/metric-card.html' with title="Active Subscriptions" value="1,234" icon="fa-credit-card" color="info" change="+5.1%" trend="up" subtitle="Current subscribers" %}
-    
-    {% include 'dashboards/admin/components/metric-card.html' with title="Pending Commissions" value="$12,450" icon="fa-hand-holding-usd" color="warning" change="-2.3%" trend="down" subtitle="Awaiting payout" %}
+<div class="content-card mb-4">
+    <small class="text-muted">No KPI data available.</small>
 </div>
 
 <!-- Quick Stats Row -->
@@ -86,56 +80,8 @@
             </div>
             
             <div class="list-group list-group-flush">
-                <!-- Sample recent users - replace with dynamic content -->
                 <div class="list-group-item border-0 px-0">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <span class="text-white fw-bold">JD</span>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">John Doe</h6>
-                            <small class="text-muted">Business Customer • 2 hours ago</small>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <span class="badge bg-success">Active</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-group-item border-0 px-0">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <span class="text-white fw-bold">SM</span>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Sarah Miller</h6>
-                            <small class="text-muted">Reseller • 5 hours ago</small>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <span class="badge bg-warning">Pending</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="list-group-item border-0 px-0">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                <span class="text-white fw-bold">MJ</span>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">Mike Johnson</h6>
-                            <small class="text-muted">Business Customer • 1 day ago</small>
-                        </div>
-                        <div class="flex-shrink-0">
-                            <span class="badge bg-success">Active</span>
-                        </div>
-                    </div>
+                    <p class="text-muted mb-0">No recent users to display.</p>
                 </div>
             </div>
         </div>

@@ -16,6 +16,9 @@
     <button type="button" class="btn btn-primary" href="{% url 'platform_admin:admins-list' %}" data-bs-toggle="modal" data-bs-target="#addAdminModal">
         <i class="fas fa-plus me-2"></i>Add Admin
     </button>
+    <button type="button" class="btn btn-success" onclick="showQuickCreateModal('user')">
+        <i class="fas fa-bolt me-2"></i>Quick Create User
+    </button>
 </div>
 {% endblock %}
 
@@ -141,6 +144,8 @@
         </table>
     </div>
 </div>
+
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
 
 <!-- Add Admin Modal -->
 <div class="modal fade" id="addAdminModal" tabindex="-1">

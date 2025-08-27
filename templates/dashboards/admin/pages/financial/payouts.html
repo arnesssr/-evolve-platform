@@ -69,11 +69,8 @@
 
 {% block content %}
 <!-- Payout Summary -->
-<div class="row mb-4">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Payouts" value="$156,430" icon="fa-money-bill-wave" color="success" change="+18.5%" trend="up" subtitle="All time total" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Pending Payouts" value="$24,850" icon="fa-clock" color="warning" change="+7" trend="up" subtitle="Awaiting processing" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="This Month" value="$18,750" icon="fa-calendar" color="primary" change="+22.1%" trend="up" subtitle="Current month" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Failed Payouts" value="$2,450" icon="fa-exclamation-triangle" color="danger" change="-5%" trend="down" subtitle="Need attention" %}
+<div class="content-card">
+  <small class="text-muted">No KPI data available.</small>
 </div>
 
 <!-- Payout Status Overview -->
@@ -81,48 +78,7 @@
     <div class="col-lg-8">
         <div class="content-card">
             <h5 class="mb-4">Payout Status Distribution</h5>
-            <div class="row">
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-warning">18</div>
-                        <div class="text-muted">Pending</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-warning" style="width: 45%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$24,850</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-info">12</div>
-                        <div class="text-muted">Processing</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-info" style="width: 30%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$18,200</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-success">89</div>
-                        <div class="text-muted">Completed</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-success" style="width: 95%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$113,380</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-danger">3</div>
-                        <div class="text-muted">Failed</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-danger" style="width: 10%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$2,450</div>
-                    </div>
-                </div>
-            </div>
+            <p class="text-muted mb-0">No payout status data available.</p>
         </div>
     </div>
     
@@ -147,55 +103,48 @@
     </div>
 </div>
 
-<!-- Filters -->
-<div class="content-card mb-4">
-    <h5 class="mb-3">Filters</h5>
-    <div class="row">
-        <div class="col-md-2">
-            <label for="statusFilter" class="form-label">Status</label>
-            <select id="statusFilter" class="form-select">
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="resellerFilter" class="form-label">Reseller</label>
-            <select id="resellerFilter" class="form-select">
-                <option value="">All Resellers</option>
-                <option value="1">John Marketing</option>
-                <option value="2">Sarah Sales</option>
-                <option value="3">Mike Partners</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="methodFilter" class="form-label">Payment Method</label>
-            <select id="methodFilter" class="form-select">
-                <option value="">All Methods</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="paypal">PayPal</option>
-                <option value="stripe">Stripe</option>
-                <option value="crypto">Crypto</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Date Range</label>
-            <div class="input-group">
-                <input type="date" class="form-control" id="startDate">
-                <input type="date" class="form-control" id="endDate">
-            </div>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-                <button type="button" class="btn btn-outline-primary" onclick="applyFilters()">
-                    <i class="fas fa-filter me-2"></i>Apply Filters
-                </button>
-            </div>
-        </div>
-    </div>
+{% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search payouts…' offcanvas_id='payoutFilters' show_date_range=True %}
+
+<!-- Offcanvas: Payout Filters -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="payoutFilters" aria-labelledby="payoutFiltersLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="payoutFiltersLabel">Filters</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form method="get" class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label small fw-medium" for="payoutStatus">Status</label>
+        <select id="payoutStatus" class="form-select form-select-sm" name="status">
+          <option value="" {% if not request.GET.status %}selected{% endif %}>All</option>
+          <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="processing" {% if request.GET.status == 'processing' %}selected{% endif %}>Processing</option>
+          <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+          <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-medium" for="payoutReseller">Reseller</label>
+        <select id="payoutReseller" class="form-select form-select-sm" name="reseller">
+          <option value="" {% if not request.GET.reseller %}selected{% endif %}>All Resellers</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-medium" for="payoutMethod">Payment Method</label>
+        <select id="payoutMethod" class="form-select form-select-sm" name="method">
+          <option value="" {% if not request.GET.method %}selected{% endif %}>All</option>
+          <option value="bank_transfer" {% if request.GET.method == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+          <option value="paypal" {% if request.GET.method == 'paypal' %}selected{% endif %}>PayPal</option>
+          <option value="stripe" {% if request.GET.method == 'stripe' %}selected{% endif %}>Stripe</option>
+          <option value="crypto" {% if request.GET.method == 'crypto' %}selected{% endif %}>Crypto</option>
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <a href="{{ request.path }}" class="btn btn-light w-50">Clear</a>
+        <button type="submit" class="btn btn-primary w-50">Apply</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Payout Table -->
@@ -232,132 +181,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Sample data -->
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="1">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">John Marketing</div>
-                                <small class="text-muted">john@marketing.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fab fa-paypal text-primary me-2"></i>
-                            <span>PayPal</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$3,450.00</div>
-                        <small class="text-muted">From 15 commissions</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-warning">Pending</span>
-                    </td>
-                    <td>
-                        <div>Mar 15, 2024</div>
-                        <small class="text-muted">10:30 AM</small>
-                    </td>
-                    <td>
-                        <span class="text-muted">-</span>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="process,view,edit,delete" %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="2">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">Sarah Sales</div>
-                                <small class="text-muted">sarah@sales.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-university text-info me-2"></i>
-                            <span>Bank Transfer</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$2,180.00</div>
-                        <small class="text-muted">From 8 commissions</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-success">Completed</span>
-                    </td>
-                    <td>
-                        <div>Mar 10, 2024</div>
-                        <small class="text-muted">2:15 PM</small>
-                    </td>
-                    <td>
-                        <div>Mar 12, 2024</div>
-                        <small class="text-muted">11:45 AM</small>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,resend" %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="3">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">Mike Partners</div>
-                                <small class="text-muted">mike@partners.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-credit-card text-warning me-2"></i>
-                            <span>Stripe</span>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$1,850.00</div>
-                        <small class="text-muted">From 12 commissions</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-danger">Failed</span>
-                    </td>
-                    <td>
-                        <div>Mar 8, 2024</div>
-                        <small class="text-muted">4:20 PM</small>
-                    </td>
-                    <td>
-                        <span class="text-danger">Failed</span>
-                        <small class="text-muted d-block">Invalid account</small>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="retry,view,edit" %}
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -376,7 +199,7 @@
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('#payoutsTable').DataTable({
+    const table = $('#payoutsTable').DataTable({
         responsive: true,
         pageLength: 25,
         order: [[5, 'desc']], // Sort by requested date
@@ -384,6 +207,22 @@ $(document).ready(function() {
             { orderable: false, targets: [0, 7] } // Disable ordering for checkbox and actions
         ]
     });
+
+    // Search: initialize from ?q= and wire live search
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q');
+        const searchInput = document.querySelector('[data-search]');
+        if (q) {
+            table.search(q).draw();
+            if (searchInput) searchInput.value = q;
+        }
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                table.search(this.value).draw();
+            });
+        }
+    })();
     
     // Handle select all functionality
     $('#selectAll').change(function() {
@@ -391,10 +230,5 @@ $(document).ready(function() {
         $('input[type="checkbox"]').prop('checked', isChecked);
     });
 });
-
-function applyFilters() {
-    // Implementation for filter functionality
-    console.log('Applying filters...');
-}
 </script>
 {% endblock %}

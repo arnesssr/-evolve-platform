@@ -16,8 +16,8 @@
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
     </button>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickCreateModal">
-        <i class="fas fa-plus me-2"></i>Add Business
+    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('user')">
+        <i class="fas fa-plus me-2"></i>New User
     </button>
 </div>
 {% endblock %}
@@ -29,53 +29,49 @@
 
 {% block content %}
 <!-- Business Statistics -->
-<div class="row mb-4">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Businesses" value="1,847" icon="fa-building" color="primary" change="+8.2%" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Active Subscriptions" value="1,234" icon="fa-credit-card" color="success" change="+5.1%" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Pending Approvals" value="23" icon="fa-clock" color="warning" change="+2" trend="up" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Monthly Revenue" value="$42,890" icon="fa-dollar-sign" color="info" change="+12.3%" trend="up" %}
+<div class="content-card mb-4">
+    <small class="text-muted">No KPI data available.</small>
 </div>
 
-<!-- Filters Section -->
-<div class="content-card mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0">Filters & Search</h5>
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#dateRangeModal">
-            <i class="fas fa-calendar-alt me-1"></i> Date range
-        </button>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            {% include 'dashboards/admin/forms/user-filter.html' with filter_type="business" %}
-        </div>
-        <div class="col-md-4">
-            <label for="subscriptionFilter" class="form-label">Subscription Status</label>
-            <select id="subscriptionFilter" class="form-select">
-                <option value="">All Subscriptions</option>
-                <option value="active">Active</option>
-                <option value="expired">Expired</option>
-                <option value="trial">Trial</option>
-                <option value="suspended">Suspended</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label for="industryFilter" class="form-label">Industry</label>
-            <select id="industryFilter" class="form-select">
-                <option value="">All Industries</option>
-                <option value="manufacturing">Manufacturing</option>
-                <option value="retail">Retail</option>
-                <option value="services">Services</option>
-                <option value="healthcare">Healthcare</option>
-                <option value="education">Education</option>
-                <option value="technology">Technology</option>
-            </select>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col-12">
-            {% include 'dashboards/admin/components/search-filter.html' with placeholder="Search businesses by name, email, or company..." %}
-        </div>
-    </div>
+<!-- Compact Filters & Search (minimal footprint) -->
+{% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search businesses by name, email, or company...' offcanvas_id='businessFilters' show_date_range=True %}
+
+<!-- Offcanvas: Business Filters -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="businessFilters" aria-labelledby="businessFiltersLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="businessFiltersLabel">Filters</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form id="businessFiltersForm" method="get" class="d-flex flex-column gap-3">
+      <div>
+        <label for="subscriptionFilter" class="form-label small fw-medium">Subscription Status</label>
+        <select id="subscriptionFilter" class="form-select form-select-sm" name="subscription">
+          <option value="" {% if not request.GET.subscription %}selected{% endif %}>All Subscriptions</option>
+          <option value="active" {% if request.GET.subscription == 'active' %}selected{% endif %}>Active</option>
+          <option value="expired" {% if request.GET.subscription == 'expired' %}selected{% endif %}>Expired</option>
+          <option value="trial" {% if request.GET.subscription == 'trial' %}selected{% endif %}>Trial</option>
+          <option value="suspended" {% if request.GET.subscription == 'suspended' %}selected{% endif %}>Suspended</option>
+        </select>
+      </div>
+      <div>
+        <label for="industryFilter" class="form-label small fw-medium">Industry</label>
+        <select id="industryFilter" class="form-select form-select-sm" name="industry">
+          <option value="" {% if not request.GET.industry %}selected{% endif %}>All Industries</option>
+          <option value="manufacturing" {% if request.GET.industry == 'manufacturing' %}selected{% endif %}>Manufacturing</option>
+          <option value="retail" {% if request.GET.industry == 'retail' %}selected{% endif %}>Retail</option>
+          <option value="services" {% if request.GET.industry == 'services' %}selected{% endif %}>Services</option>
+          <option value="healthcare" {% if request.GET.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
+          <option value="education" {% if request.GET.industry == 'education' %}selected{% endif %}>Education</option>
+          <option value="technology" {% if request.GET.industry == 'technology' %}selected{% endif %}>Technology</option>
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <a href="{{ request.path }}" class="btn btn-light w-50">Clear</a>
+        <button type="submit" class="btn btn-primary w-50">Apply</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% include 'dashboards/admin/modals/date-range.html' %}
@@ -117,153 +113,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Sample data - replace with dynamic content -->
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="1">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-building text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">TechCorp Solutions</h6>
-                                <small class="text-muted">techcorp@example.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">John Smith</div>
-                            <small class="text-muted">CEO</small>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark">Technology</span>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">Enterprise Plan</div>
-                            <small class="text-success">Active until Dec 2024</small>
-                        </div>
-                    </td>
-                    <td class="fw-bold text-success">$2,450/mo</td>
-                    <td>
-                        {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active" %}
-                    </td>
-                    <td>
-                        <div>
-                            <div>Jan 15, 2024</div>
-                            <small class="text-muted">8 months ago</small>
-                        </div>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,suspend,delete" entity_type="business" entity_id="1" %}
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="2">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-store text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">Retail Masters Ltd</h6>
-                                <small class="text-muted">contact@retailmasters.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">Sarah Johnson</div>
-                            <small class="text-muted">Operations Manager</small>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark">Retail</span>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">Professional Plan</div>
-                            <small class="text-warning">Expires in 5 days</small>
-                        </div>
-                    </td>
-                    <td class="fw-bold text-success">$1,200/mo</td>
-                    <td>
-                        {% include 'dashboards/admin/components/status-badge.html' with status="warning" text="Expiring Soon" %}
-                    </td>
-                    <td>
-                        <div>
-                            <div>Mar 8, 2024</div>
-                            <small class="text-muted">5 months ago</small>
-                        </div>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,edit,renew,suspend" entity_type="business" entity_id="2" %}
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="3">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0">
-                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-hospital text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6 class="mb-0">HealthCare Plus</h6>
-                                <small class="text-muted">admin@healthcareplus.com</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">Dr. Michael Brown</div>
-                            <small class="text-muted">Director</small>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark">Healthcare</span>
-                    </td>
-                    <td>
-                        <div>
-                            <div class="fw-medium">Basic Plan</div>
-                            <small class="text-danger">Expired</small>
-                        </div>
-                    </td>
-                    <td class="fw-bold text-muted">$0/mo</td>
-                    <td>
-                        {% include 'dashboards/admin/components/status-badge.html' with status="danger" text="Expired" %}
-                    </td>
-                    <td>
-                        <div>
-                            <div>Dec 1, 2023</div>
-                            <small class="text-muted">8 months ago</small>
-                        </div>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,contact,reactivate" entity_type="business" entity_id="3" %}
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -276,7 +125,7 @@
 
 <!-- Include Modals -->
 {% include 'dashboards/admin/modals/bulk-action.html' with entity_type="businesses" %}
-{% include 'dashboards/admin/modals/quick-create.html' with create_type="business" %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
 {% include 'dashboards/admin/modals/user-details.html' %}
 {% endblock %}
 
@@ -333,12 +182,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Search functionality
-    const searchInput = document.querySelector('[data-search]');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', function() {
-            table.search(this.value).draw();
-        });
-    }
+    // Apply initial search from ?q= if present and wire up live search
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const q = urlParams.get('q');
+        const searchInput = document.querySelector('[data-search]');
+        if (q) {
+            table.search(q).draw();
+            if (searchInput) searchInput.value = q;
+        }
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                table.search(this.value).draw();
+            });
+        }
+    })();
 
     function applyFilters() {
         // Custom filter logic would go here

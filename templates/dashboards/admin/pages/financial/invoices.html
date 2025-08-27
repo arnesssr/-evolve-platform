@@ -69,11 +69,8 @@
 
 {% block content %}
 <!-- Invoice Summary -->
-<div class="row mb-4">
-    {% include 'dashboards/admin/components/metric-card.html' with title="Total Invoiced" value="$456,780" icon="fa-file-invoice-dollar" color="success" change="+14.2%" trend="up" subtitle="All time total" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Outstanding" value="$32,450" icon="fa-clock" color="warning" change="+3" trend="up" subtitle="Pending payment" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="This Month" value="$48,920" icon="fa-calendar" color="primary" change="+18.7%" trend="up" subtitle="Current month" %}
-    {% include 'dashboards/admin/components/metric-card.html' with title="Overdue" value="$8,230" icon="fa-exclamation-triangle" color="danger" change="+2" trend="up" subtitle="Need attention" %}
+<div class="content-card">
+  <small class="text-muted">No KPI data available.</small>
 </div>
 
 <!-- Invoice Status Overview -->
@@ -81,48 +78,7 @@
     <div class="col-lg-8">
         <div class="content-card">
             <h5 class="mb-4">Invoice Status Distribution</h5>
-            <div class="row">
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-success">142</div>
-                        <div class="text-muted">Paid</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-success" style="width: 85%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$415,100</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-warning">23</div>
-                        <div class="text-muted">Pending</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-warning" style="width: 45%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$32,450</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-danger">7</div>
-                        <div class="text-muted">Overdue</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-danger" style="width: 15%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$8,230</div>
-                    </div>
-                </div>
-                <div class="col-md-3 text-center mb-3">
-                    <div class="border rounded p-3">
-                        <div class="fw-bold fs-3 text-secondary">4</div>
-                        <div class="text-muted">Draft</div>
-                        <div class="progress mt-2" style="height: 4px;">
-                            <div class="progress-bar bg-secondary" style="width: 8%"></div>
-                        </div>
-                        <div class="text-muted small mt-1">$1,000</div>
-                    </div>
-                </div>
-            </div>
+            <p class="text-muted mb-0">No invoice status data available.</p>
         </div>
     </div>
     
@@ -147,56 +103,49 @@
     </div>
 </div>
 
-<!-- Filters -->
-<div class="content-card mb-4">
-    <h5 class="mb-3">Filters</h5>
-    <div class="row">
-        <div class="col-md-2">
-            <label for="statusFilter" class="form-label">Status</label>
-            <select id="statusFilter" class="form-select">
-                <option value="">All Status</option>
-                <option value="paid">Paid</option>
-                <option value="pending">Pending</option>
-                <option value="overdue">Overdue</option>
-                <option value="draft">Draft</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="businessFilter" class="form-label">Business</label>
-            <select id="businessFilter" class="form-select">
-                <option value="">All Businesses</option>
-                <option value="1">TechCorp Solutions</option>
-                <option value="2">HealthCare Plus</option>
-                <option value="3">Retail Masters</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label for="amountFilter" class="form-label">Amount Range</label>
-            <select id="amountFilter" class="form-select">
-                <option value="">All Amounts</option>
-                <option value="0-500">$0 - $500</option>
-                <option value="500-1000">$500 - $1000</option>
-                <option value="1000-5000">$1000 - $5000</option>
-                <option value="5000+">$5000+</option>
-            </select>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">Date Range</label>
-            <div class="input-group">
-                <input type="date" class="form-control" id="startDate">
-                <input type="date" class="form-control" id="endDate">
-            </div>
-        </div>
-        <div class="col-md-3">
-            <label class="form-label">&nbsp;</label>
-            <div class="d-grid">
-                <button type="button" class="btn btn-outline-primary" onclick="applyFilters()">
-                    <i class="fas fa-filter me-2"></i>Apply Filters
-                </button>
-            </div>
-        </div>
-    </div>
+{% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search invoices…' offcanvas_id='invoiceFilters' show_date_range=True %}
+
+<!-- Offcanvas: Invoice Filters -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="invoiceFilters" aria-labelledby="invoiceFiltersLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="invoiceFiltersLabel">Filters</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form method="get" class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label small fw-medium" for="invStatus">Status</label>
+        <select id="invStatus" class="form-select form-select-sm" name="status">
+          <option value="" {% if not request.GET.status %}selected{% endif %}>All</option>
+          <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
+          <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>Overdue</option>
+          <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>Draft</option>
+          <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-medium" for="invBusiness">Business</label>
+        <select id="invBusiness" class="form-select form-select-sm" name="business">
+          <option value="" {% if not request.GET.business %}selected{% endif %}>All Businesses</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label small fw-medium" for="invAmount">Amount Range</label>
+        <select id="invAmount" class="form-select form-select-sm" name="amount">
+          <option value="" {% if not request.GET.amount %}selected{% endif %}>All</option>
+          <option value="0-500" {% if request.GET.amount == '0-500' %}selected{% endif %}>$0 - $500</option>
+          <option value="500-1000" {% if request.GET.amount == '500-1000' %}selected{% endif %}>$500 - $1000</option>
+          <option value="1000-5000" {% if request.GET.amount == '1000-5000' %}selected{% endif %}>$1000 - $5000</option>
+          <option value="5000+" {% if request.GET.amount == '5000+' %}selected{% endif %}>$5000+</option>
+        </select>
+      </div>
+      <div class="d-flex gap-2 mt-2">
+        <a href="{{ request.path }}" class="btn btn-light w-50">Clear</a>
+        <button type="submit" class="btn btn-primary w-50">Apply</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Invoice Table -->
@@ -233,165 +182,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Sample data -->
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="1">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-primary">#INV-2024-001</div>
-                        <small class="text-muted">Enterprise Plan</small>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-primary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-building text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">TechCorp Solutions</div>
-                                <small class="text-muted">Enterprise</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$2,450.00</div>
-                        <small class="text-muted">Monthly</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-success">Paid</span>
-                    </td>
-                    <td>
-                        <div>Mar 1, 2024</div>
-                        <small class="text-muted">9:00 AM</small>
-                    </td>
-                    <td>
-                        <div>Mar 31, 2024</div>
-                        <small class="text-muted">11:59 PM</small>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,download,resend,edit" %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="2">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-primary">#INV-2024-002</div>
-                        <small class="text-muted">Professional Plan</small>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-info rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-hospital text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">HealthCare Plus</div>
-                                <small class="text-muted">Professional</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$1,850.00</div>
-                        <small class="text-muted">Monthly</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-warning">Pending</span>
-                    </td>
-                    <td>
-                        <div>Mar 15, 2024</div>
-                        <small class="text-muted">2:30 PM</small>
-                    </td>
-                    <td>
-                        <div class="text-warning">Apr 14, 2024</div>
-                        <small class="text-muted">11:59 PM</small>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,download,remind,edit" %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="3">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-primary">#INV-2024-003</div>
-                        <small class="text-muted">Basic Plan</small>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-warning rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-store text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">Retail Masters Ltd</div>
-                                <small class="text-muted">Basic</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-success">$850.00</div>
-                        <small class="text-muted">Monthly</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-danger">Overdue</span>
-                    </td>
-                    <td>
-                        <div>Feb 15, 2024</div>
-                        <small class="text-muted">10:15 AM</small>
-                    </td>
-                    <td>
-                        <div class="text-danger">Mar 16, 2024</div>
-                        <small class="text-muted">11:59 PM</small>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="view,download,remind,suspend" %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="4">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-secondary">#INV-2024-004</div>
-                        <small class="text-muted">Enterprise Plan - Draft</small>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                <i class="fas fa-industry text-white"></i>
-                            </div>
-                            <div>
-                                <div class="fw-medium">Manufacturing Co</div>
-                                <small class="text-muted">Enterprise</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-muted">$2,450.00</div>
-                        <small class="text-muted">Monthly</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-secondary">Draft</span>
-                    </td>
-                    <td>
-                        <span class="text-muted">-</span>
-                    </td>
-                    <td>
-                        <span class="text-muted">-</span>
-                    </td>
-                    <td>
-                        {% include 'dashboards/admin/components/action-dropdown.html' with actions="finalize,edit,delete" %}
-                    </td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -410,7 +200,7 @@
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script>
 $(document).ready(function() {
-    $('#invoicesTable').DataTable({
+    const table = $('#invoicesTable').DataTable({
         responsive: true,
         pageLength: 25,
         order: [[5, 'desc']], // Sort by issue date
@@ -418,6 +208,22 @@ $(document).ready(function() {
             { orderable: false, targets: [0, 7] } // Disable ordering for checkbox and actions
         ]
     });
+
+    // Search: initialize from ?q= and wire live search
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q');
+        const searchInput = document.querySelector('[data-search]');
+        if (q) {
+            table.search(q).draw();
+            if (searchInput) searchInput.value = q;
+        }
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                table.search(this.value).draw();
+            });
+        }
+    })();
     
     // Handle select all functionality
     $('#selectAll').change(function() {
@@ -425,10 +231,5 @@ $(document).ready(function() {
         $('input[type="checkbox"]').prop('checked', isChecked);
     });
 });
-
-function applyFilters() {
-    // Implementation for filter functionality
-    console.log('Applying filters...');
-}
 </script>
 {% endblock %}
