@@ -3,20 +3,18 @@
 <div class="user-filter-form">
     <form id="userFilterForm" class="search-filter-form" method="GET">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-light">
+            <div class="card-header bg-light py-2">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-semibold">
-                        <i class="fas fa-filter text-primary me-2"></i>
+                    <h6 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                        <i class="fas fa-filter text-primary"></i>
                         Filter Users
                     </h6>
-                    <div class="filter-actions">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
-                            <i class="fas fa-times me-1"></i>
-                            Clear
+                    <div class="d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-sm btn-light" title="Advanced filters" onclick="toggleAdvancedFilters()">
+                            <i class="fas fa-sliders-h"></i>
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleAdvancedFilters()">
-                            <i class="fas fa-cog me-1"></i>
-                            Advanced
+                        <button type="button" class="btn btn-sm btn-light" title="Clear all" onclick="clearFilters()">
+                            <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
@@ -61,14 +59,6 @@
                         </select>
                     </div>
                     
-                    <!-- Apply Button -->
-                    <div class="col-md-2">
-                        <label class="form-label small fw-medium invisible">Apply</label>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-search me-1"></i>
-                            Apply
-                        </button>
-                    </div>
                 </div>
                 
                 <!-- Advanced Filters (Initially Hidden) -->
@@ -205,13 +195,19 @@
                 </div>
             </div>
             
-            <!-- Quick Filter Badges -->
-            <div class="card-footer bg-light" id="activeFilters">
-                <div class="d-flex flex-wrap gap-2 align-items-center">
-                    <small class="text-muted me-2">Active Filters:</small>
-                    <div class="filter-badges" id="filterBadges">
-                        <!-- Filter badges will be populated here -->
-                    </div>
+            <!-- Footer: actions + active filters -->
+            <div class="card-footer bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex flex-wrap gap-2 align-items-center" id="activeFilters">
+                    <small class="text-muted">Active Filters:</small>
+                    <div class="filter-badges ms-2" id="filterBadges"><span class="text-muted small">No active filters</span></div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearFilters()">
+                        <i class="fas fa-undo me-1"></i> Clear
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-check me-1"></i> Apply Filters
+                    </button>
                 </div>
             </div>
         </div>
@@ -286,14 +282,7 @@
     border-color: #d1d5db;
 }
 
-#activeFilters {
-    display: none;
-}
-
-#activeFilters.has-filters {
-    display: block;
-}
-</style>
+/* active filters shown inline now; no hard hide */
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
