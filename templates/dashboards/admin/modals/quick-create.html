@@ -317,12 +317,16 @@ function getProductForm() {
                     </select>
                 </div>
                 <div class="col-md-4">
+                    <label class="form-label">Vendor *</label>
+                    <input type="text" class="form-control" name="vendor" placeholder="Vendor name" required>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label">Price ($) *</label>
                     <input type="number" class="form-control" name="price" step="0.01" min="0" required>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Commission Rate (%)</label>
-<input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100">
+                    <input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100">
                 </div>
             </div>
         </div>
@@ -411,42 +415,51 @@ function getPlanForm() {
 
 function getCommissionForm() {
     return `
-        <div class="form-section">
+        <div class=\"form-section\">
             <h6>Commission Details</h6>
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Reseller *</label>
-                    <select class="form-select" name="reseller_id" required>
-                        <option value="">Select Reseller</option>
-                        <option value="1">John Doe</option>
-                        <option value="2">Jane Smith</option>
-                        <option value="3">Bob Johnson</option>
-                    </select>
+            <div class=\"row g-3\">
+                <div class=\"col-md-6\">
+                    <div class=\"form-check form-switch\">
+                        <input class=\"form-check-input\" type=\"checkbox\" name=\"apply_all\" id=\"applyAllCommissions\">
+                        <label class=\"form-check-label\" for=\"applyAllCommissions\">Apply to all resellers</label>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Product/Service *</label>
-                    <select class="form-select" name="product_id" required>
-                        <option value="">Select Product</option>
-                        <option value="1">Pro Plan</option>
-                        <option value="2">Basic Plan</option>
-                        <option value="3">Enterprise Plan</option>
-                    </select>
+                <div class=\"col-md-6\" id=\"resellerSelectContainer\">
+                    <label class=\"form-label\">Reseller ID *</label>
+                    <input type=\"number\" class=\"form-control\" name=\"reseller_id\" placeholder=\"Enter reseller ID\">
+                    <small class=\"text-muted\">Leave blank if applying to all resellers.</small>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Sale Amount ($) *</label>
-                    <input type="number" class="form-control" name="sale_amount" step="0.01" min="0" required>
+                <div class=\"col-md-6\">
+                    <label class=\"form-label\">Product/Service</label>
+                    <input type=\"text\" class=\"form-control\" name=\"product_name\" placeholder=\"e.g., Pro Plan\">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Commission Rate (%)</label>
-<input type="number" class="form-control" name="commission_rate" step="0.01" min="0" max="100">
+                <div class=\"col-md-6\">
+                    <label class=\"form-label\">Transaction Reference *</label>
+                    <input type=\"text\" class=\"form-control\" name=\"transaction_reference\" placeholder=\"Auto if blank\">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">Commission Amount ($)</label>
-                    <input type="number" class="form-control" name="commission_amount" step="0.01" min="0" readonly>
+                <div class=\"col-md-4\">
+                    <label class=\"form-label\">Sale Amount ($) *</label>
+                    <input type=\"number\" class=\"form-control\" name=\"sale_amount\" step=\"0.01\" min=\"0\" required>
                 </div>
-                <div class="col-12">
-                    <label class="form-label">Notes</label>
-                    <textarea class="form-control" name="notes" rows="2" placeholder="Optional notes about this commission"></textarea>
+                <div class=\"col-md-4\">
+                    <label class=\"form-label\">Commission Rate (%) *</label>
+                    <input type=\"number\" class=\"form-control\" name=\"commission_rate\" step=\"0.01\" min=\"0\" max=\"100\" required>
+                </div>
+                <div class=\"col-md-4\">
+                    <label class=\"form-label\">Commission Amount ($)</label>
+                    <input type=\"number\" class=\"form-control\" name=\"commission_amount\" step=\"0.01\" min=\"0\" readonly>
+                </div>
+                <div class=\"col-md-6\">
+                    <label class=\"form-label\">Client Name</label>
+                    <input type=\"text\" class=\"form-control\" name=\"client_name\">
+                </div>
+                <div class=\"col-md-6\">
+                    <label class=\"form-label\">Client Email</label>
+                    <input type=\"email\" class=\"form-control\" name=\"client_email\">
+                </div>
+                <div class=\"col-12\">
+                    <label class=\"form-label\">Notes</label>
+                    <textarea class=\"form-control\" name=\"notes\" rows=\"2\" placeholder=\"Optional notes about this commission\"></textarea>
                 </div>
             </div>
         </div>
@@ -610,7 +623,160 @@ function createItem() {
             return;
         }
     }
-    
+
+    // If creating a product, call admin API to save
+    if (currentCreateType === 'product') {
+        const data = collectFormData();
+        const payload = {
+            name: data['product_name'],
+            sku: data['sku'] || '',
+            description: data['description'] || '',
+            category: data['category'] || '',
+            vendor: data['vendor'] || '',
+            price: parseFloat(data['price']),
+            commission_rate: data['commission_rate'] ? parseFloat(data['commission_rate']) : null,
+            active: !!data['active'],
+            featured: !!data['featured']
+        };
+        if (!payload.name || isNaN(payload.price)) {
+            alert('Product name and price are required.');
+            return;
+        }
+        const createBtn = document.getElementById('createBtn');
+        const originalText = createBtn.innerHTML;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+        createBtn.disabled = true;
+
+        fetch('/platform/admin/api/v1/products/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (typeof getCsrfToken === 'function' ? getCsrfToken() : '')
+            },
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).then(resp => {
+            if (resp && resp.success) {
+                if (typeof showToast === 'function') {
+                    showToast('Product created successfully', 'success');
+                }
+                bootstrap.Modal.getInstance(document.getElementById('quickCreateModal')).hide();
+                // Reload to show the new product
+                window.location.reload();
+            } else {
+                const msg = resp && resp.error ? resp.error : 'Unable to create product';
+                alert(msg);
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('Failed to create product');
+        }).finally(() => {
+            createBtn.innerHTML = originalText;
+            createBtn.disabled = false;
+        });
+        return;
+    }
+
+    // If creating a plan, call admin API to save
+    if (currentCreateType === 'plan') {
+        const data = collectFormData();
+        const payload = {
+            name: data['plan_name'],
+            plan_type: data['plan_type'] || '',
+            description: data['description'] || '',
+            monthly_price: parseFloat(data['monthly_price']),
+            annual_price: data['annual_price'] ? parseFloat(data['annual_price']) : null,
+            active: true
+        };
+        if (!payload.name || isNaN(payload.monthly_price)) {
+            alert('Plan name and monthly price are required.');
+            return;
+        }
+        const createBtn = document.getElementById('createBtn');
+        const originalText = createBtn.innerHTML;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+        createBtn.disabled = true;
+
+        fetch('/platform/admin/api/v1/plans/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (typeof getCsrfToken === 'function' ? getCsrfToken() : '')
+            },
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).then(resp => {
+            if (resp && resp.success) {
+                if (typeof showToast === 'function') {
+                    showToast('Plan created successfully', 'success');
+                }
+                bootstrap.Modal.getInstance(document.getElementById('quickCreateModal')).hide();
+                window.location.reload();
+            } else {
+                const msg = resp && resp.error ? resp.error : 'Unable to create plan';
+                alert(msg);
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('Failed to create plan');
+        }).finally(() => {
+            createBtn.innerHTML = originalText;
+            createBtn.disabled = false;
+        });
+        return;
+    }
+
+    // If creating a commission, call admin API to create for one or all resellers
+    if (currentCreateType === 'commission') {
+        const data = collectFormData();
+        const applyAll = !!data['apply_all'];
+        const payload = {
+            apply_all: applyAll,
+            reseller_id: data['reseller_id'] || null,
+            transaction_reference: data['transaction_reference'] || null,
+            client_name: data['client_name'] || '',
+            client_email: data['client_email'] || '',
+            product_name: data['product_name'] || '',
+            sale_amount: data['sale_amount'],
+            commission_rate: data['commission_rate']
+        };
+        // Basic validation
+        if (!applyAll && !payload.reseller_id) {
+            alert('Please provide a reseller ID or choose Apply to all resellers.');
+            return;
+        }
+        if (!payload.sale_amount || !payload.commission_rate) {
+            alert('Sale amount and commission rate are required.');
+            return;
+        }
+        const createBtn = document.getElementById('createBtn');
+        const originalText = createBtn.innerHTML;
+        createBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+        createBtn.disabled = true;
+
+        fetch('/platform/admin/api/v1/commissions/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': (typeof getCsrfToken === 'function' ? getCsrfToken() : '')
+            },
+            body: JSON.stringify(payload)
+        }).then(r => r.json()).then(resp => {
+            if (resp && resp.success) {
+                showToast('Commission created successfully', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('quickCreateModal')).hide();
+            } else {
+                const msg = resp && resp.errors && resp.errors.length ? resp.errors.join('\n') : 'Unable to create commission';
+                alert(msg);
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('Failed to create commission');
+        }).finally(() => {
+            createBtn.innerHTML = originalText;
+            createBtn.disabled = false;
+        });
+        return;
+    }
+
     // Fallback: Simulate for other types
     const createBtn = document.getElementById('createBtn');
     const originalText = createBtn.innerHTML;
@@ -655,9 +821,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const commissionRate = parseFloat(document.querySelector('[name="commission_rate"]')?.value || 0);
             const commissionAmountField = document.querySelector('[name="commission_amount"]');
             
-            if (commissionAmountField && saleAmount && commissionRate) {
-                const commissionAmount = (saleAmount * commissionRate / 100).toFixed(2);
+            if (commissionAmountField) {
+                const commissionAmount = (saleAmount && commissionRate) ? (saleAmount * commissionRate / 100).toFixed(2) : '';
                 commissionAmountField.value = commissionAmount;
+            }
+        }
+        if (e.target.name === 'apply_all') {
+            const checked = e.target.checked;
+            const resellerContainer = document.getElementById('resellerSelectContainer');
+            if (resellerContainer) {
+                resellerContainer.style.display = checked ? 'none' : '';
             }
         }
     });

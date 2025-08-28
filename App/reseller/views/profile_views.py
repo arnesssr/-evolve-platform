@@ -207,9 +207,8 @@ def profile_stats(request):
     from ..earnings.services.commission_service import CommissionService
     commission_service = CommissionService()
     recent_commissions = commission_service.get_reseller_commissions(
-        reseller.id, 
-        limit=10
-    )
+        reseller
+    )[:10]
     
     context = {
         'reseller': reseller,

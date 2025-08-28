@@ -190,6 +190,13 @@ class AdminResellersRepository:
     def get_reseller_overview(self, reseller_id: int) -> Dict[str, Any]:
         r = Reseller.objects.select_related('user').get(id=reseller_id)
         perf_label, perf_score = self._performance_segment_and_score(r.total_sales)
+
+        def _mask(val: str) -> str:
+            if not val:
+                return ''
+            s = str(val)
+            return ('****' + s[-4:]) if len(s) >= 4 else '****'
+
         return {
             'id': r.id,
             'name': (r.user.get_full_name() or r.user.username),
@@ -208,6 +215,19 @@ class AdminResellersRepository:
             'performance_segment': perf_label,
             'performance_score': perf_score,
             'total_earnings': float(r.total_commission_earned or 0),
+            # Payout-related fields
+            'available_balance': float(r.get_available_balance() or 0),
+            'payment_method': r.payment_method or '',
+            'paypal_email': r.paypal_email or '',
+            'bank_name': r.bank_name or '',
+            'bank_account_name': r.bank_account_name or '',
+            'bank_account_number_masked': _mask(r.bank_account_number),
+            'bank_routing_number_masked': _mask(r.bank_routing_number),
+            'address': r.address or '',
+            'city': r.city or '',
+            'state': r.state or '',
+            'country': r.country or '',
+            'postal_code': r.postal_code or '',
         }
 
     def get_commission_summary(self, reseller_id: int) -> Dict[str, Any]:

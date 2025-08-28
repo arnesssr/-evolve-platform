@@ -41,10 +41,6 @@
 <div class="analytics-page">
 {% include 'dashboards/admin/components/filter-bar.html' with show_search=False offcanvas_id=None show_date_range=True %}
 
-<!-- Key Performance Indicators -->
-<div class="content-card">
-  <small class="text-muted">No KPI data available.</small>
-</div>
 
 <!-- Revenue & Growth Charts -->
 <div class="row mb-3">
@@ -76,120 +72,6 @@
     </div>
 </div>
 
-<!-- Show more analytics toggle -->
-<div class="d-flex justify-content-center my-2">
-  <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#analyticsMore" aria-expanded="false" aria-controls="analyticsMore" id="analyticsMoreToggle">
-    Show more analytics
-  </button>
-</div>
-
-<!-- Collapsible extra analytics -->
-<div id="analyticsMore" class="collapse">
-
-<!-- Business & Plan Analytics -->
-<div class="row mb-4">
-    <!-- Plan Distribution -->
-    <div class="col-lg-6">
-        <div class="content-card">
-            <h5 class="mb-4">Plan Distribution</h5>
-            <canvas id="planDistributionChart" height="200"></canvas>
-            
-        </div>
-    </div>
-    
-    <!-- Industry Breakdown -->
-    <div class="col-lg-6">
-        <div class="content-card">
-            <h5 class="mb-4">Industry Breakdown</h5>
-            <p class="text-muted mb-0">No industry data available.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Reseller & Commission Analytics -->
-<div class="row mb-3">
-    <!-- Reseller Performance -->
-    <div class="col-lg-8">
-        <div class="content-card">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0">Top Performing Resellers</h5>
-                <a href="{% url 'platform_admin:resellers-list' %}" class="btn btn-sm btn-outline-primary">View All</a>
-            </div>
-            
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Reseller</th>
-                            <th>Businesses</th>
-                            <th>Revenue Generated</th>
-                            <th>Commission Earned</th>
-                            <th>Performance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">No data available</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Commission Overview -->
-    <div class="col-lg-4">
-        <div class="content-card">
-            <h5 class="mb-4">Commission Overview</h5>
-            <canvas id="commissionChart" height="200"></canvas>
-            
-        </div>
-    </div>
-</div>
-
-<!-- User Activity & Engagement -->
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="content-card">
-            <h5 class="mb-4">User Activity & Engagement</h5>
-            <div class="row">
-                <div class="col-lg-8">
-                    <canvas id="userActivityChart" height="100"></canvas>
-                </div>
-                <div class="col-lg-4">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="text-muted mb-0">No user metrics data available.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Geographic & Device Analytics -->
-<div class="row mb-2">
-    <!-- Geographic Distribution -->
-    <div class="col-lg-6">
-        <div class="content-card">
-            <h5 class="mb-4">Geographic Distribution</h5>
-            
-            <p class="text-muted mb-0">No geographic data available.</p>
-        </div>
-    </div>
-    
-    <!-- Device & Browser Analytics -->
-    <div class="col-lg-6">
-        <div class="content-card">
-            <h5 class="mb-4">Device & Browser Usage</h5>
-            
-            <p class="text-muted mb-0">No device/browser data available.</p>
-        </div>
-    </div>
-</div>
-
-</div>
 
 <!-- Modals -->
 {% include 'dashboards/admin/modals/generate-report.html' with report_type="analytics" %}
@@ -200,33 +82,14 @@
 {% block extra_js %}
 <script>
 $(document).ready(function() {
-    // Initialize charts
+    // Initialize charts only
     initializeAnalyticsCharts();
-    // Initialize 'More analytics' collapse toggle and persist state
-    const more = document.getElementById('analyticsMore');
-    const toggleBtn = document.getElementById('analyticsMoreToggle');
-    if (more && toggleBtn) {
-        const instance = new bootstrap.Collapse(more, { toggle: false });
-        const saved = localStorage.getItem('analyticsMoreOpen') === 'true';
-        if (saved) {
-            instance.show();
-            toggleBtn.textContent = 'Hide extra analytics';
-        }
-        more.addEventListener('shown.bs.collapse', function() {
-            toggleBtn.textContent = 'Hide extra analytics';
-            localStorage.setItem('analyticsMoreOpen', 'true');
-        });
-        more.addEventListener('hidden.bs.collapse', function() {
-            toggleBtn.textContent = 'Show more analytics';
-            localStorage.setItem('analyticsMoreOpen', 'false');
-        });
-    }
 });
 
 function initializeAnalyticsCharts() {
     // Revenue & Growth Chart
     const revenueCtx = document.getElementById('revenueGrowthChart').getContext('2d');
-    new Chart(revenueCtx, {
+    window.revenueGrowthChart = new Chart(revenueCtx, {
         type: 'line',
         data: {
             labels: [],
@@ -254,69 +117,92 @@ function initializeAnalyticsCharts() {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Revenue ($)'
-                    }
+title: { display: true, text: `Revenue (${window.PlatformSettings?.currency_symbol || '$'})` }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Growth Rate (%)'
-                    },
-                    grid: {
-                        drawOnChartArea: false,
-                    },
+                    title: { display: true, text: 'Growth Rate (%)' },
+                    grid: { drawOnChartArea: false },
                 }
             }
         }
     });
+
+    // Business Growth Chart
+    const bizCtx = document.getElementById('businessGrowthChart')?.getContext('2d');
+    if (bizCtx) {
+        window.businessGrowthChart = new Chart(bizCtx, {
+            type: 'bar',
+            data: { labels: [], datasets: [{ label: 'New Businesses', data: [], backgroundColor: 'rgba(59, 130, 246, 0.6)'}] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    // Plan Distribution Chart (optional)
+    const planEl = document.getElementById('planDistributionChart');
+    if (planEl) {
+        window.planDistributionChart = new Chart(planEl.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: ['#10b981', '#3b82f6', '#06b6d4'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
     
-    // Plan Distribution Chart
-    const planCtx = document.getElementById('planDistributionChart').getContext('2d');
-    new Chart(planCtx, {
-        type: 'doughnut',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: ['#10b981', '#3b82f6', '#06b6d4']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-    
-    // User Activity Chart
-    const activityCtx = document.getElementById('userActivityChart').getContext('2d');
-    new Chart(activityCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Active Users',
-                data: [],
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
+    // User Activity Chart (optional)
+    const activityEl = document.getElementById('userActivityChart');
+    if (activityEl) {
+        window.userActivityChart = new Chart(activityEl.getContext('2d'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Active Users', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', tension: 0.4, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    // Load data
+    loadAnalyticsData();
+}
+
+async function loadAnalyticsData() {
+    try {
+        // Growth trends over last 30 days
+        const gtRes = await fetch('/platform/admin/api/v1/dashboard/growth-trends/?days=30', { credentials: 'same-origin' });
+        if (gtRes.ok) {
+            const gt = await gtRes.json();
+            const labels = (gt.revenue_growth || []).map(p => p.date);
+            if (window.revenueGrowthChart) {
+                window.revenueGrowthChart.data.labels = labels;
+                window.revenueGrowthChart.data.datasets[0].data = (gt.revenue_growth || []).map(p => p.count);
+                // Growth rate derived as percent change from previous day (simple)
+                const gr = []; const rev = window.revenueGrowthChart.data.datasets[0].data;
+                for (let i = 0; i < rev.length; i++) {
+                    if (i === 0 || rev[i-1] === 0) { gr.push(0); } else { gr.push(((rev[i]-rev[i-1]) / Math.max(1, rev[i-1])) * 100); }
                 }
+                window.revenueGrowthChart.data.datasets[1].data = gr;
+                window.revenueGrowthChart.update();
+            }
+            if (window.businessGrowthChart) {
+                window.businessGrowthChart.data.labels = (gt.business_growth || []).map(p => p.date);
+                window.businessGrowthChart.data.datasets[0].data = (gt.business_growth || []).map(p => p.count);
+                window.businessGrowthChart.update();
+            }
+            if (window.userActivityChart) {
+                window.userActivityChart.data.labels = (gt.user_growth || []).map(p => p.date);
+                window.userActivityChart.data.datasets[0].data = (gt.user_growth || []).map(p => p.count);
+                window.userActivityChart.update();
             }
         }
-    });
+
+        // Dashboard metrics (to possibly update any KPI cards in future)
+        const dmRes = await fetch('/platform/admin/api/v1/dashboard/metrics/?period=last_30_days', { credentials: 'same-origin' });
+        if (dmRes.ok) {
+            const dm = await dmRes.json();
+            // Hook: if we later add KPIs on this page, we can populate them here.
+        }
+    } catch (e) {
+        console.warn('Failed to load analytics data', e);
+    }
 }
 </script>
 {% endblock %}

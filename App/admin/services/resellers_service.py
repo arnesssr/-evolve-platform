@@ -171,12 +171,49 @@ class AdminResellerService:
         action = data.get('action')
         ids_str = data.get('reseller_ids', '')
         ids = [int(x) for x in ids_str.split(',') if x.strip().isdigit()]
+        processed = 0
+
         if action == 'suspend':
             for rid in ids:
                 self.suspend_reseller(rid)
+                processed += 1
         elif action == 'resume':
             for rid in ids:
                 self.resume_reseller(rid)
-        # set_tier and message can be implemented later
-        return {'status': 'ok', 'processed': len(ids)}
+                processed += 1
+        elif action == 'delete':
+            # Soft delete: deactivate reseller accounts
+            from App.reseller.earnings.models import Reseller
+            for rid in ids:
+                Reseller.objects.filter(id=rid).update(is_active=False)
+                processed += 1
+        elif action == 'set_tier':
+            # Map UI tiers to domain tiers
+            tier = (data.get('tier') or '').lower()
+            tier_map = {
+                'basic': 'bronze',
+                'standard': 'silver',
+                'premium': 'gold',
+                'platinum': 'platinum',
+            }
+            domain_tier = tier_map.get(tier)
+            if domain_tier:
+                for rid in ids:
+                    # Update profile tier via domain service
+                    self.domain_reseller.update_profile(rid, {'tier': domain_tier})
+                    processed += 1
+        elif action == 'message':
+            # Send notification via email only for now
+            payload = {
+                'subject': data.get('subject') or 'Message from Platform Admin',
+                'body': data.get('message') or '',
+            }
+            if payload['body']:
+                self.send_message(ids, 'email', payload)
+                processed = len(ids)
+        else:
+            # Unknown or unsupported action
+            return {'status': 'error', 'error': f'Unsupported action: {action}', 'processed': 0}
+
+        return {'status': 'ok', 'processed': processed}
 

@@ -68,40 +68,7 @@
 {% endblock %}
 
 {% block content %}
-<!-- Payout Summary -->
-<div class="content-card">
-  <small class="text-muted">No KPI data available.</small>
-</div>
 
-<!-- Payout Status Overview -->
-<div class="row mb-4">
-    <div class="col-lg-8">
-        <div class="content-card">
-            <h5 class="mb-4">Payout Status Distribution</h5>
-            <p class="text-muted mb-0">No payout status data available.</p>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <div class="content-card">
-            <h5 class="mb-4">Quick Actions</h5>
-            <div class="d-grid gap-2">
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#processPayoutModal">
-                    <i class="fas fa-credit-card me-2"></i>Process Pending Payouts
-                </button>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bulkPayoutModal">
-                    <i class="fas fa-money-bill-wave me-2"></i>Bulk Payout Processing
-                </button>
-                <button type="button" class="btn btn-outline-info">
-                    <i class="fas fa-file-download me-2"></i>Export Payout Report
-                </button>
-                <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#retryFailedModal">
-                    <i class="fas fa-redo me-2"></i>Retry Failed Payouts
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search payouts…' offcanvas_id='payoutFilters' show_date_range=True %}
 
@@ -202,13 +169,37 @@ $(document).ready(function() {
     const table = $('#payoutsTable').DataTable({
         responsive: true,
         pageLength: 25,
-        order: [[5, 'desc']], // Sort by requested date
-        columnDefs: [
-            { orderable: false, targets: [0, 7] } // Disable ordering for checkbox and actions
-        ]
+        order: [[5, 'desc']],
+        columnDefs: [ { orderable: false, targets: [0, 7] } ]
     });
 
-    // Search: initialize from ?q= and wire live search
+    async function loadPayouts() {
+        try {
+            const res = await fetch('/platform/admin/api/v1/finance/payouts/?page_size=200', { credentials: 'same-origin' });
+            const json = await res.json();
+            const rows = [];
+            (json.data.payouts || []).forEach(po => {
+                rows.push([
+                    '<input type="checkbox" class="form-check-input" />',
+                    (po.reseller && po.reseller.name) ? po.reseller.name : '-',
+                    po.method || '-',
+                    '$' + (po.amount || 0).toFixed(2),
+                    po.status || '-',
+                    po.requested_at ? new Date(po.requested_at).toLocaleDateString() : '-',
+                    po.processed_at ? new Date(po.processed_at).toLocaleDateString() : '-',
+                    '<div class="btn-group btn-group-sm"><button class="btn btn-outline-secondary">View</button></div>'
+                ]);
+            });
+            table.clear();
+            table.rows.add(rows).draw();
+            $('#tableInfo').text(json.data.pagination.total_count || rows.length);
+        } catch (e) {
+            console.warn('Failed to load payouts', e);
+        }
+    }
+
+    loadPayouts();
+
     (function() {
         const params = new URLSearchParams(window.location.search);
         const q = params.get('q');
@@ -224,7 +215,6 @@ $(document).ready(function() {
         }
     })();
     
-    // Handle select all functionality
     $('#selectAll').change(function() {
         const isChecked = $(this).is(':checked');
         $('input[type="checkbox"]').prop('checked', isChecked);

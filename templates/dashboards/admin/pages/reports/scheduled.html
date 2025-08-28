@@ -4,5 +4,191 @@
 {% block breadcrumb_items %}<li class="breadcrumb-item"><a href="{% url 'platform_admin:dashboard' %}">Dashboard</a></li><li class="breadcrumb-item"><a href="{% url 'platform_admin:reports-generate' %}">Reports</a></li><li class="breadcrumb-item active">Scheduled</li>{% endblock %}
 {% block content %}
 {% include 'dashboards/admin/components/reports-tabs.html' with active='reports-scheduled' %}
-<div class="content-card"><p>Scheduled reports placeholder.</p></div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="content-card">
+      <h5 class="mb-3">Create Scheduled Report</h5>
+      <form id="scheduleForm">
+        <div class="mb-3">
+          <label for="schedReportType" class="form-label">Report Type</label>
+          <select id="schedReportType" class="form-select" required>
+            <option value="">Select Report Type</option>
+            <option value="revenue_summary">Revenue Summary</option>
+            <option value="commission_report">Commission Report</option>
+            <option value="payout_report">Payout Report</option>
+            <option value="financial_overview">Financial Overview</option>
+            <option value="cash_flow_statement">Cash Flow Statement</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="schedReportFormat" class="form-label">Format</label>
+          <select id="schedReportFormat" class="form-select">
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+            <option value="csv">CSV</option>
+            <option value="html">HTML</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="schedCron" class="form-label">Schedule (cron)</label>
+          <input type="text" id="schedCron" class="form-control" placeholder="0 9 1 * *" aria-describedby="cronHelp">
+          <div id="cronHelp" class="form-text">Use cron format (minute hour day month weekday). Example: 0 9 1 * * = 9AM on the 1st of each month.</div>
+        </div>
+        <div class="mb-3">
+          <label for="schedRecipients" class="form-label">Recipients</label>
+          <input type="text" id="schedRecipients" class="form-control" placeholder="email@example.com, email2@example.com">
+          <div class="form-text">Comma-separated email addresses</div>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="schedActive" checked>
+          <label class="form-check-label" for="schedActive">Active</label>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" id="createScheduleBtn">
+            <i class="fas fa-plus me-2"></i>Create Schedule
+          </button>
+          <button type="button" class="btn btn-outline-secondary" id="resetScheduleBtn">Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="content-card">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Scheduled Reports</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshSchedulesBtn">
+          <i class="fas fa-rotate"></i>
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle" id="schedTable">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Report Type</th>
+              <th>Schedule</th>
+              <th>Format</th>
+              <th>Recipients</th>
+              <th>Next Run</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showAlert(type, message) {
+  const container = document.querySelector('.content') || document.body;
+  const el = document.createElement('div');
+  el.className = `alert alert-${type} alert-dismissible fade show`;
+  el.role = 'alert';
+  el.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+  container.prepend(el);
+}
+
+async function loadSchedules() {
+  const tbody = document.querySelector('#schedTable tbody');
+  try {
+    const res = await fetch('/platform/admin/api/v1/finance/reports/schedule/', { credentials: 'same-origin' });
+    const data = await res.json();
+    if (!res.ok || data.success === false) throw new Error(data.error || 'Failed to load schedules');
+    const list = data.data?.scheduled_reports || [];
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No scheduled reports</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(it => `
+      <tr>
+        <td><code>${it.id || ''}</code></td>
+        <td>${(it.report_type || '').replace(/_/g,' ')}</td>
+        <td><code>${it.schedule || ''}</code></td>
+        <td>${it.format || 'pdf'}</td>
+        <td>${(it.recipients || []).length}</td>
+        <td>${it.next_run || ''}</td>
+        <td><span class="badge ${it.status === 'active' ? 'bg-success' : 'bg-secondary'}">${it.status || ''}</span></td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-danger">${e.message}</td></tr>`;
+  }
+}
+
+function parseRecipients(value) {
+  return (value || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+async function createSchedule(evt) {
+  evt.preventDefault();
+  const btn = document.getElementById('createScheduleBtn');
+  try {
+    const report_type = document.getElementById('schedReportType').value;
+    const format = document.getElementById('schedReportFormat').value || 'pdf';
+    const schedule = document.getElementById('schedCron').value || '0 9 1 * *';
+    const recipients = parseRecipients(document.getElementById('schedRecipients').value);
+    const active = document.getElementById('schedActive').checked;
+
+    if (!report_type) { showAlert('warning', 'Select report type'); return; }
+    if (!schedule) { showAlert('warning', 'Enter schedule (cron)'); return; }
+    if (!recipients.length) { showAlert('warning', 'Enter at least one recipient'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+
+    const payload = {
+      report_type,
+      schedule,
+      recipients,
+      parameters: {},
+      format,
+      active
+    };
+
+    const res = await fetch('/platform/admin/api/v1/finance/reports/schedule/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || data.success === false) throw new Error(data.error || 'Failed to create schedule');
+
+    showAlert('success', `Scheduled created with ID: <code>${data.data?.schedule_id || 'N/A'}</code>`);
+    document.getElementById('scheduleForm').reset();
+    document.getElementById('schedActive').checked = true;
+    await loadSchedules();
+  } catch (e) {
+    showAlert('danger', e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-plus me-2"></i>Create Schedule';
+  }
+}
+
+function resetScheduleForm() {
+  document.getElementById('scheduleForm').reset();
+  document.getElementById('schedActive').checked = true;
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('scheduleForm').addEventListener('submit', createSchedule);
+  document.getElementById('resetScheduleBtn').addEventListener('click', resetScheduleForm);
+  document.getElementById('refreshSchedulesBtn').addEventListener('click', loadSchedules);
+  loadSchedules();
+});
+</script>
 {% endblock %}

@@ -86,10 +86,6 @@
 <div class="tab-content">
   <!-- OVERVIEW -->
   <div class="tab-pane fade show active" id="rev-overview" role="tabpanel" aria-labelledby="rev-overview-tab">
-    <!-- Revenue Metrics -->
-    <div class="content-card">
-      <small class="text-muted">No KPI data available.</small>
-    </div>
 
     <!-- Revenue Charts -->
     <div class="row">
@@ -188,6 +184,12 @@ let revenueChart = null;
 let sourceChart = null;
 let forecastChart = null;
 
+async function fetchJSON(url) {
+  const res = await fetch(url, { credentials: 'same-origin' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 function initOverviewCharts() {
   const revenueCanvas = document.getElementById('revenueChart');
   const sourceCanvas = document.getElementById('revenueSourceChart');
@@ -195,35 +197,21 @@ function initOverviewCharts() {
     const ctx = revenueCanvas.getContext('2d');
     revenueChart = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          { label: 'Revenue', data: [],
-            borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true },
-          { label: 'Target', data: [],
-            borderColor: 'rgba(107, 114, 128, 0.5)', backgroundColor: 'transparent', borderDash: [5,5], tension: 0.4 }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + (v/1000) + 'k' } } },
-        interaction: { intersect: false }
-      }
+      data: { labels: [], datasets: [
+        { label: 'Revenue', data: [], borderColor: 'rgb(16, 185, 129)', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true },
+        { label: 'Commissions', data: [], borderColor: 'rgba(107, 114, 128, 0.8)', backgroundColor: 'transparent', borderDash: [5,5], tension: 0.4 }
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + (v/1000) + 'k' } } }, interaction: { intersect: false } }
     });
   }
   if (sourceCanvas && !sourceChart) {
     const ctx2 = sourceCanvas.getContext('2d');
     sourceChart = new Chart(ctx2, {
       type: 'doughnut',
-      data: {
-        labels: [],
-        datasets: [{ data: [], backgroundColor: ['rgb(10, 36, 99)','rgb(16, 185, 129)','rgb(245, 158, 11)'], borderWidth: 0 }]
-      },
+      data: { labels: [], datasets: [{ data: [], backgroundColor: ['rgb(10, 36, 99)','rgb(16, 185, 129)','rgb(245, 158, 11)'], borderWidth: 0 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
   }
-  // Ensure proper sizing when becoming visible
   if (revenueChart) revenueChart.resize();
   if (sourceChart) sourceChart.resize();
 }
@@ -234,41 +222,64 @@ function initForecastChart() {
     const ctx = canvas.getContext('2d');
     forecastChart = new Chart(ctx, {
       type: 'bar',
-      data: {
-        labels: [],
-        datasets: [{ label: 'Projected Revenue', data: [], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgb(59, 130, 246)', borderWidth: 1 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + (v/1000) + 'k' } } } }
+      data: { labels: [], datasets: [{ label: 'Projected Revenue', data: [], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderColor: 'rgb(59, 130, 246)', borderWidth: 1 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + (v/1000) + 'k' } } } }
     });
   }
   if (forecastChart) forecastChart.resize();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize Overview charts by default
-  initOverviewCharts();
+async function loadRevenueData() {
+  try {
+    // Trends
+    const trends = await fetchJSON('/platform/admin/api/v1/finance/revenue/trends/?interval=monthly');
+    const labels = trends.data.chart_data ? trends.data.chart_data.labels : (trends.data.trends || []).map(t => t.period);
+    const revenueData = trends.data.chart_data ? trends.data.chart_data.datasets[0].data : (trends.data.trends || []).map(t => t.revenue);
+    const commissionsData = trends.data.chart_data ? trends.data.chart_data.datasets[1].data : (trends.data.trends || []).map(t => t.commissions);
+    if (revenueChart) {
+      revenueChart.data.labels = labels;
+      revenueChart.data.datasets[0].data = revenueData;
+      revenueChart.data.datasets[1].data = commissionsData;
+      revenueChart.update();
+    }
 
-  // Handle sub-tab shown events to (lazy) init charts and resize
+    // Source breakdown
+    const src = await fetchJSON('/platform/admin/api/v1/finance/revenue/source-breakdown/');
+    if (sourceChart) {
+      sourceChart.data.labels = src.data.chart_data.labels;
+      sourceChart.data.datasets[0].data = src.data.chart_data.data;
+      sourceChart.update();
+    }
+
+    // Forecast
+    const f = await fetchJSON('/platform/admin/api/v1/finance/revenue/forecast/?periods=6');
+    if (forecastChart) {
+      const labelsF = f.data.chart_data.labels.length ? f.data.chart_data.labels : (f.data.forecast || []).map(x => x.period);
+      const dataF = (f.data.forecast || []).map(x => x.amount);
+      forecastChart.data.labels = labelsF;
+      forecastChart.data.datasets[0].data = dataF;
+      forecastChart.update();
+    }
+  } catch (e) {
+    console.warn('Failed to load revenue data', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initOverviewCharts();
+  initForecastChart();
+  loadRevenueData();
+
   document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(el => {
     el.addEventListener('shown.bs.tab', function (e) {
       const target = e.target.getAttribute('href');
       if (target === '#rev-overview') {
         initOverviewCharts();
+        loadRevenueData();
       } else if (target === '#rev-forecast') {
         initForecastChart();
+        loadRevenueData();
       }
-    });
-  });
-
-  // Period buttons (Overview)
-  document.querySelectorAll('[data-period]').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      const period = this.dataset.period;
-      showToast(`Updated chart for ${period} period`, 'info');
-      // Hook: fetch and update chart data here if needed
     });
   });
 });

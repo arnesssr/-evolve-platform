@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ PLATFORM_SETTINGS.default_language|default:'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,6 +65,16 @@
         .admin-sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
         }
+        
+        /* Sidebar nav spacing under header */
+        .sidebar-nav { margin-top: var(--header-height); }
+        
+        /* Sidebar nav layout */
+        .admin-sidebar .nav-link { display: flex; align-items: center; gap: .75rem; color: rgba(255,255,255,.92); padding: .6rem 1rem; border-radius: 8px; margin: .15rem .5rem; text-decoration: none; }
+        .admin-sidebar .nav-link:hover { background: rgba(255,255,255,.10); color: #fff; }
+        .admin-sidebar .nav-link i { width: 1.25rem; text-align: center; flex-shrink: 0; }
+        .admin-sidebar .nav-link .nav-text { transition: opacity .3s ease, visibility .3s ease, width .3s ease; white-space: nowrap; }
+        .admin-sidebar.collapsed .nav-text { opacity: 0; visibility: hidden; width: 0; overflow: hidden; }
         
         .admin-main {
             flex: none;
@@ -280,6 +290,18 @@
     
     <!-- Additional Head Content -->
     {% block extra_head %}{% endblock %}
+    <script>
+        window.PlatformSettings = {
+            default_currency: '{{ PLATFORM_SETTINGS.default_currency|default:"USD" }}',
+            currency_symbol: '{{ PLATFORM_SETTINGS.currency_symbol|default:"$" }}',
+            default_language: '{{ PLATFORM_SETTINGS.default_language|default:"en" }}',
+            platform_name: '{{ PLATFORM_SETTINGS.platform_name|default:"Evolve Platform" }}',
+            platform_url: '{{ PLATFORM_SETTINGS.platform_url|default:"" }}',
+            support_email: '{{ PLATFORM_SETTINGS.support_email|default:"" }}',
+            timezone: '{{ PLATFORM_SETTINGS.timezone|default:"UTC" }}'
+        };
+        document.documentElement.setAttribute('lang', window.PlatformSettings.default_language || 'en');
+    </script>
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -367,6 +389,7 @@
     <!-- Chart.js (if needed) -->
     {% block chart_js %}{% endblock %}
     
+    <script src="{% static 'js/platform-settings.js' %}"></script>
     <!-- Custom JavaScript -->
     <script>
         // Global Admin Functions

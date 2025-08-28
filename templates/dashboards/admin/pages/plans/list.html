@@ -11,13 +11,10 @@
 {% endblock %}
 
 {% block page_actions %}
-<div class="d-flex gap-2">
+<div class="d-flex gap-2 align-items-center">
     <button class="btn btn-outline-primary" onclick="exportPlans()">
         <i class="fas fa-download me-2"></i>Export
     </button>
-    <a href="{% url 'platform_admin:plans-form' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Plan
-    </a>
     <button type="button" class="btn btn-success" onclick="showQuickCreateModal('plan')">
         <i class="fas fa-bolt me-2"></i>Quick Create
     </button>
@@ -96,10 +93,39 @@
     </div>
     
     <!-- Grid View -->
-    <div id="plansGrid" class="row">
+    <div id="plansGrid" class="row g-3">
+        {% for pl in plans %}
+        <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="plan-card h-100 {% if pl.is_active %}featured{% endif %}">
+                {% if pl.badge %}<div class="plan-badge">{{ pl.badge }}</div>{% endif %}
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="plan-name mb-2">{{ pl.name }}</h5>
+                    {% if pl.is_active %}
+                        <span class="badge bg-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                <div class="plan-price">
+                    <span class="price-amount">${{ pl.price|floatformat:2 }}</span>
+                    <span class="price-period">/month</span>
+                </div>
+                {% if pl.yearly_price %}
+                <div class="text-muted small mb-2">${{ pl.yearly_price|floatformat:2 }} /year</div>
+                {% endif %}
+                <div class="plan-features">
+                    <small class="text-muted">{{ pl.description|default:"No description" }}</small>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewPlanDetails({{ pl.id }})">Details</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
         <div class="col-12">
             <p class="text-muted mb-0">No plans to display.</p>
         </div>
+        {% endfor %}
     </div>
     
     <!-- Table View (hidden by default) -->
@@ -119,9 +145,37 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for pl in plans %}
+                    <tr>
+                        <td>{{ pl.name }}</td>
+                        <td>${{ pl.price|floatformat:2 }}</td>
+                        <td>—</td>
+                        <td>0</td>
+                        <td>$0.00</td>
+                        <td>
+                            {% if pl.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>—</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="viewPlanDetails({{ pl.id }})"><i class="fas fa-eye me-2"></i>View</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
                     <tr>
                         <td colspan="8" class="text-center text-muted">No data available</td>
                     </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -130,7 +184,7 @@
 
 <!-- Plan Details Modal -->
 {% include 'dashboards/admin/modals/plan-details.html' %}
-{% include 'dashboards/admin/modals/quick-create.html' with show_plan=True %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_plan=True show_product=True %}
 {% endblock %}
 
 {% block extra_css %}

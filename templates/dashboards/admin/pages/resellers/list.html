@@ -19,9 +19,23 @@
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
     </button>
-    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('commission')">
-        <i class="fas fa-plus me-2"></i>New Commission
-    </button>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-plus me-2"></i>New
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" href="#" onclick="showQuickCreateModal('user'); return false;">
+                    <i class="fas fa-user-plus me-2"></i>Add Reseller
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#" onclick="showQuickCreateModal('commission'); return false;">
+                    <i class="fas fa-percentage me-2"></i>New Commission
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
 {% endblock %}
 
@@ -166,7 +180,7 @@
 </div>
 
 {% include 'dashboards/admin/modals/bulk-action.html' with entity_type="resellers" %}
-{% include 'dashboards/admin/modals/quick-create.html' with show_commission=True %}
+{% include 'dashboards/admin/modals/quick-create.html' with show_user=True show_commission=True %}
 {% include 'dashboards/admin/modals/date-range.html' %}
 {% endblock %}
 
@@ -205,5 +219,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
 });
+
+// Default the Quick Create user form to Reseller type when opened from this page
+const qcObserverInit = () => {
+  const modalEl = document.getElementById('quickCreateModal');
+  if (!modalEl) return;
+  modalEl.addEventListener('shown.bs.modal', function() {
+    const selected = document.querySelector('#quickCreateModal input[name="createType"]:checked');
+    if (selected && selected.value === 'user') {
+      const userTypeSel = document.querySelector('#quickCreateModal select[name="user_type"]');
+      if (userTypeSel) userTypeSel.value = 'reseller';
+    }
+  });
+};
+qcObserverInit();
 </script>
 {% endblock %}

@@ -55,6 +55,10 @@ urlpatterns = [
     # Include admin app URLs (namespaced)
     path('platform/admin/', include(('App.admin.urls', 'platform_admin'), namespace='platform_admin')),
 
+    # API v1 endpoints
+    path('platform/api/v1/', include('App.business.api.v1.urls')),
+    path('platform/api/v1/', include('App.reseller.api.v1.urls')),
+
     path('admin-test/', views.admin_test, name='admin-dashboard-test'),
     path('admin/dashboard/', views.admin_dashboard, name='admin-dashboard'),
     path('edit-plans/', views.edit_plans, name='edit-plans'),

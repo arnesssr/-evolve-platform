@@ -28,7 +28,33 @@ def businesses_list(request):
 
 @login_required
 def businesses_detail(request, user_id=None):
-    return render(request, 'dashboards/admin/pages/businesses/detail.html')
+    from App.models import Business
+    context = {}
+    if user_id is not None:
+        try:
+            b = Business.objects.get(pk=user_id)
+            # Map to template-expected keys while preserving fallbacks in template
+            context['business'] = {
+                'company_name': b.business_name,
+                'industry': b.industry,
+                'company_size': b.company_size,
+                'address_line1': '',
+                'address_line2': '',
+                'city': '',
+                'state': '',
+                'postal_code': b.postal_code,
+                'country': b.country,
+                'contact_person': '',
+                'contact_title': '',
+                'contact_email': b.business_email,
+                'contact_phone': '',
+                'created_date': b.created_at.strftime('%b %d, %Y') if hasattr(b, 'created_at') and b.created_at else '',
+            }
+            # Some shared modals expect a reseller object; provide a placeholder to avoid reverse errors
+            context['reseller'] = {'id': user_id}
+        except Business.DoesNotExist:
+            pass
+    return render(request, 'dashboards/admin/pages/businesses/detail.html', context)
 
 @login_required
 def resellers_list(request):
@@ -49,7 +75,14 @@ def admins_detail(request, user_id=None):
 # Products & Plans
 @login_required
 def products_list(request):
-    return render(request, 'dashboards/admin/pages/products/list.html')
+    # Provide real products to the template if the Product model exists
+    context = {}
+    try:
+        from App.models import Product
+        context['products'] = Product.objects.all().order_by('-created_at')
+    except Exception:
+        context['products'] = []
+    return render(request, 'dashboards/admin/pages/products/list.html', context)
 
 @login_required
 def products_form(request):
@@ -57,7 +90,13 @@ def products_form(request):
 
 @login_required
 def plans_list(request):
-    return render(request, 'dashboards/admin/pages/plans/list.html')
+    context = {}
+    try:
+        from App.models import Plan
+        context['plans'] = Plan.objects.all().order_by('display_order', 'name')
+    except Exception:
+        context['plans'] = []
+    return render(request, 'dashboards/admin/pages/plans/list.html', context)
 
 @login_required
 def plans_form(request):

@@ -20,37 +20,6 @@
         </button>
     </div>
 
-    <!-- Invoice Summary Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Total Invoices</div>
-                <div class="stat-value">{{ summary.total_invoices|default:0 }}</div>
-                <div class="stat-change text-muted">All time</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Paid Invoices</div>
-                <div class="stat-value text-success">{{ summary.paid_count|default:0 }}</div>
-                <div class="stat-change text-muted">${{ summary.paid_amount|default:"0"|floatformat:2 }}</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">Pending</div>
-                <div class="stat-value text-warning">{{ summary.pending_count|default:0 }}</div>
-                <div class="stat-change text-muted">${{ summary.pending_amount|default:"0"|floatformat:2 }}</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-label">This Year</div>
-                <div class="stat-value text-info">${{ summary.current_year_total|default:"0"|floatformat:2 }}</div>
-                <div class="stat-change text-success">+{{ summary.year_growth|default:"0"|floatformat:1 }}%</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Filters -->
     <div class="card mb-4">

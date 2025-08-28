@@ -78,7 +78,12 @@ class AdminResellerCreateView(LoginRequiredMixin, AdminRequiredMixin, View):
     def post(self, request):
         form = ResellerCreateForm(request.POST)
         if not form.is_valid():
-            return HttpResponseBadRequest('Invalid create form')
+            # Surface validation details to aid debugging in development
+            try:
+                errors = form.errors.as_json()
+            except Exception:
+                errors = str(form.errors)
+            return HttpResponseBadRequest(f'Invalid create form: {errors}')
         svc = AdminResellerService()
         reseller_id = svc.create_reseller(form.cleaned_data)
         return redirect(reverse('platform_admin:resellers-detail', kwargs={'reseller_id': reseller_id}))

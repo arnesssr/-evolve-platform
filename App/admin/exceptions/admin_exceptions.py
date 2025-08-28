@@ -3,6 +3,11 @@ class AdminException(Exception):
     pass
 
 
+class AdminOperationError(AdminException):
+    """Raised when an admin operation fails."""
+    pass
+
+
 class ResellerNotFound(AdminException):
     pass
 

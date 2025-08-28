@@ -16,7 +16,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="form-check report-option">
-                                <input class="form-check-input" type="radio" name="reportType" id="userReport" value="users" checked onchange="updateReportFields()">
+<input class="form-check-input" type="radio" name="reportType" id="userReport" value="users" onchange="updateReportFields()">
                                 <label class="form-check-label" for="userReport">
                                     <i class="fas fa-users text-primary me-2"></i>
                                     <strong>User Report</strong><br>
@@ -86,7 +86,7 @@
                             <select class="form-select" id="datePreset" onchange="updateDateRange()">
                                 <option value="today">Today</option>
                                 <option value="yesterday">Yesterday</option>
-                                <option value="last7days" selected>Last 7 Days</option>
+<option value="last7days">Last 7 Days</option>
                                 <option value="last30days">Last 30 Days</option>
                                 <option value="thisMonth">This Month</option>
                                 <option value="lastMonth">Last Month</option>
@@ -245,15 +245,9 @@
 
 <script>
 function showGenerateReportModal() {
-    // Initialize date range
-    updateDateRange();
-    
-    // Initialize filters
+    // Initialize filters and delivery fields
     updateReportFields();
-    
-    // Update delivery method fields
     updateDeliveryFields();
-    
     const modal = new bootstrap.Modal(document.getElementById('generateReportModal'));
     modal.show();
 }
@@ -321,10 +315,18 @@ function updateDateRange() {
 }
 
 function updateReportFields() {
-    const reportType = document.querySelector('input[name="reportType"]:checked').value;
+    const checked = document.querySelector('input[name="reportType"]:checked');
     const filterFields = document.getElementById('filterFields');
     
     let filtersHTML = '';
+    
+    if (!checked) {
+        filterFields.innerHTML = '';
+        updatePreview();
+        return;
+    }
+    
+    const reportType = checked.value;
     
     switch (reportType) {
         case 'users':
@@ -416,91 +418,102 @@ function updateDeliveryFields() {
 }
 
 function updatePreview() {
-    // Simulate preview calculation
-    const reportType = document.querySelector('input[name="reportType"]:checked').value;
-    
-    let records, columns, size, time;
-    
-    switch (reportType) {
-        case 'users':
-            records = '1,247';
-            columns = '12';
-            size = '2.1 MB';
-            time = '15 sec';
-            break;
-        case 'commissions':
-            records = '3,856';
-            columns = '15';
-            size = '4.2 MB';
-            time = '25 sec';
-            break;
-        case 'sales':
-            records = '2,134';
-            columns = '18';
-            size = '3.7 MB';
-            time = '20 sec';
-            break;
-        default:
-            records = '1,000';
-            columns = '10';
-            size = '1.5 MB';
-            time = '10 sec';
-    }
-    
-    document.getElementById('previewRecords').textContent = records;
-    document.getElementById('previewColumns').textContent = columns;
-    document.getElementById('previewSize').textContent = size;
-    document.getElementById('previewTime').textContent = time;
+    // Clear preview fields (no mock data)
+    document.getElementById('previewRecords').textContent = '-';
+    document.getElementById('previewColumns').textContent = '-';
+    document.getElementById('previewSize').textContent = '-';
+    document.getElementById('previewTime').textContent = '-';
 }
 
-function previewReport() {
-    alert('Report preview will be generated and displayed in a new window.');
+async function previewReport() {
+    try {
+        const type = document.getElementById('reportType')?.value || '';
+        const format = document.getElementById('reportFormat')?.value || 'pdf';
+        const start = document.getElementById('startDate')?.value || '';
+        const end = document.getElementById('endDate')?.value || '';
+        if (!type) { showAlert('warning', 'Select a report type.'); return; }
+        if (!start || !end) { showAlert('warning', 'Select a start and end date.'); return; }
+
+        // Build ISO datetimes covering the whole day
+        const startIso = `${start}T00:00:00Z`;
+        const endIso = `${end}T23:59:59Z`;
+
+        const res = await fetch('/platform/admin/api/v1/finance/reports/preview/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ type, parameters: { start_date: startIso, end_date: endIso, format } })
+        });
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+            throw new Error(data.error || 'Failed to preview report');
+        }
+        // Populate lightweight preview fields if present
+        const preview = data.data?.preview || {};
+        const est = data.data?.estimated_size || '';
+        const recordsEl = document.getElementById('previewRecords');
+        const sizeEl = document.getElementById('previewSize');
+        const timeEl = document.getElementById('previewTime');
+        if (recordsEl) { recordsEl.textContent = (preview.record_count ?? '-') + ''; }
+        if (sizeEl) { sizeEl.textContent = est || '-'; }
+        if (timeEl) { timeEl.textContent = ''; }
+        showAlert('info', 'Preview loaded.');
+    } catch (e) {
+        showAlert('danger', `Preview failed: ${e.message}`);
+    }
 }
 
-function generateReport() {
-    const reportType = document.querySelector('input[name="reportType"]:checked').value;
-    const format = document.getElementById('reportFormat').value;
-    const deliveryMethod = document.getElementById('deliveryMethod').value;
-    
-    // Validate delivery method requirements
-    if (deliveryMethod === 'email') {
-        const email = document.getElementById('emailAddress').value;
-        if (!email) {
-            alert('Please enter an email address');
-            return;
+async function generateReport() {
+    const btn = document.getElementById('generateBtn');
+    try {
+        const type = document.getElementById('reportType')?.value || '';
+        const format = document.getElementById('reportFormat')?.value || 'pdf';
+        const start = document.getElementById('startDate')?.value || '';
+        const end = document.getElementById('endDate')?.value || '';
+        if (!type) { showAlert('warning', 'Select a report type.'); return; }
+        if (!start || !end) { showAlert('warning', 'Select a start and end date.'); return; }
+
+        // Optional delivery validations (if used)
+        const deliveryMethod = document.getElementById('deliveryMethod')?.value || 'download';
+        if (deliveryMethod === 'email') {
+            const email = document.getElementById('emailAddress')?.value || '';
+            if (!email) { showAlert('warning', 'Enter an email address for email delivery.'); return; }
         }
+        if (deliveryMethod === 'schedule') {
+            const scheduleDate = document.getElementById('scheduleDate')?.value || '';
+            if (!scheduleDate) { showAlert('warning', 'Pick a schedule date.'); return; }
+        }
+
+        // Build ISO datetimes covering the whole day
+        const startIso = `${start}T00:00:00Z`;
+        const endIso = `${end}T23:59:59Z`;
+
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating...'; }
+
+        const res = await fetch('/platform/admin/api/v1/finance/reports/generate/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ type, parameters: { start_date: startIso, end_date: endIso, format } })
+        });
+        const data = await res.json();
+        if (!res.ok || data.success === false) {
+            throw new Error(data.error || 'Failed to generate report');
+        }
+        const filename = data.data?.filename;
+        const downloadUrl = filename ? `/platform/admin/api/v1/finance/reports/download/${encodeURIComponent(filename)}/` : (data.data?.download_url || '#');
+
+        showAlert('success', `Report generated. <a class="alert-link" href="${downloadUrl}">Download ${filename || 'file'}</a>`);
+
+        // Close modal
+        const modalEl = document.getElementById('generateReportModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+    } catch (e) {
+        showAlert('danger', `Generation failed: ${e.message}`);
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-play me-1"></i>Generate Report'; }
     }
-    
-    if (deliveryMethod === 'schedule') {
-        const scheduleDate = document.getElementById('scheduleDate').value;
-        if (!scheduleDate) {
-            alert('Please select a schedule date');
-            return;
-        }
-    }
-    
-    // Simulate report generation
-    const generateBtn = document.getElementById('generateBtn');
-    const originalText = generateBtn.innerHTML;
-    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
-    generateBtn.disabled = true;
-    
-    setTimeout(() => {
-        if (deliveryMethod === 'download') {
-            alert(`${reportType} report generated successfully! Download will start automatically.`);
-        } else if (deliveryMethod === 'email') {
-            const email = document.getElementById('emailAddress').value;
-            alert(`${reportType} report will be sent to ${email} when ready.`);
-        } else if (deliveryMethod === 'schedule') {
-            const scheduleDate = document.getElementById('scheduleDate').value;
-            alert(`${reportType} report scheduled for ${scheduleDate}.`);
-        }
-        
-        generateBtn.innerHTML = originalText;
-        generateBtn.disabled = false;
-        
-        bootstrap.Modal.getInstance(document.getElementById('generateReportModal')).hide();
-    }, 3000);
 }
 
 // Event listeners

@@ -48,14 +48,14 @@ class ResellerSerializer(serializers.ModelSerializer):
             'tier_commission_rate', 'payment_method', 'is_active', 'is_verified',
             'verified_at', 'total_sales', 'total_commission_earned',
             'total_commission_paid', 'pending_commission', 'available_balance',
-            'joined_at', 'created_at', 'updated_at'
+            'joined_at', 'created_at', 'modified_at'
         ]
         read_only_fields = [
             'id', 'user', 'referral_code', 'tier', 'commission_rate',
             'tier_commission_rate', 'is_verified', 'verified_at',
             'total_sales', 'total_commission_earned', 'total_commission_paid',
             'pending_commission', 'available_balance', 'joined_at',
-            'created_at', 'updated_at'
+            'created_at', 'modified_at'
         ]
 
 

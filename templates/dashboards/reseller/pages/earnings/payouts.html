@@ -20,37 +20,6 @@
         </button>
     </div>
 
-    <!-- Key Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value">${{ summary.total_paid|default:"0"|floatformat:2 }}</div>
-                <div class="stat-label">Total Paid</div>
-                <div class="stat-change text-muted">All time</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value">${{ summary.available_balance|default:"0"|floatformat:2 }}</div>
-                <div class="stat-label">Available Balance</div>
-                <div class="stat-change text-success">Ready to withdraw</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value">${{ summary.pending_amount|default:"0"|floatformat:2 }}</div>
-                <div class="stat-label">Pending</div>
-                <div class="stat-change text-warning">In processing</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value">{{ summary.next_payout_date|date:"M d"|default:"TBD" }}</div>
-                <div class="stat-label">Next Payout</div>
-                <div class="stat-change text-muted">Scheduled date</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Payout Requests -->
     <div class="card mb-4">
@@ -220,12 +189,10 @@
 <script>
     function exportPayouts() {
         // Implement CSV export logic
-        console.log('Exporting payouts to CSV...');
     }
     
     function viewPayoutDetails(payoutId) {
         // Implement view details logic
-        console.log('Viewing payout details for ID:', payoutId);
     }
     
     function submitPayoutRequest() {
@@ -239,7 +206,6 @@
         }
         
         // Here you would make an AJAX call to submit the payout request
-        console.log('Submitting payout request...', Object.fromEntries(formData));
         
         // For now, just close the modal
         const modal = bootstrap.Modal.getInstance(document.getElementById('requestPayoutModal'));

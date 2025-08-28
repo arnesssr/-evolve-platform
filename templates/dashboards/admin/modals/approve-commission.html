@@ -16,49 +16,49 @@
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Commission ID:</label>
-                                <div id="commissionId">COM-001234</div>
+                                <div id="commissionId"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Sale ID:</label>
-                                <div id="saleId">SALE-001234</div>
+                                <div id="saleId"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Reseller:</label>
-                                <div id="resellerName">John Doe</div>
+                                <div id="resellerName"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Product:</label>
-                                <div id="productName">Pro Plan</div>
+                                <div id="productName"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Sale Amount:</label>
-                                <div id="saleAmount" class="text-success fw-bold">$99.00</div>
+                                <div id="saleAmount" class="text-success fw-bold"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Commission Rate:</label>
-                                <div id="commissionRate">15%</div>
+                                <div id="commissionRate"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Commission Amount:</label>
-                                <div id="commissionAmount" class="text-warning fw-bold">$14.85</div>
+                                <div id="commissionAmount" class="text-warning fw-bold"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Sale Date:</label>
-                                <div id="saleDate">2024-01-20</div>
+                                <div id="saleDate"></div>
                             </div>
                         </div>
                     </div>
@@ -71,21 +71,19 @@
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Customer:</label>
-                                <div id="customerName">ABC Corporation</div>
+                                <div id="customerName"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Email:</label>
-                                <div id="customerEmail">customer@abc.com</div>
+                                <div id="customerEmail"></div>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="detail-item">
                                 <label class="fw-bold text-muted">Transaction Details:</label>
-                                <div id="transactionDetails" class="bg-light p-2 rounded">
-                                    Pro Plan subscription - Annual billing - Transaction ID: TXN-987654
-                                </div>
+                                <div id="transactionDetails" class="bg-light p-2 rounded"></div>
                             </div>
                         </div>
                     </div>
@@ -129,7 +127,7 @@
                                 <input class="form-check-input" type="radio" name="approvalDecision" id="approveFullAmount" value="approve" checked>
                                 <label class="form-check-label" for="approveFullAmount">
                                     <i class="fas fa-check-circle text-success me-1"></i>
-                                    Approve Full Amount ($<span id="fullAmount">14.85</span>)
+                                    Approve Full Amount ($<span id="fullAmount"></span>)
                                 </label>
                             </div>
                         </div>
@@ -149,7 +147,7 @@
                         <div class="row g-2">
                             <div class="col-md-4">
                                 <label class="form-label">Approved Amount ($)</label>
-                                <input type="number" class="form-control" id="partialAmount" step="0.01" min="0" max="14.85">
+                                <input type="number" class="form-control" id="partialAmount" step="0.01" min="0">
                             </div>
                             <div class="col-md-8">
                                 <label class="form-label">Reason for Partial Approval</label>
@@ -226,20 +224,21 @@ function showApproveCommissionModal(commissionData) {
     currentCommissionData = commissionData;
     
     // Populate commission data
-    document.getElementById('commissionId').textContent = commissionData.id || 'COM-001234';
-    document.getElementById('saleId').textContent = commissionData.saleId || 'SALE-001234';
-    document.getElementById('resellerName').textContent = commissionData.resellerName || 'John Doe';
-    document.getElementById('productName').textContent = commissionData.productName || 'Pro Plan';
-    document.getElementById('saleAmount').textContent = '$' + (commissionData.saleAmount || '99.00');
-    document.getElementById('commissionRate').textContent = (commissionData.commissionRate || '15') + '%';
-    document.getElementById('commissionAmount').textContent = '$' + (commissionData.commissionAmount || '14.85');
-    document.getElementById('saleDate').textContent = commissionData.saleDate || '2024-01-20';
-    document.getElementById('customerName').textContent = commissionData.customerName || 'ABC Corporation';
-    document.getElementById('customerEmail').textContent = commissionData.customerEmail || 'customer@abc.com';
-    document.getElementById('fullAmount').textContent = commissionData.commissionAmount || '14.85';
+    document.getElementById('commissionId').textContent = commissionData.id || '';
+    document.getElementById('saleId').textContent = commissionData.saleId || '';
+    document.getElementById('resellerName').textContent = commissionData.resellerName || '';
+    document.getElementById('productName').textContent = commissionData.productName || '';
+    document.getElementById('saleAmount').textContent = commissionData.saleAmount ? ('$' + commissionData.saleAmount) : '';
+    document.getElementById('commissionRate').textContent = (commissionData.commissionRate !== undefined && commissionData.commissionRate !== null && commissionData.commissionRate !== '') ? (commissionData.commissionRate + '%') : '';
+    document.getElementById('commissionAmount').textContent = commissionData.commissionAmount ? ('$' + commissionData.commissionAmount) : '';
+    document.getElementById('saleDate').textContent = commissionData.saleDate || '';
+    document.getElementById('customerName').textContent = commissionData.customerName || '';
+    document.getElementById('customerEmail').textContent = commissionData.customerEmail || '';
+    document.getElementById('transactionDetails').textContent = commissionData.transactionDetails || '';
+    document.getElementById('fullAmount').textContent = commissionData.commissionAmount || '';
     
     // Set max value for partial amount
-    const maxAmount = parseFloat(commissionData.commissionAmount || '14.85');
+    const maxAmount = parseFloat(commissionData.commissionAmount || 0);
     document.getElementById('partialAmount').max = maxAmount;
     
     // Reset form

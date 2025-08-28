@@ -1,26 +1,23 @@
 {% extends 'dashboards/admin/layouts/admin-base.html' %}
 {% load static %}
 
-{% block title %}{% if admin.id %}Edit{% else %}Add{% endif %} Administrator{% endblock %}
+{% block title %}{{ title|default:'Administrator' }}{% endblock %}
 
-{% block page_title %}{% if admin.id %}Edit Administrator{% else %}Add New Administrator{% endif %}{% endblock %}
-{% block page_subtitle %}{% if admin.id %}Update administrator information and permissions{% else %}Create a new platform administrator{% endif %}{% endblock %}
+{% block page_title %}{{ title|default:'Administrator' }}{% endblock %}
+{% block page_subtitle %}{{ action|default:'Save' }} administrator information and permissions{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'platform_admin:admins-list' %}">Admin Users</a></li>
-    <li class="breadcrumb-item active">{% if admin.id %}Edit{% else %}Add{% endif %} Administrator</li>
+    <li class="breadcrumb-item"><a href="{% url 'platform_admin:admin_admins:list' %}">Admin Users</a></li>
+    <li class="breadcrumb-item active">{{ title|default:'Administrator' }}</li>
 {% endblock %}
 
 {% block page_actions %}
 <div class="d-flex gap-2">
-    <a href="{% url 'platform_admin:admins-list' %}" class="btn btn-outline-secondary">
+    <a href="{% url 'platform_admin:admin_admins:list' %}" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <button type="submit" form="adminForm" class="btn btn-primary">
-        <i class="fas fa-save me-2"></i>{% if admin.id %}Update{% else %}Create{% endif %} Administrator
-    </button>
-    <button type="button" class="btn btn-success" onclick="showQuickCreateModal('user')">
-        <i class="fas fa-bolt me-2"></i>Quick Create User
+        <i class="fas fa-save me-2"></i>{{ action|default:'Save' }} Administrator
     </button>
 </div>
 {% endblock %}
@@ -33,262 +30,82 @@
             
             <form id="adminForm" method="post">
                 {% csrf_token %}
-                
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="first_name" 
-                               value="{{ admin.first_name|default:'' }}" required>
+                        <label class="form-label" for="id_username">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors }}</div>{% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="last_name" 
-                               value="{{ admin.last_name|default:'' }}" required>
+                        <label class="form-label" for="id_email">Email Address</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="email" name="email" 
-                               value="{{ admin.email|default:'' }}" required>
+                        <label class="form-label" for="id_first_name">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="phone" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" 
-                               value="{{ admin.phone|default:'' }}">
+                        <label class="form-label" for="id_last_name">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors }}</div>{% endif %}
                     </div>
                 </div>
-                
-                {% if not admin.id %}
+
+                {% if form.password1 %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <label class="form-label" for="id_password1">Password</label>
+                        {{ form.password1 }}
                         <small class="text-muted">Minimum 8 characters</small>
+                        {% if form.password1.errors %}<div class="text-danger small">{{ form.password1.errors }}</div>{% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                        <label class="form-label" for="id_password2">Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}<div class="text-danger small">{{ form.password2.errors }}</div>{% endif %}
                     </div>
                 </div>
                 {% endif %}
-                
-                <div class="mb-3">
-                    <label for="role" class="form-label">Role</label>
-                    <select class="form-select" id="role" name="role" required>
-                        <option value="">Select Role</option>
-                        <option value="admin" {% if admin.role == 'admin' %}selected{% endif %}>Administrator</option>
-                        <option value="super_admin" {% if admin.role == 'super_admin' %}selected{% endif %}>Super Administrator</option>
-                        <option value="moderator" {% if admin.role == 'moderator' %}selected{% endif %}>Moderator</option>
-                    </select>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_superuser }}
+                    <label class="form-check-label" for="id_is_superuser">Is Superuser</label>
+                    {% if form.is_superuser.errors %}<div class="text-danger small">{{ form.is_superuser.errors }}</div>{% endif %}
                 </div>
-                
+
                 <div class="mb-3">
-                    <label class="form-label">Permissions</label>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permUserManagement" 
-                                       name="permissions" value="user_management"
-                                       {% if 'user_management' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permUserManagement">
-                                    <strong>User Management</strong><br>
-                                    <small class="text-muted">Create, edit, and manage user accounts</small>
-                                </label>
-                            </div>
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permFinancial" 
-                                       name="permissions" value="financial_management"
-                                       {% if 'financial_management' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permFinancial">
-                                    <strong>Financial Management</strong><br>
-                                    <small class="text-muted">Access to revenue, commissions, and payouts</small>
-                                </label>
-                            </div>
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permReports" 
-                                       name="permissions" value="reports_analytics"
-                                       {% if 'reports_analytics' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permReports">
-                                    <strong>Reports & Analytics</strong><br>
-                                    <small class="text-muted">Generate and view platform reports</small>
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permContentManagement" 
-                                       name="permissions" value="content_management"
-                                       {% if 'content_management' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permContentManagement">
-                                    <strong>Content Management</strong><br>
-                                    <small class="text-muted">Manage products, plans, and content</small>
-                                </label>
-                            </div>
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permSystemSettings" 
-                                       name="permissions" value="system_settings"
-                                       {% if 'system_settings' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permSystemSettings">
-                                    <strong>System Settings</strong><br>
-                                    <small class="text-muted">Configure platform settings</small>
-                                </label>
-                            </div>
-                            
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="permSupportAccess" 
-                                       name="permissions" value="support_access"
-                                       {% if 'support_access' in admin.permissions %}checked{% endif %}>
-                                <label class="form-check-label" for="permSupportAccess">
-                                    <strong>Support Access</strong><br>
-                                    <small class="text-muted">Handle customer support tickets</small>
-                                </label>
-                            </div>
-                        </div>
+                    <label class="form-label">Groups</label>
+                    <div class="form-control" style="height:auto;">
+                        {{ form.groups }}
                     </div>
+                    {% if form.groups.errors %}<div class="text-danger small">{{ form.groups.errors }}</div>{% endif %}
                 </div>
-                
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="isActive" name="is_active" 
-                               {% if admin.is_active or not admin.id %}checked{% endif %}>
-                        <label class="form-check-label" for="isActive">
-                            Active Administrator
-                        </label>
-                    </div>
-                    <small class="text-muted">Uncheck to suspend this administrator</small>
-                </div>
+
             </form>
         </div>
     </div>
     
     <div class="col-lg-4">
         <div class="content-card mb-4">
-            <h6 class="fw-bold mb-3">Account Status</h6>
-            {% if admin.id %}
-                <table class="table table-sm table-borderless">
-                    <tr>
-                        <td class="text-muted">Created:</td>
-                        <td>{{ admin.created_at|default:"Just now" }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Last Login:</td>
-                        <td>{{ admin.last_login|default:"Never" }}</td>
-                    </tr>
-                    <tr>
-                        <td class="text-muted">Status:</td>
-                        <td>
-                            {% if admin.is_active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-danger">Suspended</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                </table>
-            {% else %}
-                <p class="text-muted">Account information will be available after creation.</p>
-            {% endif %}
-        </div>
-        
-        <div class="content-card">
-            <h6 class="fw-bold mb-3">Security Notes</h6>
-            <ul class="list-unstyled small text-muted">
-                <li class="mb-2">
-                    <i class="fas fa-shield-alt text-primary me-2"></i>
-                    Passwords must be at least 8 characters long
-                </li>
-                <li class="mb-2">
-                    <i class="fas fa-key text-primary me-2"></i>
-                    Two-factor authentication is recommended
-                </li>
-                <li class="mb-2">
-                    <i class="fas fa-clock text-primary me-2"></i>
-                    Sessions expire after 24 hours of inactivity
-                </li>
-                <li class="mb-2">
-                    <i class="fas fa-eye text-primary me-2"></i>
-                    All admin actions are logged and audited
-                </li>
+            <h6 class="fw-bold mb-3">Help</h6>
+            <ul class="list-unstyled small text-muted mb-0">
+                <li class="mb-2"><i class="fas fa-shield-alt text-primary me-2"></i> Admins are staff users with access to the admin dashboard.</li>
+                <li class="mb-2"><i class="fas fa-crown text-primary me-2"></i> Superusers have all permissions automatically.</li>
+                <li class="mb-2"><i class="fas fa-users text-primary me-2"></i> Groups let you assign sets of permissions quickly.</li>
             </ul>
         </div>
     </div>
 </div>
-{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('adminForm');
-    const roleSelect = document.getElementById('role');
-    const permissionCheckboxes = document.querySelectorAll('input[name="permissions"]');
-    
-    // Auto-select permissions based on role
-    roleSelect.addEventListener('change', function() {
-        const role = this.value;
-        
-        // Clear all permissions
-        permissionCheckboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        
-        // Set permissions based on role
-        if (role === 'super_admin') {
-            permissionCheckboxes.forEach(checkbox => {
-                checkbox.checked = true;
-            });
-        } else if (role === 'admin') {
-            ['user_management', 'financial_management', 'reports_analytics', 'content_management'].forEach(perm => {
-                const checkbox = document.querySelector(`input[value="${perm}"]`);
-                if (checkbox) checkbox.checked = true;
-            });
-        } else if (role === 'moderator') {
-            ['user_management', 'support_access'].forEach(perm => {
-                const checkbox = document.querySelector(`input[value="${perm}"]`);
-                if (checkbox) checkbox.checked = true;
-            });
-        }
-    });
-    
-    // Password confirmation validation
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirmPassword');
-    
-    if (password && confirmPassword) {
-        confirmPassword.addEventListener('input', function() {
-            if (password.value !== confirmPassword.value) {
-                confirmPassword.setCustomValidity('Passwords do not match');
-            } else {
-                confirmPassword.setCustomValidity('');
-            }
-        });
-    }
-    
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Validate that at least one permission is selected
-        const hasPermissions = Array.from(permissionCheckboxes).some(cb => cb.checked);
-        if (!hasPermissions) {
-            alert('Please select at least one permission for this administrator.');
-            return;
-        }
-        
-        // In a real application, submit the form data via AJAX or normal form submission
-        showToast('Administrator {% if admin.id %}updated{% else %}created{% endif %} successfully!', 'success');
-        
-        // Redirect after a delay (in real app, this would happen after successful server response)
-        setTimeout(() => {
-            window.location.href = "{% url 'platform_admin:admins-list' %}";
-        }, 1500);
-    });
-});
-</script>
 {% endblock %}

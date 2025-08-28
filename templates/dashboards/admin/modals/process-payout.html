@@ -18,25 +18,25 @@
                                 <div class="col-md-6">
                                     <div class="summary-item">
                                         <label class="fw-bold text-muted">Reseller:</label>
-                                        <div id="payoutReseller" class="fs-5">John Doe</div>
+<div id="payoutReseller" class="fs-5">{{ reseller.name|default:'' }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="summary-item">
                                         <label class="fw-bold text-muted">Total Amount:</label>
-                                        <div id="payoutAmount" class="fs-4 text-success fw-bold">$1,247.50</div>
+<div id="payoutAmount" class="fs-4 text-success fw-bold"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="summary-item">
                                         <label class="fw-bold text-muted">Commissions Count:</label>
-                                        <div id="commissionsCount">15 commissions</div>
+<div id="commissionsCount"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="summary-item">
                                         <label class="fw-bold text-muted">Period:</label>
-                                        <div id="payoutPeriod">Jan 1 - Jan 31, 2024</div>
+<div id="payoutPeriod"></div>
                                     </div>
                                 </div>
                             </div>
@@ -50,7 +50,7 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="form-check payment-option">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" checked onchange="updatePaymentFields()">
+<input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer" {% if reseller.payment_method == 'bank_transfer' or not reseller.payment_method %}checked{% endif %} onchange="updatePaymentFields()">
                                 <label class="form-check-label" for="bankTransfer">
                                     <i class="fas fa-university text-primary me-2"></i>
                                     <strong>Bank Transfer</strong><br>
@@ -60,7 +60,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-check payment-option">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" onchange="updatePaymentFields()">
+<input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" {% if reseller.payment_method == 'paypal' %}checked{% endif %} onchange="updatePaymentFields()">
                                 <label class="form-check-label" for="paypal">
                                     <i class="fab fa-paypal text-info me-2"></i>
                                     <strong>PayPal</strong><br>
@@ -70,7 +70,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-check payment-option">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="check" value="check" onchange="updatePaymentFields()">
+<input class="form-check-input" type="radio" name="paymentMethod" id="check" value="check" {% if reseller.payment_method == 'check' %}checked{% endif %} onchange="updatePaymentFields()">
                                 <label class="form-check-label" for="check">
                                     <i class="fas fa-money-check text-warning me-2"></i>
                                     <strong>Check</strong><br>
@@ -87,19 +87,19 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Bank Name</label>
-                            <input type="text" class="form-control" id="bankName" value="Chase Bank" readonly>
+<input type="text" class="form-control" id="bankName" value="{{ reseller.bank_name }}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Account Holder</label>
-                            <input type="text" class="form-control" id="accountHolder" value="John Doe" readonly>
+<input type="text" class="form-control" id="accountHolder" value="{{ reseller.bank_account_name }}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Account Number</label>
-                            <input type="text" class="form-control" id="accountNumber" value="****1234" readonly>
+<input type="text" class="form-control" id="accountNumber" value="{{ reseller.bank_account_number_masked }}" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Routing Number</label>
-                            <input type="text" class="form-control" id="routingNumber" value="****5678" readonly>
+<input type="text" class="form-control" id="routingNumber" value="{{ reseller.bank_routing_number_masked }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">PayPal Email</label>
-                            <input type="email" class="form-control" id="paypalEmail" value="john.doe@example.com" readonly>
+<input type="email" class="form-control" id="paypalEmail" value="{{ reseller.paypal_email }}" readonly>
                         </div>
                     </div>
                 </div>
@@ -121,9 +121,7 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">Address</label>
-                            <textarea class="form-control" id="mailingAddress" rows="3" readonly>123 Main St
-Anytown, ST 12345
-United States</textarea>
+<textarea class="form-control" id="mailingAddress" rows="3" readonly>{% if reseller.address or reseller.city or reseller.state or reseller.postal_code or reseller.country %}{{ reseller.address|default:'' }}{% if reseller.address %}\n{% endif %}{{ reseller.city|default:'' }}{% if reseller.city and reseller.state %}, {% endif %}{{ reseller.state|default:'' }}{% if reseller.postal_code %} {{ reseller.postal_code }}{% endif %}{% if reseller.city or reseller.state or reseller.postal_code %}\n{% endif %}{{ reseller.country|default:'' }}{% else %}—{% endif %}</textarea>
                         </div>
                     </div>
                 </div>
@@ -136,27 +134,27 @@ United States</textarea>
                             <label class="form-label">Processing Fee</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="processingFee" value="5.00" step="0.01" onchange="calculateNetAmount()">
+                                <input type="number" class="form-control" id="processingFee" value="" step="0.01" onchange="calculateNetAmount()" placeholder="0.00">
                             </div>
-                            <small class="form-text text-muted">Standard processing fee</small>
+                            <small class="form-text text-muted">Optional</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Tax Withholding</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="taxWithholding" value="0.00" step="0.01" onchange="calculateNetAmount()">
+                                <input type="number" class="form-control" id="taxWithholding" value="" step="0.01" onchange="calculateNetAmount()" placeholder="0.00">
                             </div>
                             <small class="form-text text-muted">If applicable</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Reference Number</label>
-                            <input type="text" class="form-control" id="referenceNumber" value="PAY-2024-001234" readonly>
+<input type="text" class="form-control" id="referenceNumber" value="" placeholder="Auto-generated on processing" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Net Payout Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="text" class="form-control" id="netAmount" value="1242.50" readonly>
+<input type="text" class="form-control" id="netAmount" value="" readonly>
                             </div>
                         </div>
                     </div>
@@ -194,7 +192,7 @@ United States</textarea>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Scheduled Time</label>
-                                <input type="time" class="form-control" id="scheduledTime" value="09:00">
+                                <input type="time" class="form-control" id="scheduledTime" value="">
                             </div>
                         </div>
                     </div>
@@ -284,15 +282,10 @@ function showProcessPayoutModal(payoutData) {
     currentPayoutData = payoutData;
     
     // Populate payout data
-    document.getElementById('payoutReseller').textContent = payoutData.resellerName || 'John Doe';
-    document.getElementById('payoutAmount').textContent = '$' + (payoutData.totalAmount || '1,247.50');
-    document.getElementById('commissionsCount').textContent = (payoutData.commissionsCount || '15') + ' commissions';
-    document.getElementById('payoutPeriod').textContent = payoutData.period || 'Jan 1 - Jan 31, 2024';
-    
-    // Set tomorrow as default scheduled date
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('scheduledDate').value = tomorrow.toISOString().split('T')[0];
+document.getElementById('payoutReseller').textContent = payoutData.resellerName || document.getElementById('payoutReseller').textContent;
+if (payoutData.totalAmount !== undefined && payoutData.totalAmount !== null) { document.getElementById('payoutAmount').textContent = '$' + payoutData.totalAmount; }
+if (payoutData.commissionsCount !== undefined) { document.getElementById('commissionsCount').textContent = payoutData.commissionsCount + ' commissions'; }
+if (payoutData.period) { document.getElementById('payoutPeriod').textContent = payoutData.period; }
     
     // Load commission breakdown
     loadCommissionBreakdown(payoutData.commissions || []);
@@ -321,17 +314,12 @@ function updatePaymentFields() {
         document.getElementById('checkFields').style.display = 'block';
     }
     
-    // Update processing fee based on method
-    let fee = 5.00;
-    if (selectedMethod === 'paypal') fee = 12.50;
-    if (selectedMethod === 'check') fee = 2.00;
-    
-    document.getElementById('processingFee').value = fee.toFixed(2);
+    // Do not auto-set processing fees; leave for admin to enter
     calculateNetAmount();
 }
 
 function calculateNetAmount() {
-    const grossAmount = parseFloat(currentPayoutData?.totalAmount || '1247.50');
+const grossAmount = parseFloat(document.getElementById('grossAmountHidden').value || (currentPayoutData?.totalAmount ?? '0'));
     const processingFee = parseFloat(document.getElementById('processingFee').value || '0');
     const taxWithholding = parseFloat(document.getElementById('taxWithholding').value || '0');
     
@@ -342,15 +330,10 @@ function calculateNetAmount() {
 function loadCommissionBreakdown(commissions) {
     const tbody = document.getElementById('commissionBreakdown');
     
-    // Sample commission data if none provided
+    // If none provided, leave empty (no mock data)
     if (commissions.length === 0) {
-        commissions = [
-            { date: '2024-01-20', saleId: 'SALE-001234', product: 'Pro Plan', amount: '$15.50' },
-            { date: '2024-01-19', saleId: 'SALE-001230', product: 'Basic Plan', amount: '$7.35' },
-            { date: '2024-01-18', saleId: 'SALE-001225', product: 'Enterprise', amount: '$29.85' },
-            { date: '2024-01-17', saleId: 'SALE-001220', product: 'Pro Plan', amount: '$15.50' },
-            { date: '2024-01-16', saleId: 'SALE-001215', product: 'Basic Plan', amount: '$7.35' }
-        ];
+        tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No commission breakdown available.</td></tr>';
+        return;
     }
     
     let html = '';
@@ -380,6 +363,16 @@ function loadCommissionBreakdown(commissions) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Seed gross amount from server context
+    const grossHidden = document.createElement('input');
+    grossHidden.type = 'hidden';
+    grossHidden.id = 'grossAmountHidden';
+grossHidden.value = '';
+    document.body.appendChild(grossHidden);
+
+    // Initialize fields based on selected method
+    updatePaymentFields();
+    calculateNetAmount();
     // Schedule radio button change
     document.querySelectorAll('input[name="schedule"]').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -405,9 +398,7 @@ function preparePayoutSubmit() {
         method: paymentMethod,
         schedule: schedule,
         referenceNumber: document.getElementById('referenceNumber').value,
-        notes: notes,
-        processedBy: 'Current Admin',
-        processedAt: new Date().toISOString()
+        notes: notes
     };
     
     if (schedule === 'scheduled') {

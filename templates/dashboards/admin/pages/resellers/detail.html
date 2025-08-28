@@ -31,9 +31,6 @@
                 <i class="fas fa-ban me-2"></i>Suspend Account
             </a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">
-                <i class="fas fa-envelope me-2"></i>Send Message
-            </a></li>
         </ul>
 </div>
     <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('commission')">
@@ -58,16 +55,15 @@
                         </div>
                     </div>
                     <div>
-                        <h4 class="mb-1">{{ reseller.name|default:"John Marketing" }}</h4>
-                        <p class="text-muted mb-2">{{ reseller.company|default:"Marketing Pro Solutions" }} • {{ reseller.specialization|default:"Digital Marketing" }}</p>
+<h4 class="mb-1">{{ reseller.name }}</h4>
+<p class="text-muted mb-2">{{ reseller.company }}{% if reseller.specialization %} • {{ reseller.specialization }}{% endif %}</p>
                         <div class="d-flex align-items-center gap-3">
                             {% include 'dashboards/admin/components/status-badge.html' with status="active" text="Active Reseller" %}
-                            <span class="badge bg-warning">Premium Tier</span>
                         </div>
                     </div>
                 </div>
                 <div class="text-end">
-                    <div class="fw-bold text-success fs-4">${{ reseller.total_earnings|default:"8,450" }}</div>
+<div class="fw-bold text-success fs-4">${{ reseller.total_earnings|floatformat:2 }}</div>
                     <small class="text-muted">Total Earnings</small>
                 </div>
             </div>
@@ -78,19 +74,19 @@
                     <table class="table table-sm table-borderless">
                         <tr>
                             <td class="text-muted">Email:</td>
-                            <td class="fw-medium">{{ reseller.email|default:"john@marketingpro.com" }}</td>
+<td class="fw-medium">{{ reseller.email|default:"—" }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Phone:</td>
-                            <td class="fw-medium">{{ reseller.phone|default:"+254 700 123 456" }}</td>
+<td class="fw-medium">{{ reseller.phone|default:"—" }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Company:</td>
-                            <td>{{ reseller.company|default:"Marketing Pro Solutions" }}</td>
+<td>{{ reseller.company|default:"—" }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Website:</td>
-                            <td><a href="{{ reseller.website|default:'#' }}" target="_blank">{{ reseller.website|default:"www.marketingpro.com" }}</a></td>
+<td><a href="{{ reseller.website|default:'#' }}" target="_blank">{{ reseller.website|default:"—" }}</a></td>
                         </tr>
                     </table>
                 </div>
@@ -98,19 +94,19 @@
                     <h6 class="fw-bold mb-3">Performance Metrics</h6>
                     <div class="row text-center">
                         <div class="col-6 mb-3">
-                            <div class="fw-bold fs-4 text-primary">{{ reseller.sales_count|default:"23" }}</div>
+<div class="fw-bold fs-4 text-primary">{{ reseller.sales_count|default:"0" }}</div>
                             <small class="text-muted">Total Sales</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <div class="fw-bold fs-4 text-info">{{ reseller.conversion_rate|default:"15.8" }}%</div>
+<div class="fw-bold fs-4 text-info">{{ reseller.conversion_rate|default:"—" }}{% if reseller.conversion_rate %}%{% endif %}</div>
                             <small class="text-muted">Conversion Rate</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <div class="fw-bold fs-4 text-success">{{ reseller.commission_rate|default:"10" }}%</div>
+<div class="fw-bold fs-4 text-success">{{ reseller.commission_rate|floatformat:2 }}%</div>
                             <small class="text-muted">Commission Rate</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <div class="fw-bold fs-4 text-warning">{{ reseller.avg_deal_size|default:"$2,450" }}</div>
+<div class="fw-bold fs-4 text-warning">{{ reseller.avg_deal_size|default:"—" }}</div>
                             <small class="text-muted">Avg Deal Size</small>
                         </div>
                     </div>
@@ -121,14 +117,13 @@
         <!-- Performance Chart -->
         <div class="content-card mb-4">
             <h5 class="mb-4">Sales Performance</h5>
-            <canvas id="performanceChart" height="100"></canvas>
+            <div class="chart-container"><canvas id="performanceChart"></canvas></div>
         </div>
         
         <!-- Recent Sales -->
         <div class="content-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="mb-0">Recent Sales</h5>
-                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             
             <div class="table-responsive">
@@ -178,17 +173,17 @@
         <div class="content-card mb-4">
             <h6 class="fw-bold mb-3">Commission Summary</h6>
             <div class="text-center mb-3">
-                <div class="fw-bold fs-3 text-success">${{ reseller.pending_commission|default:"1,470" }}</div>
+<div class="fw-bold fs-3 text-success">${{ reseller.pending_commission|floatformat:2 }}</div>
                 <small class="text-muted">Pending Commission</small>
             </div>
             
             <div class="row text-center">
                 <div class="col-6 mb-2">
-                    <div class="fw-bold text-primary">${{ reseller.monthly_commission|default:"2,450" }}</div>
+<div class="fw-bold text-primary">${{ reseller.monthly_commission|floatformat:2 }}</div>
                     <small class="text-muted">This Month</small>
                 </div>
                 <div class="col-6 mb-2">
-                    <div class="fw-bold text-info">${{ reseller.yearly_commission|default:"18,750" }}</div>
+<div class="fw-bold text-info">${{ reseller.yearly_commission|floatformat:2 }}</div>
                     <small class="text-muted">This Year</small>
                 </div>
             </div>
@@ -222,19 +217,19 @@
             <table class="table table-sm table-borderless">
                 <tr>
                     <td class="text-muted">Joined:</td>
-                    <td class="fw-medium">{{ reseller.join_date|default:"Jan 15, 2024" }}</td>
+<td class="fw-medium">{{ reseller.join_date|date:'M j, Y'|default:"—" }}</td>
                 </tr>
                 <tr>
                     <td class="text-muted">Last Login:</td>
-                    <td class="fw-medium">{{ reseller.last_login|default:"2 hours ago" }}</td>
+<td class="fw-medium">{% if reseller.last_login %}{{ reseller.last_login|timesince }} ago{% else %}Never{% endif %}</td>
                 </tr>
                 <tr>
                     <td class="text-muted">Referral Code:</td>
-                    <td class="fw-medium">{{ reseller.referral_code|default:"JOHN2024" }}</td>
+<td class="fw-medium">{{ reseller.referral_code|default:"—" }}</td>
                 </tr>
                 <tr>
                     <td class="text-muted">Territory:</td>
-                    <td class="fw-medium">{{ reseller.territory|default:"East Africa" }}</td>
+<td class="fw-medium">{{ reseller.territory|default:"—" }}</td>
                 </tr>
             </table>
         </div>
@@ -303,6 +298,22 @@
 
 {% block extra_css %}
 <style>
+/* Fix chart height to keep layout stable */
+.chart-container {
+    position: relative;
+    height: 320px;
+    max-height: 320px;
+    width: 100%;
+    overflow: hidden;
+}
+.chart-container canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
 .timeline {
     position: relative;
     padding-left: 30px;
@@ -390,19 +401,14 @@ document.addEventListener('DOMContentLoaded', function() {
     qcEl.addEventListener('shown.bs.modal', function() {
       const selected = document.querySelector('#quickCreateModal input[name="createType"]:checked');
       if (selected && selected.value === 'commission') {
-        const resellerSel = document.querySelector('#quickCreateModal select[name="reseller_id"]');
-        if (resellerSel) {
-          const rid = "{{ reseller.id }}";
-          const rname = "{{ reseller.name|escapejs }}";
-          if (rid) {
-            let opt = Array.from(resellerSel.options).find(o => o.value === rid);
-            if (!opt) {
-              opt = new Option(rname, rid, true, true);
-              resellerSel.add(opt);
-            } else {
-              resellerSel.value = rid;
-            }
-          }
+        const rid = "{{ reseller.id }}";
+        const input = document.querySelector('#quickCreateModal input[name="reseller_id"]');
+        const applyAll = document.querySelector('#quickCreateModal input[name="apply_all"]');
+        if (input && rid) {
+          input.value = rid;
+          if (applyAll) applyAll.checked = false;
+          const container = document.getElementById('resellerSelectContainer');
+          if (container) container.style.display = '';
         }
       }
     });

@@ -1,0 +1,108 @@
+/* UI Standards for Reseller Dashboard */
+/* Loads after existing CSS to provide consistent, professional styling */
+:root {
+  --ui-card-radius: 12px;
+  --ui-card-padding: 1rem;
+  --ui-gap-sm: 0.5rem;
+  --ui-gap-md: 1rem;
+  --ui-gap-lg: 1.5rem;
+}
+
+/* Page header: title + optional actions aligned neatly */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--ui-gap-md);
+  margin-bottom: 1.5rem;
+}
+.page-title {
+  margin: 0;
+  font-weight: 600;
+}
+.page-subtitle {
+  margin: 0;
+}
+
+/* Cards */
+.card,
+.content-card {
+  border-radius: var(--ui-card-radius);
+}
+.card-header {
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.card-title {
+  font-weight: 600;
+}
+
+/* Stat card used across multiple pages */
+.stat-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--ui-card-radius);
+  padding: 1rem;
+}
+.stat-card .stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+.stat-card .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.stat-card .stat-change {
+  font-size: 0.8rem;
+}
+
+/* Commission card component - unify look */
+.commission-card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--ui-card-radius);
+}
+.commission-card .card-title {
+  color: var(--reseller-primary, #0d6efd);
+  margin-bottom: 0.5rem;
+}
+
+/* Icon circles (replace inline width/height if needed) */
+.icon-circle-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-circle-md {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Progress thickness helpers */
+.progress-thin { height: 8px !important; }
+.progress-xxs { height: 4px !important; }
+.progress-lg  { height: 20px !important; }
+
+/* Tables */
+.table thead th {
+  font-weight: 600;
+}
+
+/* Spacing helpers for sections */
+.section {
+  margin-bottom: 1.5rem;
+}
+.section-title {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Breadcrumb area compactness (base already includes breadcrumb styles) */
+.breadcrumb-nav { margin-bottom: 0.75rem; }
+

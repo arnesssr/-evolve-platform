@@ -4,62 +4,65 @@
     <ul class="nav flex-column p-2">
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:dashboard' %}">
-          <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+          <i class="fas fa-tachometer-alt me-2"></i>
+          <span class="nav-text">Dashboard</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:businesses-list' %}">
-          <i class="fas fa-building me-2"></i> Businesses
+          <i class="fas fa-building me-2"></i>
+          <span class="nav-text">Businesses</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:resellers-list' %}">
-          <i class="fas fa-handshake me-2"></i> Resellers
+          <i class="fas fa-handshake me-2"></i>
+          <span class="nav-text">Resellers</span>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'platform_admin:admins-list' %}">
-          <i class="fas fa-user-shield me-2"></i> Administrators
+        <a class="nav-link" href="{% url 'platform_admin:admin_admins:list' %}">
+          <i class="fas fa-user-shield me-2"></i>
+          <span class="nav-text">Administrators</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:products-list' %}">
-          <i class="fas fa-box me-2"></i> Products
+          <i class="fas fa-box me-2"></i>
+          <span class="nav-text">Products</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:financial-revenue' %}">
-          <i class="fas fa-chart-line me-2"></i> Financial
+          <i class="fas fa-chart-line me-2"></i>
+          <span class="nav-text">Financial</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:analytics-overview' %}">
-          <i class="fas fa-chart-bar me-2"></i> Analytics
+          <i class="fas fa-chart-bar me-2"></i>
+          <span class="nav-text">Analytics</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:reports-generate' %}">
-          <i class="fas fa-file-alt me-2"></i> Reports
+          <i class="fas fa-file-alt me-2"></i>
+          <span class="nav-text">Reports</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:settings-general' %}">
-          <i class="fas fa-cog me-2"></i> Settings
+          <i class="fas fa-cog me-2"></i>
+          <span class="nav-text">Settings</span>
         </a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="{% url 'platform_admin:system-status' %}">
-          <i class="fas fa-server me-2"></i> System
+          <i class="fas fa-server me-2"></i>
+          <span class="nav-text">System</span>
         </a>
       </li>
     </ul>
   </nav>
 </aside>
-
-<style>
-.admin-sidebar{width:250px;position:fixed;left:0;top:0;height:100vh;background:#0a2463;color:#fff}
-.admin-sidebar .nav-link{color:rgba(255,255,255,.9);padding:.6rem 1rem;border-radius:6px;margin:.15rem 0}
-.admin-sidebar .nav-link:hover{background:rgba(255,255,255,.1);color:#fff}
-.sidebar-nav{margin-top:70px}
-</style>
 

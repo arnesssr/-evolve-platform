@@ -53,37 +53,6 @@
         
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="overview" role="tabpanel">
-            <!-- Commission Stats -->
-    <div class="row g-2 mb-4">
-        <div class="col">
-            <div class="stat-card stat-card-square">
-                <i class="bi bi-cash-stack stat-icon-minimal text-success"></i>
-                <div class="stat-value-minimal">${{ current_month_earnings|default:"0" }}</div>
-                <div class="stat-label-minimal">This Month</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="stat-card stat-card-square">
-                <i class="bi bi-hourglass-split stat-icon-minimal text-warning"></i>
-                <div class="stat-value-minimal">${{ pending_amount|default:"0" }}</div>
-                <div class="stat-label-minimal">Pending</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="stat-card stat-card-square">
-                <i class="bi bi-check-circle stat-icon-minimal text-info"></i>
-                <div class="stat-value-minimal">${{ lifetime_earnings|default:"0" }}</div>
-                <div class="stat-label-minimal">Lifetime</div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="stat-card stat-card-square">
-                <i class="bi bi-trophy stat-icon-minimal text-primary"></i>
-                <div class="stat-value-minimal">{{ current_tier|default:"Bronze" }}</div>
-                <div class="stat-label-minimal">Tier</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Commission Structure -->
     <div class="row g-3 mb-4">

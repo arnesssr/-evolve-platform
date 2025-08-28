@@ -24,10 +24,10 @@ class ResellerCreateForm(forms.Form):
     email = forms.EmailField(required=False)
     phone = forms.CharField(required=False)
     company = forms.CharField(required=False)
-    tier = forms.ChoiceField(choices=[('basic','Basic'),('standard','Standard'),('premium','Premium')])
+    tier = forms.ChoiceField(required=False, choices=[('basic','Basic'),('standard','Standard'),('premium','Premium')])
     territory = forms.CharField(required=False)
     specialization = forms.CharField(required=False)
-    status = forms.ChoiceField(choices=[('active','Active'),('suspended','Suspended'),('pending','Pending')], initial='active')
+    status = forms.ChoiceField(required=False, choices=[('active','Active'),('suspended','Suspended'),('pending','Pending')], initial='active')
 
     def clean(self):
         cleaned = super().clean()

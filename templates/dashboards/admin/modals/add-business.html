@@ -1,0 +1,55 @@
+<div class="modal fade" id="addBusinessModal" tabindex="-1" aria-labelledby="addBusinessLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBusinessLabel">Add Business</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addBusinessForm" class="d-flex flex-column gap-3">
+          <div>
+            <label class="form-label">Company Name</label>
+            <input type="text" name="business_name" class="form-control" required />
+          </div>
+          <div>
+            <label class="form-label">Company Email</label>
+            <input type="email" name="business_email" class="form-control" required />
+          </div>
+          <div>
+            <label class="form-label">Industry</label>
+            <select name="industry" class="form-select" required>
+              {% for key,label in App.models.Business.INDUSTRY_CHOICES %}
+              <option value="{{ key }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Company Size</label>
+            <select name="company_size" class="form-select" required>
+              {% for key,label in App.models.Business.COMPANY_SIZE_CHOICES %}
+              <option value="{{ key }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Country</label>
+            <select name="country" class="form-select" required>
+              {% for key,label in App.models.Business.COUNTRY_CHOICES %}
+              <option value="{{ key }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Postal Code</label>
+            <input type="text" name="postal_code" class="form-control" required />
+          </div>
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

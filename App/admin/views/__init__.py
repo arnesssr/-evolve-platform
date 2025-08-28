@@ -1,0 +1,1 @@
+# Admin views module

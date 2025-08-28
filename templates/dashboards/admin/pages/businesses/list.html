@@ -16,8 +16,8 @@
     <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#bulkActionModal">
         <i class="fas fa-tasks me-2"></i>Bulk Actions
     </button>
-    <button type="button" class="btn btn-primary" onclick="showQuickCreateModal('user')">
-        <i class="fas fa-plus me-2"></i>New User
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBusinessModal">
+        <i class="fas fa-plus me-2"></i>New Business
     </button>
 </div>
 {% endblock %}
@@ -125,7 +125,7 @@
 
 <!-- Include Modals -->
 {% include 'dashboards/admin/modals/bulk-action.html' with entity_type="businesses" %}
-{% include 'dashboards/admin/modals/quick-create.html' with show_user=True %}
+{% include 'dashboards/admin/modals/add-business.html' %}
 {% include 'dashboards/admin/modals/user-details.html' %}
 {% endblock %}
 
@@ -136,13 +136,57 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize DataTable
-    const table = $('#businessesTable').DataTable({
+    const $table = $('#businessesTable');
+    const table = $table.DataTable({
         responsive: true,
         pageLength: 25,
-        order: [[7, 'desc']], // Sort by registration date
+        order: [[7, 'desc']],
+        processing: true,
+        searching: true,
+        ajax: function(data, callback) {
+            const params = new URLSearchParams();
+            // Filters
+            const searchInput = document.querySelector('[data-search]');
+            const q = (searchInput && searchInput.value) ? searchInput.value : '';
+            const industry = (document.getElementById('industryFilter') || {}).value || '';
+            if (q) params.set('q', q);
+            if (industry) params.set('industry', industry);
+            params.set('page_size', '1000');
+            fetch(`/platform/api/v1/businesses/?${params.toString()}`)
+              .then(r => r.json())
+              .then(json => {
+                  const rows = (json.results || []).map(b => ([
+                    // checkbox
+                    `<div class="form-check"><input class="form-check-input" type="checkbox" value="${b.id}"></div>`,
+                    // Business
+                    `<div class="fw-semibold">${b.name}</div><div class="text-muted small">${b.email || ''}</div>`,
+                    // Contact person (placeholder)
+                    '-',
+                    // Industry
+                    b.industry || '-',
+                    // Subscription (placeholder)
+                    '-',
+                    // Revenue (placeholder)
+                    '-',
+                    // Status (placeholder)
+                    `<span class="badge bg-success">Active</span>`,
+                    // Registration
+                    (b.created_at ? new Date(b.created_at).toLocaleDateString() : '-'),
+                    // Actions
+                    `<a class="btn btn-sm btn-outline-primary" href="/platform/admin/businesses/detail/${b.id}/"><i class="fas fa-eye"></i></a>`
+                  ]));
+                  callback({
+                    data: rows
+                  });
+                  const infoEl = document.getElementById('tableInfo');
+                  if (infoEl) {
+                    infoEl.textContent = `${rows.length} of ${json.count || rows.length}`;
+                  }
+              })
+              .catch(() => callback({ data: [] }));
+        },
         columnDefs: [
-            { orderable: false, targets: [0, 8] }, // Disable sorting for checkbox and actions
+            { orderable: false, targets: [0, 8] },
             { searchable: false, targets: [0, 8] }
         ],
         dom: 'tr<"d-flex justify-content-between align-items-center"<"d-flex align-items-center gap-2"l<"ms-2"i>>p>',
@@ -156,13 +200,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Update table info
-    table.on('draw', function() {
-        const info = table.page.info();
-        document.getElementById('tableInfo').textContent = 
-            `${info.start + 1}-${info.end} of ${info.recordsDisplay}`;
-    });
-
     // Select all checkboxes
     document.getElementById('selectAll').addEventListener('change', function() {
         const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
@@ -171,37 +208,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Filter functionality
-    ['statusFilter', 'subscriptionFilter', 'industryFilter'].forEach(filterId => {
-        const filter = document.getElementById(filterId);
-        if (filter) {
-            filter.addEventListener('change', function() {
-                applyFilters();
-            });
-        }
+    // Filter change triggers reload
+    ['subscriptionFilter', 'industryFilter'].forEach(filterId => {
+        const el = document.getElementById(filterId);
+        if (el) el.addEventListener('change', () => table.ajax.reload());
     });
+    const searchInput = document.querySelector('[data-search]');
+    if (searchInput) searchInput.addEventListener('keyup', () => table.ajax.reload());
 
-    // Search functionality
-    // Apply initial search from ?q= if present and wire up live search
-    (function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const q = urlParams.get('q');
-        const searchInput = document.querySelector('[data-search]');
-        if (q) {
-            table.search(q).draw();
-            if (searchInput) searchInput.value = q;
-        }
-        if (searchInput) {
-            searchInput.addEventListener('keyup', function() {
-                table.search(this.value).draw();
+    // Handle Add Business form submit
+    const addForm = document.getElementById('addBusinessForm');
+    if (addForm) {
+        addForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(addForm);
+            const payload = Object.fromEntries(formData.entries());
+            const res = await fetch('/platform/api/v1/businesses/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
             });
-        }
-    })();
-
-    function applyFilters() {
-        // Custom filter logic would go here
-        // For now, just trigger table redraw
-        table.draw();
+            if (res.ok) {
+                const modalEl = document.getElementById('addBusinessModal');
+                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                modal.hide();
+                addForm.reset();
+                table.ajax.reload();
+                showToast && showToast('Business created successfully', 'success');
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert('Failed to create business. ' + (data.error || ''));
+            }
+        });
     }
 
     // View toggle
@@ -209,11 +247,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
-            const view = this.dataset.view;
-            if (view === 'grid') {
-                // Switch to grid view (implement grid view logic)
-                showToast('Grid view coming soon!', 'info');
+            if (this.dataset.view === 'grid') {
+                showToast && showToast('Grid view coming soon!', 'info');
             }
         });
     });

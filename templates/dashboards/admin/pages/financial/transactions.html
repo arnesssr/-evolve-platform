@@ -28,7 +28,6 @@
 
 {% block extra_css %}
 <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block page_header %}
@@ -69,46 +68,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Transaction Summary -->
-<div class="content-card">
-  <small class="text-muted">No KPI data available.</small>
-</div>
-
-<!-- Transaction Charts -->
-<div class="row mb-4">
-    <!-- Transaction Volume Chart -->
-    <div class="col-lg-8">
-        <div class="content-card">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="mb-0">Transaction Volume Trends</h5>
-                <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary active" data-period="7days">7 Days</button>
-                    <button type="button" class="btn btn-outline-primary" data-period="30days">30 Days</button>
-                    <button type="button" class="btn btn-outline-primary" data-period="90days">90 Days</button>
-                </div>
-            </div>
-            <canvas id="transactionVolumeChart" height="100"></canvas>
-        </div>
-    </div>
-    
-    <!-- Transaction Types -->
-    <div class="col-lg-4">
-        <div class="content-card">
-            <h5 class="mb-4">Transaction Types</h5>
-            <canvas id="transactionTypesChart" height="200"></canvas>
-        </div>
-    </div>
-</div>
-
-<!-- Transaction Status Overview -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="content-card">
-            <h5 class="mb-4">Transaction Status Overview</h5>
-            <p class="text-muted mb-0">No transaction status data available.</p>
-        </div>
-    </div>
-</div>
 
 {% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search transactions…' offcanvas_id='transactionFilters' show_date_range=True %}
 
@@ -225,18 +184,40 @@ $(document).ready(function() {
     const table = $('#transactionsTable').DataTable({
         responsive: true,
         pageLength: 25,
-        order: [[7, 'desc']], // Sort by date
+        order: [[7, 'desc']],
         autoWidth: false,
-        columns: [null, null, null, null, null, null, null, null, null],
-        columnDefs: [
-            { orderable: false, targets: [0, 8] } // Disable ordering for checkbox and actions
-        ],
-        language: {
-            emptyTable: 'No transactions found.'
-        }
+        columnDefs: [ { orderable: false, targets: [0, 8] } ],
+        language: { emptyTable: 'No transactions found.' }
     });
 
-    // Search: initialize from ?q= and wire live search
+    async function loadTransactions() {
+        try {
+            const res = await fetch('/platform/admin/api/v1/finance/transactions/?page_size=200', { credentials: 'same-origin' });
+            const json = await res.json();
+            const rows = [];
+            (json.data.transactions || []).forEach(tx => {
+                rows.push([
+                    '<input type="checkbox" class="form-check-input" />',
+                    tx.id,
+                    tx.counterparty || '-',
+                    tx.type,
+                    (tx.amount >= 0 ? '$' + tx.amount.toFixed(2) : '-$' + Math.abs(tx.amount).toFixed(2)),
+                    tx.method || '-',
+                    tx.status || '-',
+                    tx.date ? new Date(tx.date).toLocaleDateString() : '-',
+                    '<div class="btn-group btn-group-sm"><button class="btn btn-outline-secondary">View</button></div>'
+                ]);
+            });
+            table.clear();
+            table.rows.add(rows).draw();
+            $('#tableInfo').text(json.data.pagination.total_count || rows.length);
+        } catch (e) {
+            console.warn('Failed to load transactions', e);
+        }
+    }
+
+    loadTransactions();
+
     (function() {
         const params = new URLSearchParams(window.location.search);
         const q = params.get('q');
@@ -252,7 +233,6 @@ $(document).ready(function() {
         }
     })();
     
-    // Handle select all functionality
     $('#selectAll').change(function() {
         const isChecked = $(this).is(':checked');
         $('input[type="checkbox"]').prop('checked', isChecked);

@@ -19,9 +19,9 @@
                                     <i class="fas fa-user-circle fa-3x text-muted"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-1" id="suspendUserName">John Doe</h6>
-                                    <p class="mb-1 text-muted" id="suspendUserEmail">john.doe@example.com</p>
-                                    <small class="text-muted">User ID: <span id="suspendUserId">12345</span></small>
+<h6 class="mb-1" id="suspendUserName">{{ reseller.name|default:"—" }}</h6>
+<p class="mb-1 text-muted" id="suspendUserEmail">{{ reseller.email|default:"—" }}</p>
+<small class="text-muted">User ID: <span id="suspendUserId">{{ reseller.id }}</span></small>
                                 </div>
                             </div>
                         </div>
@@ -168,12 +168,20 @@
 let currentSuspendUserId = null;
 
 function showSuspendUserModal(userData) {
-    currentSuspendUserId = userData.id;
+    if (userData && userData.id) {
+        currentSuspendUserId = userData.id;
+    }
     
-    // Populate user information
-    document.getElementById('suspendUserName').textContent = userData.name || 'John Doe';
-    document.getElementById('suspendUserEmail').textContent = userData.email || 'john.doe@example.com';
-    document.getElementById('suspendUserId').textContent = userData.id || '12345';
+    // Populate user information (only override if provided)
+    if (userData && userData.name) {
+        document.getElementById('suspendUserName').textContent = userData.name;
+    }
+    if (userData && userData.email) {
+        document.getElementById('suspendUserEmail').textContent = userData.email;
+    }
+    if (userData && userData.id) {
+        document.getElementById('suspendUserId').textContent = userData.id;
+    }
     
     // Reset form
     resetSuspensionForm();
@@ -329,6 +337,9 @@ function prepareSuspendSubmit() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize with page reseller context
+    try { currentSuspendUserId = parseInt('{{ reseller.id }}'); } catch(e) { /* noop */ }
+
     // Validate form when reason changes
     document.getElementById('suspensionReason').addEventListener('change', validateSuspensionForm);
     document.getElementById('customReason').addEventListener('input', validateSuspensionForm);

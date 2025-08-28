@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 import random
 import string
 
@@ -126,11 +127,13 @@ class Business(models.Model):
     ]
 
     business_name = models.CharField(max_length=100)
-    business_email = models.EmailField()
+    business_email = models.EmailField(unique=True)
     industry = models.CharField(max_length=50, choices=INDUSTRY_CHOICES)
     company_size = models.CharField(max_length=20, choices=COMPANY_SIZE_CHOICES)
     country = models.CharField(max_length=50, choices=COUNTRY_CHOICES)
     postal_code = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
     def __str__(self):
@@ -155,3 +158,36 @@ class Feature(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.plan.name}"
+
+
+class Product(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('pending', 'Pending Review'),
+        ('active', 'Active'),
+        ('suspended', 'Suspended'),
+    ]
+
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, blank=True)
+    sku = models.CharField(max_length=64, blank=True, null=True)
+    description = models.TextField(blank=True)
+    category = models.CharField(max_length=50, blank=True)
+    vendor = models.CharField(max_length=120, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    commission_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    is_featured = models.BooleanField(default=False)
+    is_popular = models.BooleanField(default=False)
+    allow_reviews = models.BooleanField(default=True)
+    sales_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

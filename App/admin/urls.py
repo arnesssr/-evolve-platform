@@ -16,6 +16,9 @@ urlpatterns = [
     # Resellers (delegate to modular urls)
     path('', include('App.admin.urls.resellers')),
 
+    # Administrators (new modular namespace)
+    path('admins/', include(("App.admin.urls.admins", "admin_admins"), namespace="admin_admins")),
+
     path('admins/list/', views.admins_list, name='admins-list'),
     path('admins/detail/<int:user_id>/', views.admins_detail, name='admins-detail'),
 

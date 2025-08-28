@@ -55,37 +55,6 @@
         </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value text-primary">{{ monthly_referrals|default:0 }}</div>
-                <div class="stat-label">This Month</div>
-                <div class="stat-change text-success">+{{ monthly_growth|default:"0" }}% vs last month</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value text-warning">{{ pending_commission|default:"$0" }}</div>
-                <div class="stat-label">Pending Commission</div>
-                <div class="stat-change text-muted">{{ pending_count|default:0 }} referrals</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value text-success">{{ conversion_rate|default:"0%" }}</div>
-                <div class="stat-label">Conversion Rate</div>
-                <div class="stat-change text-muted">Industry avg: 25%</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="stat-card">
-                <div class="stat-value text-info">{{ avg_deal_size|default:"$0" }}</div>
-                <div class="stat-label">Avg Deal Size</div>
-                <div class="stat-change text-muted">Per referral</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Active Referrals Table -->
     <div class="card">

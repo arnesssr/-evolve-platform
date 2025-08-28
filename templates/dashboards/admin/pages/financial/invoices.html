@@ -68,40 +68,7 @@
 {% endblock %}
 
 {% block content %}
-<!-- Invoice Summary -->
-<div class="content-card">
-  <small class="text-muted">No KPI data available.</small>
-</div>
 
-<!-- Invoice Status Overview -->
-<div class="row mb-4">
-    <div class="col-lg-8">
-        <div class="content-card">
-            <h5 class="mb-4">Invoice Status Distribution</h5>
-            <p class="text-muted mb-0">No invoice status data available.</p>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <div class="content-card">
-            <h5 class="mb-4">Quick Actions</h5>
-            <div class="d-grid gap-2">
-                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#generateInvoiceModal">
-                    <i class="fas fa-plus me-2"></i>Generate New Invoice
-                </button>
-                <button type="button" class="btn btn-outline-primary">
-                    <i class="fas fa-paper-plane me-2"></i>Send Payment Reminders
-                </button>
-                <button type="button" class="btn btn-outline-info">
-                    <i class="fas fa-file-download me-2"></i>Export Invoice Report
-                </button>
-                <button type="button" class="btn btn-outline-warning">
-                    <i class="fas fa-sync me-2"></i>Sync Payment Status
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% include 'dashboards/admin/components/filter-bar.html' with show_search=True search_name='q' search_placeholder='Search invoices…' offcanvas_id='invoiceFilters' show_date_range=True %}
 
@@ -203,13 +170,37 @@ $(document).ready(function() {
     const table = $('#invoicesTable').DataTable({
         responsive: true,
         pageLength: 25,
-        order: [[5, 'desc']], // Sort by issue date
-        columnDefs: [
-            { orderable: false, targets: [0, 7] } // Disable ordering for checkbox and actions
-        ]
+        order: [[5, 'desc']],
+        columnDefs: [ { orderable: false, targets: [0, 7] } ]
     });
 
-    // Search: initialize from ?q= and wire live search
+    async function loadInvoices() {
+        try {
+            const res = await fetch('/platform/admin/api/v1/finance/invoices/?page_size=200', { credentials: 'same-origin' });
+            const json = await res.json();
+            const rows = [];
+            (json.data.invoices || []).forEach(inv => {
+                rows.push([
+                    '<input type="checkbox" class="form-check-input" />',
+                    inv.invoice_number,
+                    (inv.reseller && inv.reseller.name) ? inv.reseller.name : '-',
+                    '$' + (inv.amount || 0).toFixed(2),
+                    inv.status,
+                    inv.issue_date ? new Date(inv.issue_date).toLocaleDateString() : '-',
+                    inv.due_date ? new Date(inv.due_date).toLocaleDateString() : '-',
+                    '<div class="btn-group btn-group-sm"><button class="btn btn-outline-secondary">View</button></div>'
+                ]);
+            });
+            table.clear();
+            table.rows.add(rows).draw();
+            $('#tableInfo').text(json.data.pagination.total_count || rows.length);
+        } catch (e) {
+            console.warn('Failed to load invoices', e);
+        }
+    }
+
+    loadInvoices();
+
     (function() {
         const params = new URLSearchParams(window.location.search);
         const q = params.get('q');
@@ -225,7 +216,6 @@ $(document).ready(function() {
         }
     })();
     
-    // Handle select all functionality
     $('#selectAll').change(function() {
         const isChecked = $(this).is(':checked');
         $('input[type="checkbox"]').prop('checked', isChecked);

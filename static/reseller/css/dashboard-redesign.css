@@ -1,0 +1,31 @@
+/* Dashboard Redesign Styles */
+.dashboard-neo .hero-performance .display-6 {
+  letter-spacing: -0.5px;
+}
+
+.kpi-card .kpi-spark {
+  width: 100%;
+}
+
+.quick-actions .btn {
+  min-width: 180px;
+}
+
+/* Tabs spacing */
+.card-header .nav-tabs .nav-link {
+  padding: 0.25rem 0.75rem;
+}
+
+/* Insights icons */
+.bg-success-subtle {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+.bg-primary-subtle {
+  background-color: rgba(30, 64, 175, 0.12) !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 992px) {
+  .quick-actions .btn { min-width: auto; }
+}
+

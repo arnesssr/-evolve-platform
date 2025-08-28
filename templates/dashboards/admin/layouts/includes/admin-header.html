@@ -13,17 +13,3 @@
   </div>
 </header>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const btn = document.getElementById('sidebarToggle');
-  const sidebar = document.getElementById('adminSidebar');
-  const main = document.getElementById('adminMain');
-  if (btn && sidebar && main) {
-    btn.addEventListener('click', function(){
-      sidebar.classList.toggle('collapsed');
-      main.classList.toggle('expanded');
-    });
-  }
-});
-</script>
-

@@ -115,12 +115,12 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">New Category</label>
-                            <select class="form-select" id="newCategory">
-                                <option value="">Select new category...</option>
-                                <option value="basic">Basic</option>
-                                <option value="premium">Premium</option>
-                                <option value="enterprise">Enterprise</option>
-                                <option value="trial">Trial</option>
+<select class="form-select" id="newCategory">
+                                <option value="">Select new tier...</option>
+                                <option value="basic">Basic (Bronze)</option>
+                                <option value="standard">Standard (Silver)</option>
+                                <option value="premium">Premium (Gold)</option>
+                                <option value="platinum">Platinum</option>
                             </select>
                         </div>
                     </div>
@@ -244,6 +244,63 @@ function showBulkActionModal(items) {
     const modal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
     modal.show();
 }
+
+// Auto-gather selected rows when the modal opens (if not using showBulkActionModal)
+(function attachBulkModalAutoSelect(){
+  const modalEl = document.getElementById('bulkActionModal');
+  if (!modalEl) return;
+  modalEl.addEventListener('show.bs.modal', function(){
+    // Collect selected checkboxes
+    const checked = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+    const items = checked.map(cb => {
+      const tr = cb.closest('tr');
+      return {
+        id: cb.value,
+        name: tr ? (tr.querySelector('td:nth-child(2) h6')?.textContent || '') : '',
+        status: tr ? (tr.querySelector('td:nth-child(7) .badge')?.textContent?.trim().toLowerCase() || '') : ''
+      };
+    });
+    selectedItems = items;
+    document.getElementById('selectedCount').textContent = items.length;
+    populateSelectedItems(items);
+    resetBulkActionForm();
+  });
+})();
+
+// Ensure change/click handlers are bound even if inline handlers are blocked by CSP
+(function attachBulkActionHandlers(){
+  function bindHandlers() {
+    const radios = document.querySelectorAll('#bulkActionModal input[name="bulkAction"]');
+    radios.forEach(r => {
+      // Remove any existing listener by cloning
+      const newR = r.cloneNode(true);
+      r.parentNode.replaceChild(newR, r);
+      newR.addEventListener('change', updateActionFields);
+      // Also make the whole card clickable
+      const wrapper = newR.closest('.action-option');
+      if (wrapper) {
+        wrapper.addEventListener('click', (e) => {
+          const input = wrapper.querySelector('input[name="bulkAction"]');
+          if (input && !input.checked) {
+            input.checked = true;
+            updateActionFields();
+          }
+        });
+      }
+    });
+  }
+  // Bind on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindHandlers);
+  } else {
+    bindHandlers();
+  }
+  // Rebind whenever modal content is shown (defensive)
+  const modalEl = document.getElementById('bulkActionModal');
+  if (modalEl) {
+    modalEl.addEventListener('shown.bs.modal', bindHandlers);
+  }
+})();
 
 function populateSelectedItems(items) {
     const tbody = document.getElementById('selectedItemsTable');
@@ -372,17 +429,73 @@ function executeBulkAction() {
     if (!confirmBulkAction()) {
         return;
     }
-    
+
+    // Map UI action to backend action
+    const actionMap = {
+        'activate': 'resume',
+        'deactivate': 'suspend',
+        'delete': 'delete',
+        'export': 'export', // not implemented server-side for selection
+        'updateCategory': 'set_tier',
+        'sendNotification': 'message'
+    };
+    const backendAction = actionMap[bulkActionType] || bulkActionType;
+
+    // Collect IDs
+    const ids = selectedItems.map(i => i.id).join(',');
+    if (!ids) {
+        alert('Please select at least one item.');
+        return;
+    }
+
+    if (backendAction === 'export') {
+        alert('Export of selected items is not implemented yet. Use the Export button with filters.');
+        return;
+    }
+
+    // Build payload for backend
+    const formData = new FormData();
+    formData.append('action', backendAction);
+    formData.append('reseller_ids', ids);
+    if (backendAction === 'set_tier') {
+        formData.append('tier', document.getElementById('newCategory').value);
+    }
+    if (backendAction === 'message') {
+        // Only email channel supported server-side for now
+        formData.append('message', document.getElementById('notificationMessage').value || '');
+        formData.append('subject', document.getElementById('notificationSubject').value || 'Message from Platform Admin');
+    }
+
     // Show progress section
     document.getElementById('progressSection').style.display = 'block';
     document.getElementById('totalItems').textContent = selectedItems.length;
-    
-    // Disable execute button
     const executeBtn = document.getElementById('executeBtn');
     executeBtn.disabled = true;
-    
-    // Simulate bulk processing
-    processBulkAction();
+
+    fetch('/platform/admin/resellers/bulk/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': (typeof getCsrfToken === 'function' ? getCsrfToken() : '') },
+        body: formData
+    }).then(r => r.json().catch(() => ({}))).then(resp => {
+        if (resp && resp.status === 'ok') {
+            if (typeof showToast === 'function') {
+                showToast('Bulk action completed successfully.', 'success');
+            } else {
+                alert('Bulk action completed successfully.');
+            }
+            bootstrap.Modal.getInstance(document.getElementById('bulkActionModal')).hide();
+            if (typeof refreshItemList === 'function') refreshItemList();
+        } else {
+            const msg = (resp && resp.error) ? resp.error : 'Bulk action failed.';
+            alert(msg);
+        }
+    }).catch(err => {
+        console.error(err);
+        alert('Bulk action failed.');
+    }).finally(() => {
+        executeBtn.disabled = false;
+        document.getElementById('progressSection').style.display = 'none';
+    });
 }
 
 function validateActionRequirements() {
