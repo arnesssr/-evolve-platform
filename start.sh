@@ -14,7 +14,13 @@ python manage.py migrate --noinput
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --noinput
+echo "Static directory contents before collection:"
+ls -la static/ | head -10 || echo "No static directory found"
+
+python manage.py collectstatic --noinput --verbosity=2
+
+echo "Static files collected. Checking staticfiles directory:"
+ls -la staticfiles/css/ | head -5 || echo "No staticfiles/css directory found"
 
 # Create superuser if it doesn't exist (only in development)
 if [ "$DEBUG" = "True" ]; then
