@@ -21,6 +21,28 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: ".onrender.com,localhost,127.0.0.1"
+      # Email (set these values in Render dashboard)
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+      - key: EMAIL_HOST
+        value: 
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: true
+      - key: EMAIL_HOST_USER
+        value: 
+      - key: EMAIL_HOST_PASSWORD
+        value: 
+      - key: DEFAULT_FROM_EMAIL
+        value: no-reply@evolvepay.local
+      # SMSLeopard
+      - key: SMSLEOPARD_API_KEY
+        value: 
+      - key: SMSLEOPARD_API_SECRET
+        value: 
+      - key: SMSLEOPARD_ACCESS_TOKEN
+        value: 
     postDeployCommand: |
       python manage.py migrate
 

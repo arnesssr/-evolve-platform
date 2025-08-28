@@ -18,5 +18,27 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.11.13
+      # Email (set these in Render dashboard; values omitted here on purpose)
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+      - key: EMAIL_HOST
+        value: 
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: true
+      - key: EMAIL_HOST_USER
+        value: 
+      - key: EMAIL_HOST_PASSWORD
+        value: 
+      - key: DEFAULT_FROM_EMAIL
+        value: no-reply@evolvepay.local
+      # SMSLeopard (set in dashboard)
+      - key: SMSLEOPARD_API_KEY
+        value: 
+      - key: SMSLEOPARD_API_SECRET
+        value: 
+      - key: SMSLEOPARD_ACCESS_TOKEN
+        value: 
     # This is the key part - run migrations after deployment
     preDeployCommand: python manage.py migrate --noinput
