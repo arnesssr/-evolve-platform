@@ -23,6 +23,11 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-(0p*%$d6a=fg%(6b1%l8!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=True)
 
+# Force DEBUG=False on Render platform
+if 'RENDER' in os.environ or 'onrender.com' in os.environ.get('RENDER_EXTERNAL_HOSTNAME', ''):
+    DEBUG = False
+    print("Production mode: DEBUG set to False on Render platform")
+
 # SMSLeopard settings (safe defaults for environments where these are not set)
 SMSLEOPARD_ENVIRONMENT = config('SMSLEOPARD_ENVIRONMENT', default='')
 SMSLEOPARD_API_KEY = config('SMSLEOPARD_API_KEY', default='')

@@ -25,15 +25,21 @@ RUN adduser --disabled-password --gecos '' appuser
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install gunicorn for production
+RUN pip install gunicorn
+
 # Copy project files
 COPY . .
+
+# Ensure static directory exists
+RUN mkdir -p static staticfiles
 
 # Change ownership of the app directory to appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Collect static files (will be overridden by volume in development)
-RUN python manage.py collectstatic --noinput || true
+# Make startup script executable
+RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 8000
@@ -42,5 +48,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
-# Default command
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Default command - use startup script
+CMD ["./start.sh"]

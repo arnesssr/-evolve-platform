@@ -31,7 +31,7 @@ db.sqlite3-journal
 media
 
 # Static files (will be collected in container)
-/static
+# Note: We need /static (source files) but not /staticfiles (generated)
 /staticfiles
 
 # OS
