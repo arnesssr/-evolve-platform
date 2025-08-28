@@ -5,6 +5,9 @@
 
 # Core Framework
 Django==5.2.5
+# WSGI server and static files
+gunicorn>=21.2
+whitenoise>=6.6
 
 # Environment Configuration
 python-decouple==3.8
@@ -17,7 +20,8 @@ pytest-django==4.9.0
 requests==2.32.4
 
 # Django REST Framework (for APIs)
-djangorestframework==3.14.0
+# DRF 3.14 is not compatible with Django 5.x; use >=3.16
+djangorestframework>=3.16,<4
 
 # Postgres driver (psycopg 3 with binary extras; supports Python 3.13)
 psycopg[binary]>=3.1

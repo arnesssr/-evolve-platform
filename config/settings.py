@@ -23,14 +23,15 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-(0p*%$d6a=fg%(6b1%l8!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=True)
 
-# SMSLeopard settings
-SMSLEOPARD_ENVIRONMENT = config('SMSLEOPARD_ENVIRONMENT')
-SMSLEOPARD_API_KEY = config('SMSLEOPARD_API_KEY')
-SMSLEOPARD_API_SECRET = config('SMSLEOPARD_API_SECRET')
-SMSLEOPARD_ACCESS_TOKEN = config('SMSLEOPARD_ACCESS_TOKEN')
+# SMSLeopard settings (safe defaults for environments where these are not set)
+SMSLEOPARD_ENVIRONMENT = config('SMSLEOPARD_ENVIRONMENT', default='')
+SMSLEOPARD_API_KEY = config('SMSLEOPARD_API_KEY', default='')
+SMSLEOPARD_API_SECRET = config('SMSLEOPARD_API_SECRET', default='')
+SMSLEOPARD_ACCESS_TOKEN = config('SMSLEOPARD_ACCESS_TOKEN', default='')
 
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1')
+# Include .onrender.com by default so first deploys work without extra env config
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1,.onrender.com')
 
 
 # Application definition
@@ -56,7 +57,8 @@ PESAPAL_SANDBOX = config('PESAPAL_SANDBOX', cast=bool, default=True)  # Set to F
 
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -172,6 +174,13 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitenoise storage backend for efficient static serving
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
