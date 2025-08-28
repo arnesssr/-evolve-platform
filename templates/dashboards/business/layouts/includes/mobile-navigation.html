@@ -1,0 +1,68 @@
+<!-- Business Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav d-lg-none">
+  <div class="mobile-nav-container">
+    <a href="{% url 'business-dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'business-dashboard' %}active{% endif %}">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </a>
+    <a href="{% url 'business-subscriptions' %}" class="nav-item {% if 'subscriptions' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-box"></i>
+      <span>Plans</span>
+    </a>
+    <a href="{% url 'business-billing' %}" class="nav-item {% if 'billing' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-receipt"></i>
+      <span>Billing</span>
+    </a>
+    <a href="{% url 'business-users' %}" class="nav-item {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fas fa-users"></i>
+      <span>Users</span>
+    </a>
+    <button class="nav-item" data-bs-toggle="offcanvas" data-bs-target="#businessMobileMenu" aria-controls="businessMobileMenu">
+      <i class="fas fa-ellipsis-h"></i>
+      <span>More</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Business Mobile Menu Offcanvas -->
+<div class="offcanvas offcanvas-bottom mobile-offcanvas d-lg-none" tabindex="-1" id="businessMobileMenu" aria-labelledby="businessMobileMenuLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="businessMobileMenuLabel">Menu</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="mobile-menu-grid">
+      <div class="menu-section">
+        <h6 class="menu-section-title">Account</h6>
+        <div class="menu-items">
+          <a href="{% url 'business-billing' %}" class="menu-item">
+            <i class="fas fa-receipt"></i>
+            <span>Billing</span>
+          </a>
+          <a href="{% url 'business-subscriptions' %}" class="menu-item">
+            <i class="fas fa-box"></i>
+            <span>Subscriptions</span>
+          </a>
+          <a href="{% url 'business-users' %}" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Users</span>
+          </a>
+        </div>
+      </div>
+      <div class="menu-section">
+        <h6 class="menu-section-title">Support</h6>
+        <div class="menu-items">
+          <a href="{% url 'business-support' %}" class="menu-item">
+            <i class="fas fa-life-ring"></i>
+            <span>Support Center</span>
+          </a>
+          <a href="{% url 'logout' %}" class="menu-item text-danger">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

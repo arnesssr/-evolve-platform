@@ -1,0 +1,116 @@
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="mobile-bottom-nav d-lg-none">
+    <div class="mobile-nav-container">
+        <a href="{% url 'reseller:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-house-door"></i>
+            <span>Home</span>
+        </a>
+        
+        <a href="{% url 'reseller:leads' %}" class="nav-item {% if 'leads' in request.resolver_match.url_name or 'referrals' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-people"></i>
+            <span>Sales</span>
+        </a>
+        
+        <a href="{% url 'reseller:earnings_commissions' %}" class="nav-item {% if 'earnings' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-cash-stack"></i>
+            <span>Earnings</span>
+        </a>
+        
+        <a href="{% url 'reseller:links' %}" class="nav-item {% if 'links' in request.resolver_match.url_name or 'tools' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-megaphone"></i>
+            <span>Marketing</span>
+        </a>
+        
+        <button class="nav-item" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu">
+            <i class="bi bi-three-dots"></i>
+            <span>More</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Menu Offcanvas (for additional options) -->
+<div class="offcanvas offcanvas-bottom mobile-offcanvas d-lg-none" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="mobile-menu-grid">
+            <!-- Sales Section -->
+            <div class="menu-section">
+                <h6 class="menu-section-title">Sales</h6>
+                <div class="menu-items">
+                    <a href="{% url 'reseller:leads' %}" class="menu-item">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Leads</span>
+                    </a>
+                    <a href="{% url 'reseller:referrals' %}" class="menu-item">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Referrals</span>
+                    </a>
+                    <a href="{% url 'reseller:reports' %}" class="menu-item">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Earnings Section -->
+            <div class="menu-section">
+                <h6 class="menu-section-title">Earnings</h6>
+                <div class="menu-items">
+                    <a href="{% url 'reseller:earnings_commissions' %}" class="menu-item">
+                        <i class="bi bi-coin"></i>
+                        <span>Commissions</span>
+                    </a>
+                    <a href="{% url 'reseller:earnings_invoices' %}" class="menu-item">
+                        <i class="bi bi-receipt"></i>
+                        <span>Invoices</span>
+                    </a>
+                    <a href="{% url 'reseller:earnings_payouts' %}" class="menu-item">
+                        <i class="bi bi-wallet2"></i>
+                        <span>Payouts</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Marketing Section -->
+            <div class="menu-section">
+                <h6 class="menu-section-title">Marketing</h6>
+                <div class="menu-items">
+                    <a href="{% url 'reseller:links' %}" class="menu-item">
+                        <i class="bi bi-link-45deg"></i>
+                        <span>Links</span>
+                    </a>
+                    <a href="{% url 'reseller:tools' %}" class="menu-item">
+                        <i class="bi bi-tools"></i>
+                        <span>Tools</span>
+                    </a>
+                    <a href="{% url 'reseller:resources' %}" class="menu-item">
+                        <i class="bi bi-book"></i>
+                        <span>Resources</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Profile Section -->
+            <div class="menu-section">
+                <h6 class="menu-section-title">Account</h6>
+                <div class="menu-items">
+                    <a href="{% url 'reseller:profile_view' %}" class="menu-item">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Profile</span>
+                    </a>
+                    <a href="{% url 'reseller:settings' %}" class="menu-item">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="menu-item text-danger">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
