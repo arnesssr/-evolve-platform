@@ -1,7 +1,11 @@
 {% load static %}
 <!-- Reseller Dashboard Sidebar -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
+<aside class="sidebar offcanvas offcanvas-start offcanvas-lg" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header d-lg-none">
+        <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="sidebar-header d-none d-lg-flex">
         <div class="logo">
             <i class="fas fa-rocket"></i> <span class="logo-text">Evolve Reseller</span>
         </div>
@@ -13,7 +17,8 @@
             <i class="fas fa-bars"></i>
         </button>
     </div>
-    <nav class="sidebar-nav">
+    <div class="offcanvas-body p-0 d-lg-flex flex-lg-column">
+        <nav class="sidebar-nav">
         <a href="{% url 'reseller:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-tooltip="Dashboard">
             <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
         </a>
@@ -59,5 +64,6 @@
         <a href="{% url 'logout' %}" data-tooltip="Logout">
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
         </a>
-    </nav>
+        </nav>
+    </div>
 </aside>

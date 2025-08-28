@@ -191,3 +191,23 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Subscription(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('expired', 'Expired'),
+        ('cancelled', 'Cancelled'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subscriptions')
+    product = models.CharField(max_length=50)  # e.g., 'payroll'
+    plan = models.ForeignKey(Plan, on_delete=models.PROTECT)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    auto_renewal = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.product} - {self.status}"

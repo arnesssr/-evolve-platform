@@ -18,30 +18,90 @@
           <div>
             <label class="form-label">Industry</label>
             <select name="industry" class="form-select" required>
-              {% for key,label in App.models.Business.INDUSTRY_CHOICES %}
-              <option value="{{ key }}">{{ label }}</option>
-              {% endfor %}
+              <option value="Agriculture">Agriculture</option>
+              <option value="Construction">Construction</option>
+              <option value="Education">Education</option>
+              <option value="Finance">Finance</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Hospitality">Hospitality</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Manufacturing">Manufacturing</option>
+              <option value="Retail">Retail</option>
+              <option value="Transportation & Logistics">Transportation & Logistics</option>
+              <option value="Other">Other</option>
             </select>
           </div>
           <div>
             <label class="form-label">Company Size</label>
             <select name="company_size" class="form-select" required>
-              {% for key,label in App.models.Business.COMPANY_SIZE_CHOICES %}
-              <option value="{{ key }}">{{ label }}</option>
-              {% endfor %}
+              <option value="1-10">1-10</option>
+              <option value="11-50">11-50</option>
+              <option value="51-200">51-200</option>
+              <option value="200+">200+</option>
             </select>
           </div>
           <div>
             <label class="form-label">Country</label>
             <select name="country" class="form-select" required>
-              {% for key,label in App.models.Business.COUNTRY_CHOICES %}
-              <option value="{{ key }}">{{ label }}</option>
-              {% endfor %}
+              <option value="Kenya" selected>Kenya</option>
+              <option value="Algeria">Algeria</option>
+              <option value="Angola">Angola</option>
+              <option value="Benin">Benin</option>
+              <option value="Botswana">Botswana</option>
+              <option value="Burkina Faso">Burkina Faso</option>
+              <option value="Burundi">Burundi</option>
+              <option value="Cabo Verde">Cabo Verde</option>
+              <option value="Cameroon">Cameroon</option>
+              <option value="Central African Republic">Central African Republic</option>
+              <option value="Chad">Chad</option>
+              <option value="Comoros">Comoros</option>
+              <option value="Congo, Democratic Republic of the">Congo, Democratic Republic of the</option>
+              <option value="Congo, Republic of the">Congo, Republic of the</option>
+              <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+              <option value="Djibouti">Djibouti</option>
+              <option value="Egypt">Egypt</option>
+              <option value="Equatorial Guinea">Equatorial Guinea</option>
+              <option value="Eritrea">Eritrea</option>
+              <option value="Eswatini">Eswatini</option>
+              <option value="Ethiopia">Ethiopia</option>
+              <option value="Gabon">Gabon</option>
+              <option value="Gambia">Gambia</option>
+              <option value="Ghana">Ghana</option>
+              <option value="Guinea">Guinea</option>
+              <option value="Guinea-Bissau">Guinea-Bissau</option>
+              <option value="Lesotho">Lesotho</option>
+              <option value="Liberia">Liberia</option>
+              <option value="Libya">Libya</option>
+              <option value="Madagascar">Madagascar</option>
+              <option value="Malawi">Malawi</option>
+              <option value="Mali">Mali</option>
+              <option value="Mauritania">Mauritania</option>
+              <option value="Mauritius">Mauritius</option>
+              <option value="Morocco">Morocco</option>
+              <option value="Mozambique">Mozambique</option>
+              <option value="Namibia">Namibia</option>
+              <option value="Niger">Niger</option>
+              <option value="Nigeria">Nigeria</option>
+              <option value="Rwanda">Rwanda</option>
+              <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+              <option value="Senegal">Senegal</option>
+              <option value="Seychelles">Seychelles</option>
+              <option value="Sierra Leone">Sierra Leone</option>
+              <option value="Somalia">Somalia</option>
+              <option value="South Africa">South Africa</option>
+              <option value="South Sudan">South Sudan</option>
+              <option value="Sudan">Sudan</option>
+              <option value="Tanzania">Tanzania</option>
+              <option value="Togo">Togo</option>
+              <option value="Tunisia">Tunisia</option>
+              <option value="Uganda">Uganda</option>
+              <option value="Zambia">Zambia</option>
+              <option value="Zimbabwe">Zimbabwe</option>
             </select>
           </div>
           <div>
             <label class="form-label">Postal Code</label>
-            <input type="text" name="postal_code" class="form-control" required />
+            <input type="text" name="postal_code" class="form-control" />
           </div>
           <div class="d-flex justify-content-end gap-2">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

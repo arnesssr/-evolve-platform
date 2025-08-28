@@ -5,6 +5,13 @@
 
 .kpi-card .kpi-spark {
   width: 100%;
+  height: 40px;
+  display: block;
+}
+
+#revenueChart, #topProductsChart {
+  height: 220px;
+  display: block;
 }
 
 .quick-actions .btn {

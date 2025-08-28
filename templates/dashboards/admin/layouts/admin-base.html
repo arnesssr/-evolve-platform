@@ -21,6 +21,8 @@
     
     <!-- Custom CSS -->
     <link href="{% static 'css/admin-dashboard.css' %}" rel="stylesheet">
+    <!-- Admin mobile UX (bottom nav, fonts, header/spacing) -->
+    <link href="{% static 'admin/css/mobile-navigation.css' %}" rel="stylesheet">
     
     <!-- Additional CSS -->
     {% block extra_css %}{% endblock %}
@@ -286,6 +288,40 @@
                 padding: 0 !important;
             }
         }
+
+        /* Mobile button sizing (Facebook-like, enforced site-wide) */
+        @media (max-width: 991.98px) {
+            .btn {
+                min-height: 36px !important;
+                padding: 6px 12px !important;
+                font-size: 15px !important;
+                line-height: 1.2 !important;
+                border-radius: 6px !important;
+            }
+            .btn-sm {
+                min-height: 32px !important;
+                padding: 5px 10px !important;
+                font-size: 14px !important;
+                border-radius: 6px !important;
+            }
+            .btn-lg {
+                min-height: 40px !important;
+                padding: 8px 14px !important;
+                font-size: 15px !important;
+                border-radius: 6px !important;
+            }
+            /* Icon sizing/spacing within buttons */
+            .btn i, .btn .fa, .btn .fas, .btn .far, .btn .bi {
+                font-size: 1em !important;
+                line-height: 1 !important;
+            }
+            .btn i:first-child, .btn .fa:first-child, .btn .fas:first-child, .btn .far:first-child, .btn .bi:first-child { margin-right: 6px !important; }
+            .btn i:last-child, .btn .fa:last-child, .btn .fas:last-child, .btn .far:last-child, .btn .bi:last-child { margin-left: 6px !important; }
+            /* Toolbars / groups */
+            .btn-group .btn { padding-left: 10px !important; padding-right: 10px !important; }
+            /* Page-level actions */
+            .page-actions .btn { min-height: 36px !important; }
+        }
     </style>
     
     <!-- Additional Head Content -->
@@ -373,6 +409,9 @@
             </main>
         </div>
     </div>
+
+    <!-- Mobile Bottom Navigation -->
+    {% include 'dashboards/admin/layouts/includes/mobile-navigation.html' %}
     
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>

@@ -1,11 +1,3 @@
-{% extends 'dashboards/business/layouts/business-base.html' %}
-
-{% block title %}Software Hub - Business Portal{% endblock %}
-
-{% block page_title %}Software Hub{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -18,8 +10,8 @@
                     <button class="btn btn-outline-primary">
                         <i class="fas fa-question-circle me-2"></i>Need Help?
                     </button>
-                </div>
-            </div>
+</div>
+</div>
         </div>
     </div>
 
@@ -60,9 +52,9 @@
                                                 <button class="btn btn-outline-warning">
                                                     <i class="fas fa-renew me-1"></i>Renew
                                                 </button>
-                                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upgradeModal">
+                                                <a href="{% url 'business-support' %}" class="btn btn-outline-primary">
                                                     <i class="fas fa-arrow-up me-1"></i>Upgrade
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -96,9 +88,9 @@
                                                 <button class="btn btn-outline-primary">
                                                     <i class="fas fa-users me-1"></i>Manage Users
                                                 </button>
-                                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#upgradeModal">
+                                                <a href="{% url 'business-support' %}" class="btn btn-outline-primary">
                                                     <i class="fas fa-arrow-up me-1"></i>Upgrade
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -145,9 +137,9 @@
                                                 <a href="/software/payroll/" target="_blank" class="btn btn-info">
                                                     <i class="fas fa-external-link-alt me-1"></i>Launch Trial
                                                 </a>
-                                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#purchaseModal" data-software="payroll">
+                                                <a href="{% url 'business-support' %}" class="btn btn-primary">
                                                     <i class="fas fa-shopping-cart me-1"></i>Purchase License
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -160,397 +152,11 @@
         </div>
     </div>
 
-    <!-- Software Catalog - Available for Purchase -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-store me-2"></i>Available Software - Expand Your Business
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-4">
-                        <!-- CRM System - Available -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-primary h-100">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-3 text-center">
-                                            <i class="fas fa-users-cog fa-4x text-primary"></i>
-                                        </div>
-                                        <div class="col-9">
-                                            <h5 class="card-title text-primary">CRM System</h5>
-                                            <p class="card-text mb-2">Customer Relationship Management - Lead tracking, sales pipeline, customer communications, and analytics.</p>
-                                            <div class="mb-3">
-                                                <span class="badge bg-primary me-2">Available for Purchase</span>
-                                                <span class="badge bg-success">14-day free trial</span>
-                                            </div>
-                                            <div class="row small text-muted mb-3">
-                                                <div class="col-6">📈 Boost sales by 30%</div>
-                                                <div class="col-6">💰 Starting at KES 12,000/month</div>
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#purchaseModal" data-software="crm">
-                                                    <i class="fas fa-shopping-cart me-1"></i>Purchase License
-                                                </button>
-                                                <button class="btn btn-outline-success">
-                                                    <i class="fas fa-play me-1"></i>Start Free Trial
-                                                </button>
-                                                <button class="btn btn-outline-info">
-                                                    <i class="fas fa-eye me-1"></i>View Demo
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Inventory Management - Available -->
-                        <div class="col-lg-6 col-md-12">
-                            <div class="card border-primary h-100">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-3 text-center">
-                                            <i class="fas fa-boxes fa-4x text-primary"></i>
-                                        </div>
-                                        <div class="col-9">
-                                            <h5 class="card-title text-primary">Inventory Management</h5>
-                                            <p class="card-text mb-2">Advanced inventory tracking - Stock levels, reorder points, supplier management, and warehouse operations.</p>
-                                            <div class="mb-3">
-                                                <span class="badge bg-primary me-2">Available for Purchase</span>
-                                                <span class="badge bg-success">30-day free trial</span>
-                                            </div>
-                                            <div class="row small text-muted mb-3">
-                                                <div class="col-6">📦 Reduce stock-outs by 85%</div>
-                                                <div class="col-6">💰 Starting at KES 18,000/month</div>
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#purchaseModal" data-software="inventory">
-                                                    <i class="fas fa-shopping-cart me-1"></i>Purchase License
-                                                </button>
-                                                <button class="btn btn-outline-success">
-                                                    <i class="fas fa-play me-1"></i>Start Free Trial
-                                                </button>
-                                                <button class="btn btn-outline-info">
-                                                    <i class="fas fa-eye me-1"></i>View Demo
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Quick Stats -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-users text-primary fa-2x mb-3"></i>
-                    <h4>24</h4>
-                    <p class="text-muted mb-0">Total Users</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-clock text-info fa-2x mb-3"></i>
-                    <h4>247</h4>
-                    <p class="text-muted mb-0">Hours This Month</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-chart-line text-success fa-2x mb-3"></i>
-                    <h4>98%</h4>
-                    <p class="text-muted mb-0">Uptime</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-shield-alt text-warning fa-2x mb-3"></i>
-                    <h4>Secure</h4>
-                    <p class="text-muted mb-0">All Systems</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- System Status -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-heartbeat text-primary me-2"></i>System Status
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-cogs text-primary me-3 fa-lg"></i>
-                            <div>
-                                <h6 class="mb-1">ERP System</h6>
-                                <small class="text-muted">Last updated: 2 minutes ago</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-success">Online</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-handshake text-info me-3 fa-lg"></i>
-                            <div>
-                                <h6 class="mb-1">SACCO Platform</h6>
-                                <small class="text-muted">Last updated: 1 minute ago</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-success">Online</span>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center py-3">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-money-check text-success me-3 fa-lg"></i>
-                            <div>
-                                <h6 class="mb-1">Payroll System</h6>
-                                <small class="text-muted">Last updated: 3 minutes ago</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-success">Online</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-bell text-primary me-2"></i>Recent Updates
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex">
-                            <div class="bg-primary rounded-circle p-1 me-3" style="width: 8px; height: 8px; margin-top: 6px;"></div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fs-6">ERP Update v2.1.4</h6>
-                                <p class="mb-1 text-muted small">New inventory management features</p>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex">
-                            <div class="bg-info rounded-circle p-1 me-3" style="width: 8px; height: 8px; margin-top: 6px;"></div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fs-6">SACCO Security Patch</h6>
-                                <p class="mb-1 text-muted small">Enhanced authentication system</p>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <div class="d-flex">
-                            <div class="bg-success rounded-circle p-1 me-3" style="width: 8px; height: 8px; margin-top: 6px;"></div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fs-6">Payroll Tax Update</h6>
-                                <p class="mb-1 text-muted small">2024 tax tables updated</p>
-                                <small class="text-muted">3 days ago</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<!-- Purchase Modal -->
-<div class="modal fade" id="purchaseModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-shopping-cart text-primary me-2"></i>Purchase Software License
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="purchase-content">
-                    <h6>Select Your Plan</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <div class="card border-primary h-100">
-                                <div class="card-header bg-primary text-white text-center">
-                                    <h6 class="mb-0">Standard Plan</h6>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h4 class="text-primary mb-3">KES 15,000<small>/month</small></h4>
-                                    <ul class="list-unstyled mb-3">
-                                        <li>✓ Up to 10 users</li>
-                                        <li>✓ Basic features</li>
-                                        <li>✓ Email support</li>
-                                        <li>✓ Monthly backups</li>
-                                    </ul>
-                                    <button class="btn btn-outline-primary w-100" onclick="selectPlan('standard')">Select Plan</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-success h-100">
-                                <div class="card-header bg-success text-white text-center">
-                                    <h6 class="mb-0">Professional Plan</h6>
-                                    <small>Most Popular</small>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h4 class="text-success mb-3">KES 25,000<small>/month</small></h4>
-                                    <ul class="list-unstyled mb-3">
-                                        <li>✓ Up to 25 users</li>
-                                        <li>✓ Advanced features</li>
-                                        <li>✓ Priority support</li>
-                                        <li>✓ Daily backups</li>
-                                        <li>✓ Custom integrations</li>
-                                    </ul>
-                                    <button class="btn btn-success w-100" onclick="selectPlan('professional')">Select Plan</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="checkout-content" style="display: none;">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <strong>Plan Selected:</strong> <span id="selected-plan"></span>
-                    </div>
-                    
-                    <form>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Billing Frequency</label>
-                                <select class="form-select" onchange="updatePricing()">
-                                    <option value="monthly">Monthly Billing</option>
-                                    <option value="yearly">Yearly Billing (Save 15%)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Number of Users</label>
-                                <input type="number" class="form-control" value="5" min="1" max="25">
-                            </div>
-                        </div>
-                        
-                        <div class="pricing-summary bg-light p-3 rounded mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span>Monthly Cost:</span>
-                                <span class="fw-bold" id="monthly-cost">KES 25,000</span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span>Setup Fee (one-time):</span>
-                                <span class="fw-bold">KES 5,000</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between h5">
-                                <span>Total First Payment:</span>
-                                <span class="text-primary fw-bold" id="total-cost">KES 30,000</span>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="purchase-btn" onclick="proceedToPayment()">Proceed to Payment</button>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Upgrade Modal -->
-<div class="modal fade" id="upgradeModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-arrow-up text-primary me-2"></i>Upgrade Your License
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Upgrade to unlock more features and increase your user limits.
-                </div>
-                
-                <div class="current-plan mb-3">
-                    <h6>Current Plan: Standard (KES 15,000/month)</h6>
-                    <div class="text-muted small">10 users • Basic features • Email support</div>
-                </div>
-                
-                <div class="upgrade-option">
-                    <div class="card border-success">
-                        <div class="card-body">
-                            <h6 class="text-success">Upgrade to Professional</h6>
-                            <p class="mb-2">KES 25,000/month (+KES 10,000)</p>
-                            <ul class="list-unstyled small">
-                                <li>✓ 25 users (15 more)</li>
-                                <li>✓ Advanced reporting</li>
-                                <li>✓ Priority support</li>
-                                <li>✓ Custom integrations</li>
-                                <li>✓ Daily backups</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success">Upgrade Now - KES 25,000/month</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function selectPlan(planType) {
-    document.getElementById('purchase-content').style.display = 'none';
-    document.getElementById('checkout-content').style.display = 'block';
-    document.getElementById('selected-plan').textContent = planType.charAt(0).toUpperCase() + planType.slice(1) + ' Plan';
-    
-    // Update pricing based on plan
-    const costs = {
-        standard: 15000,
-        professional: 25000
-    };
-    
-    document.getElementById('monthly-cost').textContent = 'KES ' + costs[planType].toLocaleString();
-    document.getElementById('total-cost').textContent = 'KES ' + (costs[planType] + 5000).toLocaleString();
-}
-
-function updatePricing() {
-    // Update pricing based on billing frequency
-    // Implementation for yearly discount
-}
-
-function proceedToPayment() {
-    // Redirect to existing payment flow
-    window.location.href = '/payment/';
-}
-</script>
 
 </div>
 {% endblock %}

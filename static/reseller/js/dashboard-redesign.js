@@ -2,13 +2,33 @@
 // Requires Chart.js (already loaded in base layout)
 
 (function() {
+  // Ensure we reuse/destroy existing Chart instances to avoid duplicates and growth
+  function destroyExistingChart(el) {
+    if (!el || typeof Chart === 'undefined') return;
+    if (typeof Chart.getChart === 'function') {
+      const existing = Chart.getChart(el);
+      if (existing) existing.destroy();
+    } else if (el._chart && typeof el._chart.destroy === 'function') {
+      el._chart.destroy();
+      el._chart = null;
+    }
+  }
+
+  function createChart(el, config) {
+    const ctx = el.getContext('2d');
+    const chart = new Chart(ctx, config);
+    // store reference for fallback reuse
+    el._chart = chart;
+    return chart;
+  }
+
   function initRevenueChart() {
     const el = document.getElementById('revenueChart');
     if (!el || typeof Chart === 'undefined') return;
-    const ctx = el.getContext('2d');
+    destroyExistingChart(el);
     const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const data = [1200, 1800, 900, 1500, 2100, 1900, 2300];
-    new Chart(ctx, {
+    createChart(el, {
       type: 'line',
       data: {
         labels,
@@ -37,10 +57,10 @@
   function initTopProductsChart() {
     const el = document.getElementById('topProductsChart');
     if (!el || typeof Chart === 'undefined') return;
-    const ctx = el.getContext('2d');
+    destroyExistingChart(el);
     const labels = ['Gateway', 'POS', 'E‑commerce', 'Mobile'];
     const data = [42, 35, 28, 20];
-    new Chart(ctx, {
+    createChart(el, {
       type: 'bar',
       data: {
         labels,
@@ -66,8 +86,8 @@
   function initSparkline(id, points, color) {
     const el = document.getElementById(id);
     if (!el || typeof Chart === 'undefined') return;
-    const ctx = el.getContext('2d');
-    new Chart(ctx, {
+    destroyExistingChart(el);
+    createChart(el, {
       type: 'line',
       data: { labels: points.map((_, i) => i+1), datasets: [{ data: points, borderColor: color, fill: false, tension: 0.35, pointRadius: 0, borderWidth: 2 }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }

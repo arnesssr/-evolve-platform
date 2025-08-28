@@ -187,6 +187,11 @@ aside.sidebar,
     overflow-y: overlay; /* For Webkit browsers - shows scrollbar only when needed but doesn't take space */
 }
 
+/* Normalize icon sizing for readability on desktop */
+.sidebar-nav a i {
+    font-size: 1.05rem;
+}
+
 /* Custom scrollbar for navigation */
 .sidebar-nav::-webkit-scrollbar {
     width: 8px; /* Slightly wider for better visibility */
@@ -435,4 +440,94 @@ aside.sidebar,
 /* Hide regular toggle button when showing collapsed menu */
 .sidebar.collapsed .toggle-btn {
     display: none !important;
+}
+
+/* Ensure offcanvas is visible and not translated on desktop */
+@media (min-width: 992px) {
+    #sidebar {
+        visibility: visible !important;
+        transform: none !important;
+    }
+}
+
+/* Proper offcanvas behavior on small screens */
+@media (max-width: 991.98px) {
+    #sidebar {
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 1055 !important; /* Above header */
+    }
+}
+
+/* Desktop sidebar display fix */
+@media (min-width: 992px) {
+    /* Ensure sidebar is always visible on desktop */
+    #sidebar,
+    .sidebar,
+    aside.sidebar {
+        visibility: visible !important;
+        transform: none !important;
+        position: fixed !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Show offcanvas body properly on desktop */
+    #sidebar .offcanvas-body {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Hide offcanvas header on desktop */
+    #sidebar .offcanvas-header {
+        display: none !important;
+    }
+    
+    /* Ensure proper collapsed state on desktop */
+    .sidebar.collapsed .sidebar-nav a span,
+    .sidebar.collapsed .sidebar-group > span,
+    .sidebar.collapsed .logo-text {
+        /* Keep text hidden when collapsed on desktop */
+        display: none !important;
+    }
+    
+    .sidebar.collapsed .sidebar-nav a {
+        justify-content: center !important;
+        padding: 0.75rem !important;
+    }
+    
+    .sidebar.collapsed .toggle-btn {
+        display: none !important;
+    }
+
+    /* If preload collapsed class is stuck, force expanded desktop state */
+    .sidebar-preload-collapsed .sidebar {
+        width: var(--sidebar-width) !important;
+    }
+    .sidebar-preload-collapsed .sidebar span,
+    .sidebar-preload-collapsed .sidebar .logo-text,
+    .sidebar-preload-collapsed .sidebar .sidebar-group > span,
+    .sidebar-preload-collapsed .sidebar .toggle-btn {
+        display: inline-block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative !important;
+    }
+    .sidebar-preload-collapsed .sidebar .collapsed-menu-btn {
+        display: none !important;
+    }
+    .sidebar-preload-collapsed .sidebar-nav a {
+        justify-content: flex-start !important;
+        padding: 0.75rem 1.5rem !important;
+    }
+    .sidebar-preload-collapsed .sidebar-nav a i {
+        margin-right: 0.75rem !important;
+    }
+    
+    /* Main content proper margin */
+    .main-content {
+        transition: margin-left 0.3s ease;
+    }
 }

@@ -58,12 +58,17 @@
         <label for="industryFilter" class="form-label small fw-medium">Industry</label>
         <select id="industryFilter" class="form-select form-select-sm" name="industry">
           <option value="" {% if not request.GET.industry %}selected{% endif %}>All Industries</option>
-          <option value="manufacturing" {% if request.GET.industry == 'manufacturing' %}selected{% endif %}>Manufacturing</option>
-          <option value="retail" {% if request.GET.industry == 'retail' %}selected{% endif %}>Retail</option>
-          <option value="services" {% if request.GET.industry == 'services' %}selected{% endif %}>Services</option>
-          <option value="healthcare" {% if request.GET.industry == 'healthcare' %}selected{% endif %}>Healthcare</option>
-          <option value="education" {% if request.GET.industry == 'education' %}selected{% endif %}>Education</option>
-          <option value="technology" {% if request.GET.industry == 'technology' %}selected{% endif %}>Technology</option>
+          <option value="Agriculture" {% if request.GET.industry == 'Agriculture' %}selected{% endif %}>Agriculture</option>
+          <option value="Construction" {% if request.GET.industry == 'Construction' %}selected{% endif %}>Construction</option>
+          <option value="Education" {% if request.GET.industry == 'Education' %}selected{% endif %}>Education</option>
+          <option value="Finance" {% if request.GET.industry == 'Finance' %}selected{% endif %}>Finance</option>
+          <option value="Healthcare" {% if request.GET.industry == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+          <option value="Hospitality" {% if request.GET.industry == 'Hospitality' %}selected{% endif %}>Hospitality</option>
+          <option value="Information Technology" {% if request.GET.industry == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+          <option value="Manufacturing" {% if request.GET.industry == 'Manufacturing' %}selected{% endif %}>Manufacturing</option>
+          <option value="Retail" {% if request.GET.industry == 'Retail' %}selected{% endif %}>Retail</option>
+          <option value="Transportation & Logistics" {% if request.GET.industry == 'Transportation & Logistics' %}selected{% endif %}>Transportation & Logistics</option>
+          <option value="Other" {% if request.GET.industry == 'Other' %}selected{% endif %}>Other</option>
         </select>
       </div>
       <div class="d-flex gap-2 mt-2">
@@ -222,22 +227,44 @@ document.addEventListener('DOMContentLoaded', function() {
         addForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(addForm);
-            const payload = Object.fromEntries(formData.entries());
-            const res = await fetch('/platform/api/v1/businesses/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (res.ok) {
-                const modalEl = document.getElementById('addBusinessModal');
-                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                modal.hide();
-                addForm.reset();
-                table.ajax.reload();
-                showToast && showToast('Business created successfully', 'success');
-            } else {
-                const data = await res.json().catch(() => ({}));
-                alert('Failed to create business. ' + (data.error || ''));
+            // Build payload with required fields; include optional ones if present
+            const payload = {
+                business_name: formData.get('business_name') || '',
+                business_email: formData.get('business_email') || '',
+                industry: formData.get('industry') || '',
+                company_size: formData.get('company_size') || '',
+                country: formData.get('country') || '',
+                postal_code: formData.get('postal_code') || ''
+            };
+            try {
+                const res = await fetch('/platform/api/v1/businesses/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': (typeof getCsrfToken === 'function' ? getCsrfToken() : '')
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload),
+                });
+                if (res.ok) {
+                    const modalEl = document.getElementById('addBusinessModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    modal.hide();
+                    addForm.reset();
+                    table.ajax.reload();
+                    if (typeof showToast === 'function') showToast('Business created successfully', 'success');
+                } else {
+                    let message = 'Failed to create business.';
+                    try {
+                        const data = await res.json();
+                        if (data && (data.error || data.detail)) {
+                            message += ' ' + (data.error || data.detail);
+                        }
+                    } catch {}
+                    alert(message);
+                }
+            } catch (err) {
+                alert('Network error while creating business.');
             }
         });
     }

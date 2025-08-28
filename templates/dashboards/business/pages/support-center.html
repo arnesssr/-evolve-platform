@@ -23,177 +23,10 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-ticket-alt text-primary fa-3x mb-3"></i>
-                    <h5>Submit Ticket</h5>
-                    <p class="text-muted mb-3">Report issues or request help</p>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#newTicketModal">Create Ticket</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-book text-info fa-3x mb-3"></i>
-                    <h5>Knowledge Base</h5>
-                    <p class="text-muted mb-3">Find answers to common questions</p>
-                    <button class="btn btn-info btn-sm">Browse Articles</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-video text-success fa-3x mb-3"></i>
-                    <h5>Video Tutorials</h5>
-                    <p class="text-muted mb-3">Learn how to use your software</p>
-                    <button class="btn btn-success btn-sm">Watch Videos</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-phone text-warning fa-3x mb-3"></i>
-                    <h5>Contact Support</h5>
-                    <p class="text-muted mb-3">Speak directly with our team</p>
-                    <button class="btn btn-warning btn-sm">Call Now</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Support Tickets -->
+    <!-- Support -->
     <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list text-primary me-2"></i>Your Support Tickets
-                        </h5>
-                        <select class="form-select form-select-sm" style="width: auto;">
-                            <option>All Tickets</option>
-                            <option>Open</option>
-                            <option>Closed</option>
-                            <option>Pending</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Ticket #</th>
-                                    <th>Subject</th>
-                                    <th>Category</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#T-001</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <strong>ERP System Login Issues</strong>
-                                            <br><small class="text-muted">Cannot access inventory module</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-primary">Technical</span></td>
-                                    <td><span class="badge bg-danger">High</span></td>
-                                    <td><span class="badge bg-success">Open</span></td>
-                                    <td>2 hours ago</td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#T-002</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <strong>Payroll Report Error</strong>
-                                            <br><small class="text-muted">Monthly report generation failing</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-warning">Bug Report</span></td>
-                                    <td><span class="badge bg-warning">Medium</span></td>
-                                    <td><span class="badge bg-info">In Progress</span></td>
-                                    <td>1 day ago</td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#T-003</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <strong>SACCO Feature Request</strong>
-                                            <br><small class="text-muted">Need additional member fields</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge bg-success">Feature Request</span></td>
-                                    <td><span class="badge bg-secondary">Low</span></td>
-                                    <td><span class="badge bg-secondary">Closed</span></td>
-                                    <td>3 days ago</td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock text-primary me-2"></i>Support Hours
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between py-2">
-                        <span>Monday - Friday</span>
-                        <span>8:00 AM - 6:00 PM</span>
-                    </div>
-                    <div class="d-flex justify-content-between py-2">
-                        <span>Saturday</span>
-                        <span>9:00 AM - 2:00 PM</span>
-                    </div>
-                    <div class="d-flex justify-content-between py-2">
-                        <span>Sunday</span>
-                        <span>Closed</span>
-                    </div>
-                    <hr>
-                    <div class="text-center">
-                        <div class="badge bg-success mb-2">Currently Online</div>
-                        <p class="small text-muted mb-0">Response time: ~2 hours</p>
-                    </div>
-                </div>
-            </div>
-            
+        <div class="col-lg-6">
             <div class="card">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="mb-0">
@@ -201,19 +34,8 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <strong>Support Hotline</strong>
-                        <br><span class="text-primary">+254 700 123 456</span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Email Support</strong>
-                        <br><span class="text-primary">support@evolve-payments.com</span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Emergency Line</strong>
-                        <br><span class="text-danger">+254 700 999 000</span>
-                        <br><small class="text-muted">For critical system outages only</small>
-                    </div>
+                    <p class="text-muted mb-2">Use the button above to submit a new support ticket. Our team will respond via your account email.</p>
+                    <p class="text-muted mb-0">If you need alternative contact methods, include them in your ticket description.</p>
                 </div>
             </div>
         </div>
@@ -260,14 +82,6 @@
                     <div class="mb-3">
                         <label class="form-label">Affected Software</label>
                         <div class="d-flex gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="erp-issue">
-                                <label class="form-check-label" for="erp-issue">ERP System</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="sacco-issue">
-                                <label class="form-check-label" for="sacco-issue">SACCO Platform</label>
-                            </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="payroll-issue">
                                 <label class="form-check-label" for="payroll-issue">Payroll System</label>

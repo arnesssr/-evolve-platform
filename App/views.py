@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 
 from App.models import OTP
 from App.models import UserProfile 
-from App.models import Business, Plan, Feature
+from App.models import Business, Plan, Feature, Subscription
 from App.integrations.utils import send_otp, send_mail
 from django.views.generic import TemplateView
 from django.http import JsonResponse, Http404
@@ -15,6 +16,10 @@ from django.http import HttpResponse
 import json
 import uuid
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import timedelta
+from django.urls import reverse
+from django.contrib import messages
 
 
 # Create your views here.
@@ -288,12 +293,15 @@ def create_order_view(request):
     if amount == 0:
         amount = request.session.get('purchase_amount', 0)
 
+    # Build a callback URL to our confirmation endpoint so we can verify and activate subscriptions
+    callback_url = request.build_absolute_uri(reverse('payment_confirm'))
+
     payload = {
         "id": str(uuid.uuid4()),
         "currency": "KES",
         "amount": amount,
         "description": description,
-        "callback_url": "https://2168-197-237-221-46.ngrok-free.app/business-dashboard",
+        "callback_url": callback_url,
         "redirect_mode": "",
         "notification_id": "005bccfc-10ec-4cb7-a491-db9dd0db9213",
         "branch": "Store Name - Lixnet",
@@ -334,30 +342,81 @@ def ipn_listener(request):
     return HttpResponse("IPN received", status=200)
 
 def payment_confirm(request):
-    tracking_id = request.GET.get("order_tracking_id")
-    merchant_reference = request.GET.get("order_merchant_reference")
+    # Provider may send different param names; normalize them
+    tracking_id = (
+        request.GET.get("order_tracking_id")
+        or request.GET.get("OrderTrackingId")
+        or request.GET.get("tracking_id")
+        or request.GET.get("TrackingId")
+    )
+    merchant_reference = (
+        request.GET.get("order_merchant_reference")
+        or request.GET.get("OrderMerchantReference")
+        or request.GET.get("merchant_reference")
+        or request.GET.get("MerchantReference")
+    )
 
     token = generate_access_token()
     status = get_transaction_status(token, tracking_id, merchant_reference)
 
     if status == "COMPLETED":
-        return redirect('business-dashboard')
+        # On successful payment, activate subscription if applicable
+        software = request.session.get('purchase_software')
+        plan_name = request.session.get('purchase_plan')
+        billing = request.session.get('purchase_billing', 'monthly')
+        if software == 'payroll' and request.user.is_authenticated:
+            try:
+                plan = Plan.objects.get(name=plan_name)
+            except Plan.DoesNotExist:
+                plan = Plan.objects.filter(is_active=True).order_by('display_order').first()
+            now = timezone.now()
+            period = timedelta(days=365) if billing == 'yearly' else timedelta(days=30)
+            if plan:
+                Subscription.objects.update_or_create(
+                    user=request.user,
+                    product='payroll',
+                    defaults={
+                        'plan': plan,
+                        'status': 'active',
+                        'start_date': now,
+                        'end_date': now + period,
+                        'auto_renewal': True,
+                    }
+                )
+        # Clear purchase context
+        for k in ['purchase_software','purchase_plan','purchase_billing','purchase_users','purchase_amount','purchase_description']:
+            request.session.pop(k, None)
+        # Friendly UX: take user straight to the app
+        messages.success(request, 'Payment successful. Your Payroll subscription is now active.')
+        return redirect('launch-payroll')
     else:
-        return render(request, 'payments/payment-failed.html')
+        messages.error(request, 'Payment could not be verified. Please contact support if you were charged.')
+        return redirect('business-subscriptions')
 
 
 def business_dashboard(request):
-    return render(request, 'dashboards/business/business-dashboard.html')
+    # Render the consolidated dashboard page template
+    return render(request, 'dashboards/business/pages/dashboard.html')
 
 # Business Dashboard Views
 def business_subscriptions(request):
-    return render(request, 'dashboards/business/pages/my-plans.html')
+    payroll = None
+    payroll_active = False
+    try:
+        payroll = Subscription.objects.filter(user=request.user, product='payroll').order_by('-end_date').first()
+        if payroll and payroll.status == 'active' and payroll.end_date:
+            payroll_active = payroll.end_date >= timezone.now()
+    except Exception:
+        payroll = None
+        payroll_active = False
+    context = {
+        'payroll': payroll,
+        'payroll_active': payroll_active,
+    }
+    return render(request, 'dashboards/business/pages/my-plans.html', context)
 
 def business_billing(request):
     return render(request, 'dashboards/business/pages/billing-history.html')
-
-def business_software_hub(request):
-    return render(request, 'dashboards/business/pages/software-hub.html')
 
 def business_users(request):
     return render(request, 'dashboards/business/pages/user-management.html')
@@ -366,8 +425,8 @@ def business_support(request):
     return render(request, 'dashboards/business/pages/support-center.html')
 
 def business_settings(request):
-    # For now, redirect to the main dashboard since we don't have a settings page yet
-    return render(request, 'dashboards/business/business-dashboard.html')
+    # Redirect to the main dashboard since settings is not implemented for MVP
+    return render(request, 'dashboards/business/pages/dashboard.html')
 
 def business_purchase_software(request):
     """
@@ -418,7 +477,47 @@ def business_purchase_software(request):
         # Redirect to existing payment flow
         return redirect('payment')
     
-    return redirect('business-software-hub')
+    return redirect('business-dashboard')
+
+@login_required
+def subscribe_payroll(request):
+    """Prepare a Payroll purchase based on active plan and redirect to payment."""
+    billing = request.GET.get('billing', 'monthly')
+    plan = Plan.objects.filter(is_active=True).order_by('display_order').first()
+    if not plan:
+        # No plan configured by admin yet
+        return render(request, 'payments/payment-failed.html', { 'error': 'No active plan configured. Please contact support.' })
+
+    # Compute amount from plan based on billing
+    if billing == 'yearly' and plan.yearly_price and plan.yearly_price > 0:
+        amount = float(plan.yearly_price)
+    else:
+        amount = float(plan.price)
+        billing = 'monthly'
+
+    # Store purchase details in session for payment processing
+    request.session['purchase_software'] = 'payroll'
+    request.session['purchase_plan'] = plan.name
+    request.session['purchase_billing'] = billing
+    request.session['purchase_users'] = '1'
+    request.session['purchase_amount'] = amount
+    request.session['purchase_description'] = f"Payroll System - {billing.title()} Plan ({plan.name})"
+
+    return redirect('payment')
+
+@login_required
+def launch_payroll(request):
+    """Gate Payroll launch behind an active subscription."""
+    has_active = Subscription.objects.filter(
+        user=request.user,
+        product='payroll',
+        status='active',
+        end_date__gte=timezone.now()
+    ).exists()
+    if has_active:
+        return redirect('/software/payroll/')
+    else:
+        return redirect('subscribe_payroll')
 
 @login_required
 def reseller_dashboard(request):
@@ -949,3 +1048,11 @@ def mask_contact(contact, method):
         if len(contact) > 6:
             return contact[:3] + '*' * (len(contact) - 6) + contact[-3:]
     return contact
+
+
+def static_test_view(request):
+    """Test view to verify static files are being served correctly"""
+    return render(request, 'static_test.html', {
+        'debug': settings.DEBUG,
+        'STATIC_URL': settings.STATIC_URL,
+    })

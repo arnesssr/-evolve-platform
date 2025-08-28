@@ -1,5 +1,7 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
 import json
 from decimal import Decimal
 
@@ -87,4 +89,9 @@ class AdminProductDetailAPI(View):
             'created_display': p.created_at.strftime('%b %d, %Y') if p.created_at else None,
         }
         return JsonResponse({'success': True, 'data': data})
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminProductCountAPI(View):
+    def get(self, request):
+        return JsonResponse({'count': Product.objects.count()})
 

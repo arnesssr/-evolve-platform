@@ -54,19 +54,21 @@
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="overview" role="tabpanel">
 
-    <!-- Commission Structure -->
+    <!-- Commission Structure - Responsive Grid -->
     <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-xl-8">
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Earnings Trend</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="earningsChart" height="250"></canvas>
+                    <div class="chart-container" style="position: relative; height: 250px;">
+                        <canvas id="earningsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-xl-4">
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Commission Tiers</h5>
@@ -151,21 +153,23 @@
         <div class="tab-pane fade" id="transactions" role="tabpanel">
             <!-- Commission Details Table -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0">Commission Details</h5>
-            <div class="d-flex gap-2">
-                <select class="form-select form-select-sm" id="statusFilter">
-                    <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="paid">Paid</option>
-                </select>
-                <input type="month" class="form-control form-control-sm" id="monthFilter" value="{{ current_month }}">
+        <div class="card-header">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                <h5 class="card-title mb-2 mb-sm-0">Commission Details</h5>
+                <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
+                    <select class="form-select form-select-sm" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    <input type="month" class="form-control form-control-sm" id="monthFilter" value="{{ current_month }}">
+                </div>
             </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+<table class="table table-hover responsive-stack">
                     <thead>
                         <tr>
                             <th>Date</th>
@@ -181,18 +185,18 @@
                     <tbody>
                         {% for commission in page_obj %}
                         <tr>
-                            <td>{{ commission.calculation_date|date:"M d, Y" }}</td>
-                            <td>
+                            <td data-label="Date">{{ commission.calculation_date|date:"M d, Y" }}</td>
+                            <td data-label="Reference">
                                 <code>{{ commission.transaction_reference }}</code>
                             </td>
-                            <td>{{ commission.client_name }}</td>
-                            <td>
+                            <td data-label="Client">{{ commission.client_name }}</td>
+                            <td data-label="Product">
                                 <span class="badge bg-secondary">{{ commission.product_name }}</span>
                             </td>
-                            <td>${{ commission.sale_amount|floatformat:0 }}</td>
-                            <td>{{ commission.commission_rate|floatformat:1 }}%</td>
-                            <td class="fw-bold">${{ commission.amount|floatformat:2 }}</td>
-                            <td>
+                            <td data-label="Sale Amount">${{ commission.sale_amount|floatformat:0 }}</td>
+                            <td data-label="Rate">{{ commission.commission_rate|floatformat:1 }}%</td>
+                            <td data-label="Commission" class="fw-bold">${{ commission.amount|floatformat:2 }}</td>
+                            <td data-label="Status">
                                 {% if commission.status == 'pending' %}
                                 <span class="badge bg-warning">Pending</span>
                                 {% elif commission.status == 'approved' %}
@@ -268,7 +272,9 @@
                             <h5 class="card-title mb-0">Monthly Comparison</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="monthlyChart" height="300"></canvas>
+                            <div class="chart-container" style="position: relative; height: 250px;">
+                                <canvas id="monthlyChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -280,29 +286,29 @@
                             <h5 class="card-title mb-0">Performance Metrics</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <div class="metric-box text-center p-3 border rounded">
-                                        <div class="metric-value h3 mb-1">{{ avg_sale_amount|default:"0" }}</div>
-                                        <div class="metric-label text-muted">Avg. Sale Amount</div>
+                            <div class="row g-2 g-sm-3">
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <div class="metric-box text-center p-2 p-sm-3 border rounded">
+                                        <div class="metric-value mb-1">{{ avg_sale_amount|default:"0" }}</div>
+                                        <div class="metric-label text-muted small">Avg. Sale Amount</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="metric-box text-center p-3 border rounded">
-                                        <div class="metric-value h3 mb-1">{{ conversion_rate|default:"0" }}%</div>
-                                        <div class="metric-label text-muted">Conversion Rate</div>
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <div class="metric-box text-center p-2 p-sm-3 border rounded">
+                                        <div class="metric-value mb-1">{{ conversion_rate|default:"0" }}%</div>
+                                        <div class="metric-label text-muted small">Conversion Rate</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="metric-box text-center p-3 border rounded">
-                                        <div class="metric-value h3 mb-1">{{ total_clients|default:"0" }}</div>
-                                        <div class="metric-label text-muted">Active Clients</div>
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <div class="metric-box text-center p-2 p-sm-3 border rounded">
+                                        <div class="metric-value mb-1">{{ total_clients|default:"0" }}</div>
+                                        <div class="metric-label text-muted small">Active Clients</div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="metric-box text-center p-3 border rounded">
-                                        <div class="metric-value h3 mb-1">{{ avg_commission|default:"0" }}</div>
-                                        <div class="metric-label text-muted">Avg. Commission</div>
+                                <div class="col-12 col-sm-6 col-md-3">
+                                    <div class="metric-box text-center p-2 p-sm-3 border rounded">
+                                        <div class="metric-value mb-1">{{ avg_commission|default:"0" }}</div>
+                                        <div class="metric-label text-muted small">Avg. Commission</div>
                                     </div>
                                 </div>
                             </div>

@@ -23,58 +23,11 @@
                     </a>
                 </li>
 
-                <!-- Software Access -->
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center py-3 px-3 {% if request.resolver_match.url_name == 'business-software-hub' %}active{% endif %}" 
-                       href="{% url 'business-software-hub' %}">
-                        <i class="fas fa-rocket me-3"></i>
-                        <span class="nav-text">Software Hub</span>
-                    </a>
-                </li>
-
                 <!-- Divider -->
                 <li class="nav-divider">
                     <hr class="border-light border-opacity-25 mx-3 my-2">
                 </li>
 
-                <!-- Quick Launch -->
-                <li class="nav-item">
-                    <div class="nav-section-title px-3 mb-2">
-                        <small class="text-light opacity-75 fw-medium">QUICK LAUNCH</small>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center py-2 px-3" 
-                       href="/software/erp/" target="_blank">
-                        <i class="fas fa-cogs me-3"></i>
-                        <span class="nav-text">ERP System</span>
-                        <i class="fas fa-external-link-alt ms-auto opacity-50" style="font-size: 0.75rem;"></i>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center py-2 px-3" 
-                       href="/software/sacco/" target="_blank">
-                        <i class="fas fa-handshake me-3"></i>
-                        <span class="nav-text">SACCO Platform</span>
-                        <i class="fas fa-external-link-alt ms-auto opacity-50" style="font-size: 0.75rem;"></i>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center py-2 px-3" 
-                       href="/software/payroll/" target="_blank">
-                        <i class="fas fa-money-check me-3"></i>
-                        <span class="nav-text">Payroll System</span>
-                        <i class="fas fa-external-link-alt ms-auto opacity-50" style="font-size: 0.75rem;"></i>
-                    </a>
-                </li>
-
-                <!-- Divider -->
-                <li class="nav-divider">
-                    <hr class="border-light border-opacity-25 mx-3 my-2">
-                </li>
 
                 <!-- Account Management -->
                 <li class="nav-item">
@@ -121,13 +74,6 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center py-2 px-3 {% if request.resolver_match.url_name == 'business-settings' %}active{% endif %}" 
-                       href="{% url 'business-settings' %}">
-                        <i class="fas fa-cog me-3"></i>
-                        <span class="nav-text">Settings</span>
-                    </a>
-                </li>
             </ul>
         </nav>
 

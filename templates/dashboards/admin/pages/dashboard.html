@@ -66,24 +66,13 @@
 <div class="tab-content">
   <!-- Overview Tab -->
   <div class="tab-pane fade show active" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-tab">
-    <!-- Quick Stats Row -->
-    <div class="row mb-4">
-        <div class="col-12">
-            {% include 'dashboards/admin/components/quick-stats.html' %}
-        </div>
-    </div>
-
     <!-- Charts and Activity Row -->
     <div class="row">
-        <!-- Revenue Chart -->
-        <div class="col-lg-8 mb-4">
-            {% include 'dashboards/admin/components/revenue-chart.html' %}
-        </div>
-        
-        <!-- Activity Feed -->
-        <div class="col-lg-4 mb-4">
-            {% include 'dashboards/admin/components/activity-feed.html' %}
-        </div>
+        {% include 'dashboards/admin/components/metric-card.html' with title="Users" value="0" icon="fa-users" color="primary" id="metricUsers" %}
+        {% include 'dashboards/admin/components/metric-card.html' with title="Products" value="0" icon="fa-box" color="info" id="metricProducts" %}
+        {% include 'dashboards/admin/components/metric-card.html' with title="Plans" value="0" icon="fa-tags" color="warning" id="metricPlans" %}
+        {% include 'dashboards/admin/components/metric-card.html' with title="Resellers" value="0" icon="fa-user-tie" color="success" id="metricResellers" %}
+        {% include 'dashboards/admin/components/metric-card.html' with title="Admins" value="0" icon="fa-user-shield" color="secondary" id="metricAdmins" %}
     </div>
   </div>
 
@@ -114,9 +103,6 @@
   <!-- Financial Tab -->
   <div class="tab-pane fade" id="tab-financial" role="tabpanel" aria-labelledby="tab-financial-tab">
     <div class="row">
-        <div class="col-12 mb-4">
-            {% include 'dashboards/admin/components/revenue-chart.html' %}
-        </div>
         <div class="col-12 mb-4">
             {% include 'dashboards/admin/components/commission-summary.html' %}
         </div>
@@ -196,6 +182,48 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Load MVP metric counts
+    loadMvpCounts();
 });
+
+async function loadMvpCounts() {
+    const BASES = ['/platform/admin/api/v1', '/admin/api/v1'];
+    const safeSet = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value != null) el.textContent = Number(value || 0).toLocaleString();
+    };
+    const fetchJson = async (path) => {
+        let lastErr;
+        for (const base of BASES) {
+            try {
+                const res = await fetch(`${base}${path}`, { credentials: 'same-origin' });
+                if (!res.ok) { lastErr = new Error(`HTTP ${res.status}`); continue; }
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) { lastErr = new Error('Not JSON'); continue; }
+                return await res.json();
+            } catch (e) {
+                lastErr = e;
+            }
+        }
+        throw lastErr || new Error('All bases failed');
+    };
+    try {
+        const [metrics, resellers, products, plans, admins] = await Promise.all([
+            fetchJson('/dashboard/metrics/?period=last_30_days'),
+            fetchJson('/resellers/?page_size=1'),
+            fetchJson('/products/count/').catch(() => ({ count: 0 })),
+            fetchJson('/plans/count/').catch(() => ({ count: 0 })),
+            fetchJson('/admins/count/').catch(() => ({ count: 0 })),
+        ]);
+        safeSet('metricUsers', metrics?.users?.total_users);
+        safeSet('metricResellers', resellers?.total);
+        safeSet('metricProducts', products?.count);
+        safeSet('metricPlans', plans?.count);
+        safeSet('metricAdmins', admins?.count);
+    } catch (e) {
+        console.warn('Failed to load dashboard counts', e);
+    }
+}
 </script>
 {% endblock %}

@@ -196,6 +196,23 @@
     margin-left: var(--sidebar-collapsed-width, 70px) !important;
 }
 
+/* On small screens, main content should take full width */
+@media (max-width: 991.98px) {
+    .main-content {
+        margin-left: 0 !important;
+    }
+}
+
+/* On desktop, ensure main content accounts for sidebar width by default */
+@media (min-width: 992px) {
+    .main-content {
+        margin-left: var(--sidebar-width, 260px) !important;
+    }
+    .main-content.sidebar-collapsed {
+        margin-left: var(--sidebar-collapsed-width, 70px) !important;
+    }
+}
+
 .page-content {
     padding: 1.5rem;
 }

@@ -10,12 +10,12 @@
 {% block content %}
 <div class="leads-management">
     <!-- Page Header -->
-    <div class="page-header d-flex justify-content-between align-items-center mb-4">
-        <div>
+    <div class="page-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4">
+        <div class="mb-3 mb-sm-0">
             <h1 class="h3 mb-0">Lead Management</h1>
-            <p class="text-muted mb-0">Track and manage your sales leads</p>
+            <p class="text-muted mb-0 d-none d-sm-block">Track and manage your sales leads</p>
         </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLeadModal">
+        <button class="btn btn-primary w-100 w-sm-auto" data-bs-toggle="modal" data-bs-target="#addLeadModal">
             <i class="fas fa-plus-circle me-2"></i>Add New Lead
         </button>
     </div>
@@ -24,9 +24,9 @@
     <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
-            <form class="row g-3" method="get">
-                <div class="col-12 col-md-3">
-                    <label class="form-label">Status</label>
+            <form class="row g-2 g-sm-3" method="get">
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label small">Status</label>
                     <select name="status" class="form-select">
                         <option value="">All Status</option>
                         <option value="new">New</option>
@@ -38,8 +38,8 @@
                         <option value="lost">Lost</option>
                     </select>
                 </div>
-                <div class="col-12 col-md-3">
-                    <label class="form-label">Date Range</label>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <label class="form-label small">Date Range</label>
                     <select name="date_range" class="form-select">
                         <option value="">All Time</option>
                         <option value="today">Today</option>
@@ -49,11 +49,14 @@
                     </select>
                 </div>
                 <div class="col-12 col-md-4">
-                    <label class="form-label">Search</label>
-                    <input type="text" name="search" class="form-control" placeholder="Search by name, email, or company">
+                    <label class="form-label small">Search</label>
+                    <input type="text" name="search" class="form-control" placeholder="Name, email, or company">
                 </div>
                 <div class="col-12 col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-secondary w-100">Filter</button>
+                    <button type="submit" class="btn btn-secondary w-100">
+                        <i class="fas fa-filter d-sm-none"></i>
+                        <span class="d-none d-sm-inline">Filter</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -63,7 +66,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+<table class="table table-hover responsive-stack">
                     <thead>
                         <tr>
                             <th>Lead Info</th>
@@ -77,19 +80,19 @@
                     <tbody>
                         {% for lead in leads %}
                         <tr>
-                            <td>
+                            <td data-label="Lead Info">
                                 <div class="lead-info">
                                     <div class="fw-medium">{{ lead.name }}</div>
                                     <div class="text-muted small">{{ lead.email }}</div>
                                 </div>
                             </td>
-                            <td>{{ lead.company }}</td>
-                            <td>
+                            <td data-label="Company">{{ lead.company }}</td>
+                            <td data-label="Status">
                                 <span class="badge bg-{{ lead.status_color }}">{{ lead.status }}</span>
                             </td>
-                            <td>${{ lead.potential_value|floatformat:0 }}</td>
-                            <td>{{ lead.last_contact|date:"M d, Y" }}</td>
-                            <td>
+                            <td data-label="Value">${{ lead.potential_value|floatformat:0 }}</td>
+                            <td data-label="Last Contact">{{ lead.last_contact|date:"M d, Y" }}</td>
+                            <td data-label="Actions">
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-primary" onclick="viewLead({{ lead.id }})">
                                         <i class="fas fa-eye"></i>

@@ -9,7 +9,7 @@
                 </div>
                 <div class="text-end">
                     <h6 class="text-muted mb-1">{{ title }}</h6>
-                    <h3 class="mb-0 fw-bold">{{ value }}</h3>
+                    <h3 class="mb-0 fw-bold" {% if id %}id="{{ id }}"{% endif %}>{{ value }}</h3>
                     {% if change %}
                     {% if trend == 'up' %}
                     <small class="text-success"><i class="fas fa-arrow-up"></i> {{ change }}</small>

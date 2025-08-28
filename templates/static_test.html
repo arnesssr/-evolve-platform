@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Static Files Test</title>
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-box {
+            background-color: #f0f0f0;
+            border: 2px solid #333;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        .success {
+            color: green;
+        }
+        .fail {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Static Files Test Page</h1>
+    
+    <div class="test-box">
+        <h2>CSS Loading Test</h2>
+        <p>If you see styled elements below, CSS is loading correctly:</p>
+        
+        <!-- This should be styled by auth.css -->
+        <div class="auth-container">
+            <div class="auth-box">
+                <p>This box should have auth.css styles applied</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Static URL Test</h2>
+        <p>CSS URL: <code>{% static 'css/auth.css' %}</code></p>
+        <p>Bootstrap URL: <code>{% static 'css/bootstrap.css' %}</code></p>
+    </div>
+    
+    <div class="test-box">
+        <h2>Debug Info</h2>
+        <p>DEBUG: {{ debug|yesno:"True,False" }}</p>
+        <p>STATIC_URL: {{ STATIC_URL }}</p>
+    </div>
+</body>
+</html>

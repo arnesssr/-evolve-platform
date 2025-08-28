@@ -1,55 +1,378 @@
-/* Media queries and responsive adjustments */
-@media (max-width: 576px) {
-    .navbar {
-        flex-direction: column;
-    }
-    .navbar-collapse {
-        flex-basis: 100%;
-        align-items: center;
-    }
-    .card {
+/* =========================================================
+   ENHANCED RESPONSIVE STYLES FOR RESELLER MODULE
+   Mobile-first approach with comprehensive breakpoints
+   ========================================================= */
+
+/* ==========================================
+   MOBILE FIRST - BASE (320px - 575px)
+   ========================================== */
+
+/* Ensure no horizontal scroll on mobile */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Mobile Grid System */
+@media (max-width: 575.98px) {
+    /* Stack all columns on mobile */
+    .row > [class*='col-'] {
+        flex: 0 0 100%;
+        max-width: 100%;
         margin-bottom: 1rem;
     }
-    .row {
+    
+    /* Container adjustments */
+    .container,
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    /* Header responsive */
+    .reseller-header {
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    .header-search {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .header-search input {
+        width: 100%;
+    }
+    
+    /* Hide non-essential elements */
+    .hide-mobile,
+    .d-none-mobile {
+        display: none !important;
+    }
+    
+    /* Cards stack vertically */
+    .card-deck,
+    .card-group {
         flex-direction: column;
     }
-    .container {
-        padding-right: 10px;
-        padding-left: 10px;
+    
+    .card {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+    
+    /* Responsive tables */
+    .table-responsive {
+        border: 0;
+    }
+    
+    table {
+        font-size: 0.875rem;
+    }
+    
+    /* Buttons full width on mobile */
+    .btn-block-mobile {
+        display: block;
+        width: 100%;
+    }
+    
+    /* Form controls */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    /* Modal adjustments */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    /* Pagination */
+    .pagination {
+        font-size: 0.875rem;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    /* Dashboard specific */
+    .dashboard-neo .row {
+        margin: 0 -5px;
+    }
+    
+    .dashboard-neo [class*='col-'] {
+        padding: 5px;
+    }
+    
+    /* Commission tabs */
+    .nav-tabs {
+        border-bottom: 0;
+    }
+    
+    .nav-tabs .nav-link {
+        border: 1px solid #dee2e6;
+        margin-bottom: 5px;
+        border-radius: 0.25rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
     }
 }
 
-@media (min-width: 577px) and (max-width: 768px) {
+/* ==========================================
+   SMALL DEVICES (576px - 767px)
+   ========================================== */
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .container {
+        max-width: 540px;
+    }
+    
+    /* Two column layout */
+    .col-sm-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    .col-sm-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Show elements hidden on mobile */
+    .show-sm {
+        display: block !important;
+    }
+    
+    /* Cards in rows of 2 */
+    .card-columns {
+        column-count: 2;
+    }
+}
+
+/* ==========================================
+   MEDIUM DEVICES - TABLETS (768px - 991px)
+   ========================================== */
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .container {
+        max-width: 720px;
+    }
+    
+    /* Three column layout */
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    
     .col-md-6 {
         flex: 0 0 50%;
         max-width: 50%;
     }
-}
-
-@media (min-width: 769px) and (max-width: 992px) {
-    .col-lg-4 {
-        flex: 0 0 33.33333%;
-        max-width: 33.33333%;
+    
+    .col-md-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+    
+    .col-md-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Main content adjustment (no sidebar on tablet) */
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+    
+    /* Header adjustments */
+    .reseller-header {
+        padding: 15px 20px;
+    }
+    
+    /* Show tablet-specific elements */
+    .show-md {
+        display: block !important;
+    }
+    
+    .hide-md {
+        display: none !important;
+    }
+    
+    /* Cards in rows of 3 */
+    .card-columns {
+        column-count: 3;
     }
 }
 
-@media (min-width: 993px) {
+/* ==========================================
+   LARGE DEVICES - DESKTOP (992px - 1199px)
+   ========================================== */
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .container {
+        max-width: 960px;
+    }
+    
+    .col-lg-3 {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+    
+    .col-lg-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    
+    .col-lg-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    .col-lg-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+    
+    .col-lg-9 {
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+    
+    .col-lg-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    /* Sidebar visible, adjust main content */
+    .main-content {
+        margin-left: 260px;
+        padding: 25px;
+    }
+    
+    .main-content.sidebar-collapsed {
+        margin-left: 70px;
+    }
+    
+    /* Show desktop elements */
+    .show-lg {
+        display: block !important;
+    }
+    
+    .hide-lg {
+        display: none !important;
+    }
+}
+
+/* ==========================================
+   EXTRA LARGE DEVICES (1200px+)
+   ========================================== */
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+    
+    .col-xl-2 {
+        flex: 0 0 16.666667%;
+        max-width: 16.666667%;
+    }
+    
     .col-xl-3 {
         flex: 0 0 25%;
         max-width: 25%;
     }
-}
-
-/* Additional custom responsive tweaks */
-.hidden-xs {
-    /* Hidden on extra small devices */
-    display: none !important;
-}
-
-@media (min-width: 576px) {
-    .hidden-sm {
-        /* Hidden on small devices */
-        display: none !important;
+    
+    .col-xl-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
     }
+    
+    .col-xl-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    
+    /* Larger padding on xl screens */
+    .main-content {
+        padding: 30px;
+    }
+    
+    /* Cards can be in rows of 4 */
+    .card-columns {
+        column-count: 4;
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+/* Responsive visibility utilities */
+@media (max-width: 575.98px) {
+    .hidden-xs { display: none !important; }
+    .visible-xs { display: block !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .hidden-sm { display: none !important; }
+    .visible-sm { display: block !important; }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .hidden-md { display: none !important; }
+    .visible-md { display: block !important; }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .hidden-lg { display: none !important; }
+    .visible-lg { display: block !important; }
+}
+
+@media (min-width: 1200px) {
+    .hidden-xl { display: none !important; }
+    .visible-xl { display: block !important; }
+}
+
+/* Responsive text alignment */
+@media (max-width: 575.98px) {
+    .text-xs-center { text-align: center !important; }
+    .text-xs-left { text-align: left !important; }
+    .text-xs-right { text-align: right !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .text-sm-center { text-align: center !important; }
+    .text-sm-left { text-align: left !important; }
+    .text-sm-right { text-align: right !important; }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .text-md-center { text-align: center !important; }
+    .text-md-left { text-align: left !important; }
+    .text-md-right { text-align: right !important; }
+}
+
+@media (min-width: 992px) {
+    .text-lg-center { text-align: center !important; }
+    .text-lg-left { text-align: left !important; }
+    .text-lg-right { text-align: right !important; }
+}
+
+/* Responsive spacing utilities */
+@media (max-width: 575.98px) {
+    .p-xs-0 { padding: 0 !important; }
+    .p-xs-1 { padding: 0.25rem !important; }
+    .p-xs-2 { padding: 0.5rem !important; }
+    .p-xs-3 { padding: 1rem !important; }
+    .m-xs-0 { margin: 0 !important; }
+    .m-xs-1 { margin: 0.25rem !important; }
+    .m-xs-2 { margin: 0.5rem !important; }
+    .m-xs-3 { margin: 1rem !important; }
 }
 

@@ -5,174 +5,137 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'reseller/css/dashboard-redesign.css' %}">
+<style>
+/* Compact, improved UI for dashboard section cards */
+.dashboard-neo .page-header { margin-bottom: .5rem; }
+.dashboard-neo .section-card { position: relative; min-height: 160px; border: 1px solid var(--bs-border-color); transition: transform .15s ease, box-shadow .15s ease; }
+.dashboard-neo .section-card:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.06); }
+.dashboard-neo .section-card .card-body { padding: 12px 14px; }
+.dashboard-neo .section-card .card-title { font-size: 1rem; display: flex; align-items: center; gap: .5rem; }
+.dashboard-neo .section-card .badge { font-size: .75rem; border-radius: 50rem; }
+.dashboard-neo .section-card .icon-circle { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; }
+.dashboard-neo .section-card .meta { color: var(--bs-secondary-color); font-size: .8rem; }
+.dashboard-neo .section-card .btn { padding: .25rem .5rem; }
+.dashboard-neo .section-card .btn .bi { transition: transform .15s ease; }
+.dashboard-neo .section-card .btn:hover .bi { transform: translateX(2px); }
+/* Top accent per card */
+.dashboard-neo .section-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--bs-primary); opacity: .7; border-top-left-radius: .5rem; border-top-right-radius: .5rem; }
+.dashboard-neo .section-card.referrals::before { background: var(--bs-info); }
+.dashboard-neo .section-card.commissions::before { background: var(--bs-warning); }
+.dashboard-neo .section-card.invoices::before { background: var(--bs-secondary); }
+.dashboard-neo .section-card.payouts::before { background: var(--bs-success); }
+.dashboard-neo .section-card.links::before { background: var(--bs-primary); }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-neo">
-    <!-- Page Header -->
+    <!-- Compact Header -->
     <div class="page-header">
         <div>
-            <h1 class="page-title h3 mb-1">Dashboard</h1>
-            <p class="page-subtitle text-muted mb-0">Your business at a glance</p>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-            <select class="form-select form-select-sm" id="periodSelect">
-                <option value="week">This Week</option>
-                <option value="month" selected>This Month</option>
-                <option value="quarter">This Quarter</option>
-                <option value="year">This Year</option>
-            </select>
-            <a href="{% url 'reseller:earnings_payouts' %}" class="btn btn-sm btn-primary">
-                <i class="bi bi-cash me-1"></i>Request Payout
-            </a>
+            <h1 class="page-title h5 mb-0">Dashboard</h1>
         </div>
     </div>
 
-    <!-- Hero Performance -->
-    <section class="hero-performance card mb-3">
-        <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <div class="text-muted small">Earnings (selected period)</div>
-                <div class="display-6 fw-bold">${{ hero_earnings|default:"0" }}</div>
-                <div class="text-muted small mt-1">
-                    <span class="badge bg-success-subtle text-success me-1">▲ {{ hero_change|default:"0%" }}</span>
-                    vs previous period
-                </div>
-            </div>
-            <div>
-                <div class="text-muted small mb-1">Goal Progress</div>
-                <div class="progress progress-thin" style="width: 280px;">
-                    <div class="progress-bar bg-success" style="width: {{ goal_progress|default:0 }}%"></div>
-                </div>
-                <div class="text-muted small mt-1">{{ goal_progress|default:"0" }}% toward ${{ goal_amount|default:"10,000" }}</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- KPI Strip -->
-    <section class="kpi-strip row g-3 mb-3">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card kpi-card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Active Customers</div>
-                    <div class="h4 fw-bold mb-2">{{ active_customers|default:"0" }}</div>
-                    <canvas class="kpi-spark" id="sparkActive" height="40"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card kpi-card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Commission Rate</div>
-                    <div class="h4 fw-bold mb-2">{{ commission_rate|default:"0%" }}</div>
-                    <canvas class="kpi-spark" id="sparkRate" height="40"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card kpi-card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Conversion Rate</div>
-                    <div class="h4 fw-bold mb-2">{{ conversion_rate|default:"0%" }}</div>
-                    <canvas class="kpi-spark" id="sparkConv" height="40"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card kpi-card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Monthly Recurring</div>
-                    <div class="h4 fw-bold mb-2">${{ mrr|default:"0" }}</div>
-                    <canvas class="kpi-spark" id="sparkMRR" height="40"></canvas>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="quick-actions card mb-3">
-        <div class="card-body d-flex flex-wrap gap-2">
-            <a href="{% url 'reseller:links' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-link-45deg me-1"></i>Generate Referral Link
-            </a>
-            <a href="{% url 'reseller:earnings_commissions' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-cash-coin me-1"></i>Pending Commissions
-            </a>
-            <a href="{% url 'reseller:reports' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-graph-up me-1"></i>Download Reports
-            </a>
-            <a href="{% url 'reseller:leads' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-person-plus me-1"></i>Invite Customer
-            </a>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <div class="row g-3">
-        <div class="col-12 col-lg-7">
-            <div class="card h-100">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Activity Timeline</h5>
-                </div>
-                <div class="card-body">
-                    {% include 'dashboards/reseller/components/activity-feed.html' %}
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-5">
-            <div class="card h-100">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabRevenue" type="button" role="tab">Revenue</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabProducts" type="button" role="tab">Top Products</button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body tab-content">
-                    <div class="tab-pane fade show active" id="tabRevenue" role="tabpanel">
-                        <canvas id="revenueChart" height="220"></canvas>
+    <!-- Section Cards Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
+        <!-- Leads -->
+        <div class="col">
+            <div class="card section-card leads h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-primary-subtle text-primary"><i class="bi bi-person-plus"></i></span> Leads</h5>
+                        <span class="badge bg-secondary">{{ leads_count|default:0 }}</span>
                     </div>
-                    <div class="tab-pane fade" id="tabProducts" role="tabpanel">
-                        <canvas id="topProductsChart" height="220"></canvas>
+                    <p class="meta mb-2">Track and manage prospective customers.</p>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <a href="{% url 'reseller:leads' %}" class="btn btn-sm btn-outline-primary stretched-link">View Leads <i class="bi bi-chevron-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Referrals -->
+        <div class="col">
+            <div class="card section-card referrals h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-info-subtle text-info"><i class="bi bi-people"></i></span> Referrals</h5>
+                        <span class="badge bg-secondary">{{ referrals_count|default:0 }}</span>
+                    </div>
+                    <p class="meta mb-2">Monitor referral pipeline and progress.</p>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <a href="{% url 'reseller:referrals' %}" class="btn btn-sm btn-outline-primary stretched-link">View Referrals <i class="bi bi-chevron-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Commissions -->
+        <div class="col">
+            <div class="card section-card commissions h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-warning-subtle text-warning"><i class="bi bi-cash-coin"></i></span> Commissions</h5>
+                        <span class="badge bg-secondary">${{ commissions_pending|default:"0" }}</span>
+                    </div>
+                    <p class="meta mb-2">View pending and paid commissions.</p>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <a href="{% url 'reseller:earnings_commissions' %}" class="btn btn-sm btn-outline-primary stretched-link">View Commissions <i class="bi bi-chevron-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Invoices -->
+        <div class="col">
+            <div class="card section-card invoices h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-secondary-subtle text-secondary"><i class="bi bi-receipt"></i></span> Invoices</h5>
+                        <span class="badge bg-secondary">{{ open_invoices_count|default:0 }}</span>
+                    </div>
+                    <p class="meta mb-2">Manage invoices for your earnings.</p>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <a href="{% url 'reseller:earnings_invoices' %}" class="btn btn-sm btn-outline-primary stretched-link">View Invoices <i class="bi bi-chevron-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payouts -->
+        <div class="col">
+            <div class="card section-card payouts h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-success-subtle text-success"><i class="bi bi-wallet2"></i></span> Payouts</h5>
+                        <span class="badge bg-secondary">{{ pending_payouts|default:0 }}</span>
+                    </div>
+                    <p class="meta mb-2">Request and track your payouts.</p>
+                    <div class="mt-auto d-flex gap-2 justify-content-end">
+                        <a href="{% url 'reseller:earnings_payouts' %}" class="btn btn-sm btn-outline-primary stretched-link">Go to Payouts <i class="bi bi-chevron-right ms-1"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Links -->
+        <div class="col">
+            <div class="card section-card links h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="card-title mb-0"><span class="icon-circle bg-primary-subtle text-primary"><i class="bi bi-link-45deg"></i></span> Links</h5>
+                        <span class="badge bg-secondary">{{ active_links_count|default:0 }}</span>
+                    </div>
+                    <p class="meta mb-2">Create and manage your referral links.</p>
+                    <div class="mt-auto d-flex justify-content-end">
+                        <a href="{% url 'reseller:links' %}" class="btn btn-sm btn-outline-primary stretched-link">Manage Links <i class="bi bi-chevron-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Insights -->
-    <section class="insights row g-3 mt-1">
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="card-body d-flex align-items-start gap-3">
-                    <div class="icon-circle-sm bg-success-subtle text-success"><i class="bi bi-lightbulb"></i></div>
-                    <div>
-                        <h6 class="mb-1">Boost conversions</h6>
-                        <p class="mb-2 text-muted small">Your conversion rate is below last month. Share your updated case study to warm leads.</p>
-                        <a href="{% url 'reseller:tools' %}" class="btn btn-sm btn-outline-success">View Resources</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="card-body d-flex align-items-start gap-3">
-                    <div class="icon-circle-sm bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
-                    <div>
-                        <h6 class="mb-1">3 referrals close to converting</h6>
-                        <p class="mb-2 text-muted small">Follow up on trials expiring this week to maximize wins.</p>
-                        <a href="{% url 'reseller:referrals' %}" class="btn btn-sm btn-outline-primary">Go to Referrals</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'reseller/js/dashboard-redesign.js' %}"></script>
-{% endblock %}
+{% block extra_js %}{% endblock %}

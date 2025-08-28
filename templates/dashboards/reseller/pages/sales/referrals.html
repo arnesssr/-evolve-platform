@@ -74,7 +74,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+<table class="table table-hover responsive-stack">
                     <thead>
                         <tr>
                             <th>Referral Details</th>
@@ -89,30 +89,30 @@
                     <tbody>
                         {% for referral in referrals %}
                         <tr>
-                            <td>
+                            <td data-label="Referral Details">
                                 <div class="referral-info">
                                     <div class="fw-medium">{{ referral.company_name }}</div>
                                     <div class="text-muted small">{{ referral.contact_name }} • {{ referral.created_date|date:"M d, Y" }}</div>
                                 </div>
                             </td>
-                            <td>
+                            <td data-label="Product">
                                 <span class="badge bg-secondary">{{ referral.product }}</span>
                             </td>
-                            <td>
+                            <td data-label="Stage">
                                 <div class="d-flex align-items-center">
                                     <div class="stage-indicator bg-{{ referral.stage_color }} rounded-circle me-2" style="width: 8px; height: 8px;"></div>
                                     {{ referral.stage }}
                                 </div>
                             </td>
-                            <td>{{ referral.days_in_stage }} days</td>
-                            <td class="fw-medium">${{ referral.estimated_commission|floatformat:0 }}</td>
-                            <td>
+                            <td data-label="Days in Stage">{{ referral.days_in_stage }} days</td>
+                            <td data-label="Est. Commission" class="fw-medium">${{ referral.estimated_commission|floatformat:0 }}</td>
+                            <td data-label="Next Action">
                                 <div class="next-action">
                                     <div class="small">{{ referral.next_action }}</div>
                                     <div class="text-muted small">{{ referral.next_action_date|date:"M d" }}</div>
                                 </div>
                             </td>
-                            <td>
+                            <td data-label="Actions">
                                 <div class="dropdown">
                                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                         Actions

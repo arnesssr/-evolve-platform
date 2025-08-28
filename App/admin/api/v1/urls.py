@@ -10,8 +10,9 @@ from .views.dashboard import (
     refresh_dashboard_cache
 )
 from .views.commissions import AdminCommissionCreateAPI
-from .views.products import AdminProductCreateAPI, AdminProductDetailAPI
-from .views.plans import AdminPlanCreateAPI
+from .views.products import AdminProductCreateAPI, AdminProductDetailAPI, AdminProductCountAPI
+from .views.plans import AdminPlanCreateAPI, AdminPlanCountAPI
+from .views.admins import AdminsCountAPI
 
 # Finance API Views
 from .views.finance.revenue import (
@@ -64,12 +65,17 @@ urlpatterns = [
     # Commission endpoints
     path('commissions/create/', AdminCommissionCreateAPI.as_view(), name='commissions-create'),
 
-    # Product endpoints
+# Product endpoints
     path('products/create/', AdminProductCreateAPI.as_view(), name='products-create'),
     path('products/<int:product_id>/', AdminProductDetailAPI.as_view(), name='products-detail'),
+    path('products/count/', AdminProductCountAPI.as_view(), name='products-count'),
 
-    # Plan endpoints
+# Plan endpoints
     path('plans/create/', AdminPlanCreateAPI.as_view(), name='plans-create'),
+    path('plans/count/', AdminPlanCountAPI.as_view(), name='plans-count'),
+
+    # Admins endpoints
+    path('admins/count/', AdminsCountAPI.as_view(), name='admins-count'),
     
     # ===== FINANCE API ENDPOINTS =====
     

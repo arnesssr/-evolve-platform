@@ -1,5 +1,7 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseBadRequest
+from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
 import json
 from decimal import Decimal
 
@@ -56,4 +58,9 @@ class AdminPlanCreateAPI(View):
         )
 
         return JsonResponse({'success': True, 'id': p.id})
+
+@method_decorator(staff_member_required, name='dispatch')
+class AdminPlanCountAPI(View):
+    def get(self, request):
+        return JsonResponse({'count': Plan.objects.count()})
 
