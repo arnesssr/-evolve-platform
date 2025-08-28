@@ -192,9 +192,11 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Whitenoise storage backend for efficient static serving
+# Using CompressedStaticFilesStorage instead of CompressedManifestStaticFilesStorage
+# to avoid issues with missing file references in CSS
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     }
 }
 
