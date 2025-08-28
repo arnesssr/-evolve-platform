@@ -33,6 +33,22 @@ SMSLEOPARD_ACCESS_TOKEN = config('SMSLEOPARD_ACCESS_TOKEN', default='')
 # Include .onrender.com by default so first deploys work without extra env config
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1,.onrender.com')
 
+# Auto-include Render external hostname if present (prevents DisallowedHost on first deploy)
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if not RENDER_EXTERNAL_HOSTNAME:
+    RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
+    if RENDER_EXTERNAL_URL:
+        try:
+            RENDER_EXTERNAL_HOSTNAME = urlparse(RENDER_EXTERNAL_URL).hostname
+        except Exception:
+            RENDER_EXTERNAL_HOSTNAME = None
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    # Ensure ALLOWED_HOSTS is a mutable list, not a tuple/string
+    try:
+        ALLOWED_HOSTS = list(ALLOWED_HOSTS)
+    except Exception:        ALLOWED_HOSTS = [ALLOWED_HOSTS]
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 
 # Application definition
 
