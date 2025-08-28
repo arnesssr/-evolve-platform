@@ -93,7 +93,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover responsive-stack">
                     <thead>
                         <tr>
                             <th>Campaign</th>
@@ -108,14 +108,14 @@
                     <tbody>
                         {% for link in referral_links %}
                         <tr>
-                            <td>
+                            <td data-label="Campaign">
                                 <div class="fw-medium">{{ link.campaign_name }}</div>
                                 <div class="text-muted small">{{ link.utm_source|default:"Direct" }}</div>
                             </td>
-                            <td>
+                            <td data-label="Product">
                                 <span class="badge bg-secondary">{{ link.product }}</span>
                             </td>
-                            <td>
+                            <td data-label="Link">
                                 <div class="link-wrapper">
                                     <code class="small">{{ link.short_url|default:link.url|truncatechars:30 }}</code>
                                     <button class="btn btn-sm btn-link" onclick="copyLinkToClipboard('{{ link.url }}')">
@@ -123,15 +123,15 @@
                                     </button>
                                 </div>
                             </td>
-                            <td>{{ link.clicks|default:0 }}</td>
-                            <td>
+                            <td data-label="Clicks">{{ link.clicks|default:0 }}</td>
+                            <td data-label="Conversions">
                                 <span class="text-success">{{ link.conversions|default:0 }}</span>
                                 {% if link.clicks > 0 %}
                                 <span class="text-muted small">({{ link.conversion_rate|default:"0" }}%)</span>
                                 {% endif %}
                             </td>
-                            <td>{{ link.created_date|date:"M d, Y" }}</td>
-                            <td>
+                            <td data-label="Created">{{ link.created_date|date:"M d, Y" }}</td>
+                            <td data-label="Actions">
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-primary" onclick="viewLinkStats('{{ link.id }}')">
                                         <i class="bi bi-graph-up"></i>

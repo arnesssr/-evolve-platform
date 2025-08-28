@@ -5,7 +5,7 @@
 {% block page_title %}Billing & Invoices{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="billing-page container-fluid">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -15,9 +15,6 @@
                     <p class="text-muted mb-0">View payment history, download invoices, and manage billing settings</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#paymentMethodModal">
-                        <i class="fas fa-credit-card me-2"></i>Update Payment Method
-                    </button>
                     <a href="#" class="btn btn-primary">
                         <i class="fas fa-download me-2"></i>Download Statement
                     </a>
@@ -26,49 +23,6 @@
         </div>
     </div>
 
-    <!-- Current Billing Summary -->
-    <div class="row g-4 mb-4">
-        {% include 'dashboards/business/components/billing-summary.html' with title="Current Month" value="KES 45,000" icon="credit-card" status="info" %}
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="text-success mb-3">
-                        <i class="fas fa-check-circle fa-3x"></i>
-                    </div>
-                    <h3 class="mb-1">Paid</h3>
-                    <p class="text-muted mb-0">Payment Status</p>
-                    <small class="text-success">All subscriptions current</small>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="text-warning mb-3">
-                        <i class="fas fa-calendar-alt fa-3x"></i>
-                    </div>
-                    <h3 class="mb-1">Dec 10</h3>
-                    <p class="text-muted mb-0">Next Payment</p>
-                    <small class="text-warning">Payroll renewal</small>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-3 col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="text-primary mb-3">
-                        <i class="fas fa-chart-line fa-3x"></i>
-                    </div>
-                    <h3 class="mb-1">KES 540K</h3>
-                    <p class="text-muted mb-0">Year to Date</p>
-                    <small class="text-primary">Total spent in 2024</small>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Invoices Table -->
     <div class="row mb-4">
@@ -93,7 +47,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
+<table class="table table-hover mb-0 responsive-stack">
                             <thead class="table-light">
                                 <tr>
                                     <th>Invoice #</th>
@@ -106,81 +60,8 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#INV-2024-001</span>
-                                    </td>
-                                    <td>Nov 30, 2024</td>
-                                    <td>
-                                        <div>
-                                            <strong>Monthly Subscriptions</strong>
-                                            <br><small class="text-muted">ERP, SACCO, Payroll</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="fw-bold">KES 45,000</span></td>
-                                    <td>
-                                        <span class="badge bg-success">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#INV-2024-002</span>
-                                    </td>
-                                    <td>Oct 30, 2024</td>
-                                    <td>
-                                        <div>
-                                            <strong>Monthly Subscriptions</strong>
-                                            <br><small class="text-muted">ERP, SACCO, Payroll</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="fw-bold">KES 45,000</span></td>
-                                    <td>
-                                        <span class="badge bg-success">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="fw-bold text-primary">#INV-2024-003</span>
-                                    </td>
-                                    <td>Sep 30, 2024</td>
-                                    <td>
-                                        <div>
-                                            <strong>Monthly Subscriptions</strong>
-                                            <br><small class="text-muted">ERP, SACCO, Payroll</small>
-                                        </div>
-                                    </td>
-                                    <td><span class="fw-bold">KES 45,000</span></td>
-                                    <td>
-                                        <span class="badge bg-success">Paid</span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Download">
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        No invoices available yet.
                                     </td>
                                 </tr>
                             </tbody>
@@ -201,22 +82,11 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            <i class="fab fa-cc-visa fa-2x text-primary"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">•••• •••• •••• 4242</div>
-                            <div class="text-muted">Expires 12/26</div>
-                        </div>
-                        <div>
-                            <span class="badge bg-success">Primary</span>
-                        </div>
-                    </div>
+                    <div class="text-muted">No payment method on file.</div>
                     <hr>
-                    <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#paymentMethodModal">
-                        <i class="fas fa-edit me-2"></i>Update Payment Method
-                    </button>
+                    <a href="{% url 'business-support' %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-edit me-2"></i>Add / Update Payment Method
+                    </a>
                 </div>
             </div>
         </div>
@@ -229,62 +99,15 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-2">
-                        <strong>{{ user.first_name }} {{ user.last_name }}</strong>
-                    </div>
-                    <div class="text-muted">
-                        <div>Acme Corporation</div>
-                        <div>123 Business Street</div>
-                        <div>Nairobi, Kenya</div>
-                        <div>P.O. Box 12345</div>
-                    </div>
+                    <div class="text-muted">Billing details not set.</div>
                     <hr>
-                    <button class="btn btn-outline-primary btn-sm w-100">
+                    <a href="{% url 'business-support' %}" class="btn btn-outline-primary btn-sm w-100">
                         <i class="fas fa-edit me-2"></i>Update Billing Info
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Payment Method Modal -->
-<div class="modal fade" id="paymentMethodModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-credit-card text-primary me-2"></i>Update Payment Method
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Card Number</label>
-                        <input type="text" class="form-control" placeholder="1234 5678 9012 3456">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Expiry Date</label>
-                            <input type="text" class="form-control" placeholder="MM/YY">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">CVC</label>
-                            <input type="text" class="form-control" placeholder="123">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Cardholder Name</label>
-                        <input type="text" class="form-control" placeholder="John Doe">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Update Payment Method</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

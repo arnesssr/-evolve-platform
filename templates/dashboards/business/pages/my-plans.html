@@ -4,8 +4,30 @@
 
 {% block page_title %}My Subscriptions{% endblock %}
 
+{% block extra_css %}
+<style>
+/* My Subscriptions (mobile compaction) */
+@media (max-width: 991.98px) {
+  .subscription-page h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+  .subscription-page .text-muted { font-size: 0.9rem; }
+  .subscription-page .card-header { padding: 0.5rem 0.75rem; }
+  .subscription-page .card-header h5 { font-size: 1rem; margin: 0; }
+  .subscription-page .card-body { padding: 0.75rem; }
+  .subscription-page .status-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+  .subscription-page .card-header i { font-size: 1.25rem !important; }
+}
+@media (max-width: 575.98px) {
+  .subscription-page .row.mb-4 > .col-12 > .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
+<div class="subscription-page container-fluid">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -18,377 +40,76 @@
                     <a href="{% url 'business-billing' %}" class="btn btn-outline-primary">
                         <i class="fas fa-receipt me-2"></i>View Billing
                     </a>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#upgradeModal">
+                    <a href="{% url 'business-support' %}" class="btn btn-primary">
                         <i class="fas fa-arrow-up me-2"></i>Upgrade Plan
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Subscription Cards -->
-    <div class="row g-4 mb-4">
-        <!-- ERP Subscription -->
-        <div class="col-lg-4 col-md-6">
-            <div class="card h-100 border-2 border-primary">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-cogs fa-2x me-3"></i>
-                            <div>
-                                <h5 class="mb-0">ERP System</h5>
-                                <small class="opacity-75">Enterprise Plan</small>
-                            </div>
-                        </div>
-                        <span class="status-badge status-active">Active</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center mb-3">
-                        <div class="col-6">
-                            <h4 class="text-primary mb-0">12</h4>
-                            <small class="text-muted">Active Users</small>
-                        </div>
-                        <div class="col-6">
-                            <h4 class="text-success mb-0">85%</h4>
-                            <small class="text-muted">Usage</small>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Users (12/15)</small>
-                            <small>80%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: 80%"></div>
-                        </div>
-                    </div>
-
-                    <hr>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Monthly Cost</span>
-                        <span class="fw-bold">KES 25,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Next Billing</span>
-                        <span>Dec 15, 2024</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Expires</span>
-                        <span class="text-warning fw-bold">15 days</span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-cog me-2"></i>Manage Users
-                        </button>
-                        <a href="/software/erp/" target="_blank" class="btn btn-primary btn-sm">
-                            <i class="fas fa-external-link-alt me-2"></i>Launch ERP
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SACCO Subscription -->
-        <div class="col-lg-4 col-md-6">
-            <div class="card h-100 border-2 border-info">
-                <div class="card-header bg-info text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-handshake fa-2x me-3"></i>
-                            <div>
-                                <h5 class="mb-0">SACCO Platform</h5>
-                                <small class="opacity-75">Professional Plan</small>
-                            </div>
-                        </div>
-                        <span class="status-badge status-active">Active</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center mb-3">
-                        <div class="col-6">
-                            <h4 class="text-info mb-0">8</h4>
-                            <small class="text-muted">Active Users</small>
-                        </div>
-                        <div class="col-6">
-                            <h4 class="text-success mb-0">60%</h4>
-                            <small class="text-muted">Usage</small>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Users (8/10)</small>
-                            <small>80%</small>
-                        </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-info" style="width: 80%"></div>
-                        </div>
-                    </div>
-
-                    <hr>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Monthly Cost</span>
-                        <span class="fw-bold">KES 15,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Next Billing</span>
-                        <span>Dec 20, 2024</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Expires</span>
-                        <span class="text-success fw-bold">20 days</span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-cog me-2"></i>Manage Users
-                        </button>
-                        <a href="/software/sacco/" target="_blank" class="btn btn-info btn-sm">
-                            <i class="fas fa-external-link-alt me-2"></i>Launch SACCO
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <!-- Subscription & Summary Side-by-Side -->
+    <div class="row g-4 align-items-stretch mb-4">
         <!-- Payroll Subscription -->
-        <div class="col-lg-4 col-md-6">
+        <div class="col-xl-8 col-lg-7 col-md-12">
             <div class="card h-100 border-2 border-success">
-                <div class="card-header bg-success text-white">
+                <div class="card-header {% if payroll_active %}bg-success text-white{% else %}bg-light{% endif %}">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-money-check fa-2x me-3"></i>
                             <div>
                                 <h5 class="mb-0">Payroll System</h5>
-                                <small class="opacity-75">Standard Plan</small>
+                                <small class="opacity-75">
+                                    {% if payroll %}{{ payroll.plan.name }} Plan{% else %}No Plan{% endif %}
+                                </small>
                             </div>
                         </div>
-                        <span class="status-badge status-active">Active</span>
+                        <span class="status-badge {% if payroll_active %}status-active{% else %}status-inactive{% endif %}">
+                            {% if payroll_active %}Active{% else %}Not Subscribed{% endif %}
+                        </span>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="row text-center mb-3">
-                        <div class="col-6">
-                            <h4 class="text-success mb-0">4</h4>
-                            <small class="text-muted">Active Users</small>
+                    {% if payroll_active %}
+                        <div class="text-muted small mb-3">
+                            Subscribed until {{ payroll.end_date|date:'M d, Y' }}
                         </div>
-                        <div class="col-6">
-                            <h4 class="text-success mb-0">40%</h4>
-                            <small class="text-muted">Usage</small>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'launch-payroll' %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-external-link-alt me-2"></i>Launch Payroll
+                            </a>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Users (4/5)</small>
-                            <small>80%</small>
+                    {% else %}
+                        <div class="text-muted small mb-3">No active subscription yet.</div>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'subscribe_payroll' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-credit-card me-2"></i>Subscribe & Pay
+                            </a>
+                            <a href="{% url 'launch-payroll' %}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-external-link-alt me-2"></i>Launch (Will prompt to subscribe)
+                            </a>
                         </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-success" style="width: 80%"></div>
-                        </div>
-                    </div>
-
-                    <hr>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Monthly Cost</span>
-                        <span class="fw-bold">KES 5,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted">Next Billing</span>
-                        <span>Dec 10, 2024</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Expires</span>
-                        <span class="text-success fw-bold">10 days</span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-cog me-2"></i>Manage Users
-                        </button>
-                        <a href="/software/payroll/" target="_blank" class="btn btn-success btn-sm">
-                            <i class="fas fa-external-link-alt me-2"></i>Launch Payroll
-                        </a>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Subscription Summary -->
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-chart-line text-primary me-2"></i>Usage Analytics
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="usageAnalyticsChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card">
+        <!-- Cost Summary -->
+        <div class="col-xl-4 col-lg-5 col-md-12">
+            <div class="card h-100">
                 <div class="card-header bg-white border-bottom">
                     <h5 class="mb-0">
                         <i class="fas fa-calculator text-primary me-2"></i>Cost Summary
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <span class="text-muted">ERP System</span>
-                        <span class="fw-bold">KES 25,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <span class="text-muted">SACCO Platform</span>
-                        <span class="fw-bold">KES 15,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <span class="text-muted">Payroll System</span>
-                        <span class="fw-bold">KES 5,000</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center py-3 bg-light rounded mt-3">
-                        <span class="fw-bold">Total Monthly Cost</span>
-                        <span class="fw-bold text-primary h5 mb-0">KES 45,000</span>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <h6>Next Renewals</h6>
-                        <div class="small">
-                            <div class="d-flex justify-content-between py-1">
-                                <span>Payroll System</span>
-                                <span class="text-warning">10 days</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-1">
-                                <span>ERP System</span>
-                                <span class="text-warning">15 days</span>
-                            </div>
-                            <div class="d-flex justify-content-between py-1">
-                                <span>SACCO Platform</span>
-                                <span class="text-success">20 days</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="text-muted small">Billing summary will appear here once available.</div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
-<!-- Upgrade Modal -->
-<div class="modal fade" id="upgradeModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-arrow-up text-primary me-2"></i>Upgrade Subscription
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Choose which subscription you'd like to upgrade:</p>
-                
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <div class="card border-primary">
-                            <div class="card-body text-center">
-                                <i class="fas fa-cogs text-primary fa-2x mb-3"></i>
-                                <h6>ERP System</h6>
-                                <p class="text-muted small">Upgrade to Premium</p>
-                                <button class="btn btn-primary btn-sm">Upgrade</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-info">
-                            <div class="card-body text-center">
-                                <i class="fas fa-handshake text-info fa-2x mb-3"></i>
-                                <h6>SACCO Platform</h6>
-                                <p class="text-muted small">Upgrade to Enterprise</p>
-                                <button class="btn btn-info btn-sm">Upgrade</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card border-success">
-                            <div class="card-body text-center">
-                                <i class="fas fa-money-check text-success fa-2x mb-3"></i>
-                                <h6>Payroll System</h6>
-                                <p class="text-muted small">Upgrade to Professional</p>
-                                <button class="btn btn-success btn-sm">Upgrade</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Usage Analytics Chart
-    const ctx = document.getElementById('usageAnalyticsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [
-                {
-                    label: 'ERP System',
-                    data: [65, 70, 80, 85, 90, 85],
-                    borderColor: 'var(--primary-color)',
-                    backgroundColor: 'transparent',
-                    tension: 0.4
-                },
-                {
-                    label: 'SACCO Platform',
-                    data: [45, 50, 55, 60, 65, 60],
-                    borderColor: '#17a2b8',
-                    backgroundColor: 'transparent',
-                    tension: 0.4
-                },
-                {
-                    label: 'Payroll System',
-                    data: [25, 30, 35, 40, 45, 40],
-                    borderColor: '#28a745',
-                    backgroundColor: 'transparent',
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
-</script>
-{% endblock %}

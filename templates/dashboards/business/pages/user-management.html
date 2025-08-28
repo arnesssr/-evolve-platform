@@ -5,7 +5,7 @@
 {% block page_title %}User Management{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="user-management-page container-fluid">
     <!-- Page Header -->
     <div class="row mb-4">
         <div class="col-12">
@@ -23,45 +23,6 @@
         </div>
     </div>
 
-    <!-- User Stats -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-users text-primary fa-2x mb-3"></i>
-                    <h3>24</h3>
-                    <p class="text-muted mb-0">Total Users</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-user-check text-success fa-2x mb-3"></i>
-                    <h3>22</h3>
-                    <p class="text-muted mb-0">Active Users</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-clock text-warning fa-2x mb-3"></i>
-                    <h3>2</h3>
-                    <p class="text-muted mb-0">Pending</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card text-center">
-                <div class="card-body">
-                    <i class="fas fa-crown text-info fa-2x mb-3"></i>
-                    <h3>3</h3>
-                    <p class="text-muted mb-0">Administrators</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Users Table -->
     <div class="row">
@@ -85,7 +46,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
+<table class="table table-hover mb-0 responsive-stack">
                             <thead class="table-light">
                                 <tr>
                                     <th>User</th>
@@ -99,103 +60,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">JD</span>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">John Doe</div>
-                                                <small class="text-muted">Administrator</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>john.doe@company.com</td>
-                                    <td><span class="badge bg-danger">Admin</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-primary">ERP</span>
-                                            <span class="badge bg-info">SACCO</span>
-                                            <span class="badge bg-success">Payroll</span>
-                                        </div>
-                                    </td>
-                                    <td>5 min ago</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
-                                                <i class="fas fa-pause"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">JS</span>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">Jane Smith</div>
-                                                <small class="text-muted">Manager</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>jane.smith@company.com</td>
-                                    <td><span class="badge bg-warning">Manager</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-primary">ERP</span>
-                                            <span class="badge bg-success">Payroll</span>
-                                        </div>
-                                    </td>
-                                    <td>2 hours ago</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-warning btn-sm" title="Suspend">
-                                                <i class="fas fa-pause"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                                <span class="text-white fw-bold">MB</span>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold">Mike Brown</div>
-                                                <small class="text-muted">Employee</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>mike.brown@company.com</td>
-                                    <td><span class="badge bg-secondary">Employee</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <span class="badge bg-info">SACCO</span>
-                                        </div>
-                                    </td>
-                                    <td>Yesterday</td>
-                                    <td><span class="badge bg-warning">Pending</span></td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <button class="btn btn-outline-primary btn-sm" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-success btn-sm" title="Activate">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                        </div>
-                                    </td>
+                                    <td colspan="7" class="text-center text-muted py-4">No users added yet.</td>
                                 </tr>
                             </tbody>
                         </table>

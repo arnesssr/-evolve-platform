@@ -1,0 +1,141 @@
+/* ================================================
+   BUSINESS MOBILE NAVIGATION + MOBILE UX
+   ================================================ */
+
+/* 1) System UI font stack on mobile (Facebook-like) */
+@media (max-width: 991.98px) {
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+                 "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif !important;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  /* Keep controls at 16px for iOS */
+  button, input, select, textarea, .btn, .form-control, .form-select { font-size: 16px; }
+
+  /* Compact buttons */
+  .btn { min-height: 36px; padding: 6px 12px; font-size: 15px; line-height: 1.2; border-radius: 6px; }
+  .btn-sm { min-height: 32px; padding: 5px 10px; font-size: 14px; }
+
+  /* Adjust main content spacing for header & bottom nav */
+  .content-area { padding: 12px; }
+  .main-content { padding-bottom: 70px !important; }
+}
+
+/* 1b) Mobile type scale and card compaction */
+@media (max-width: 991.98px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
+  h4 { font-size: 1rem; }
+  h5 { font-size: 0.95rem; }
+  h6 { font-size: 0.85rem; }
+
+  .card-header { padding: 0.5rem 0.75rem; }
+  .card-body { padding: 0.75rem; }
+  .card-title { font-size: 1rem; }
+  .status-badge { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+  .card-header i.fa-2x { font-size: 1.25rem; }
+}
+
+/* Stack page utilities/header on very small screens */
+@media (max-width: 575.98px) {
+  .content-area .row.mb-4 > .col-12 > .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* 1c) Responsive tables and page header compaction for Billing and Users */
+@media (max-width: 575.98px) {
+  /* Stack tables into cards */
+  table.responsive-stack thead { display: none; }
+  table.responsive-stack tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  table.responsive-stack tbody tr td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 0;
+    border-bottom: 1px solid var(--bs-border-color);
+    min-height: 44px;
+  }
+  table.responsive-stack tbody tr td:last-child { border-bottom: 0; }
+  table.responsive-stack tbody tr td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+  table.responsive-stack tbody tr td .btn-group { margin-left: auto; }
+
+  /* Card header action stack for billing and users pages */
+  .billing-page .card-header .d-flex,
+  .user-management-page .card-header .d-flex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .billing-page .card-header .form-select,
+  .billing-page .card-header .form-control,
+  .billing-page .card-header .btn,
+  .user-management-page .card-header .form-select,
+  .user-management-page .card-header .form-control,
+  .user-management-page .card-header .btn {
+    width: 100% !important;
+  }
+  .billing-page .card-header .d-flex .d-flex,
+  .user-management-page .card-header .d-flex .d-flex {
+    width: 100%;
+    gap: 0.5rem;
+  }
+}
+
+/* 2) Bottom navigation bar */
+.mobile-bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 56px;
+  background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 10px rgba(0,0,0,.05);
+  z-index: 1030; display: none; align-items: center;
+}
+@media (max-width: 991.98px) { .mobile-bottom-nav { display: flex; } }
+.mobile-nav-container { display: flex; justify-content: space-around; align-items: center; width: 100%; height: 100%; padding: 0 10px; }
+.mobile-bottom-nav .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#6b7280; text-decoration:none; border:none; background:none; }
+.mobile-bottom-nav .nav-item i { font-size:20px; margin-bottom:2px; }
+.mobile-bottom-nav .nav-item span { font-size:11px; font-weight:500; }
+.mobile-bottom-nav .nav-item.active { color:#2563eb; }
+.mobile-bottom-nav .nav-item.active::before { content:''; position:absolute; top:0; left:20%; right:20%; height:2px; background:#2563eb; }
+
+/* 3) Mobile menu offcanvas */
+.mobile-offcanvas { --bs-offcanvas-height: 70vh; max-height:600px; border-top-left-radius:20px; border-top-right-radius:20px; }
+.mobile-offcanvas .offcanvas-header { padding:1rem 1.5rem; border-bottom:1px solid #e5e7eb; }
+.mobile-offcanvas .offcanvas-title { font-size:1.125rem; font-weight:600; }
+.mobile-offcanvas .offcanvas-body { padding:1rem; overflow-y:auto; }
+.mobile-menu-grid { display:flex; flex-direction:column; gap:1.25rem; }
+.menu-section-title { font-size:.75rem; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin:0 0 .5rem .5rem; }
+.menu-items { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
+.menu-item { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1rem .5rem; background:#f9fafb; border-radius:12px; text-decoration:none; color:#374151; min-height:80px; }
+.menu-item i { font-size:24px; margin-bottom:6px; color:#2563eb; }
+.menu-item.text-danger { color:#dc3545; }
+.menu-item.text-danger i { color:#dc3545; }
+
+/* 4) Mobile header adjustments: hide hamburger */
+@media (max-width: 991.98px) {
+  #sidebar-toggle { display:none !important; }
+}
+
+/* 5) Desktop content margin to reserve sidebar */
+@media (min-width: 992px) {
+  .main-content { margin-left: var(--sidebar-width, 250px) !important; }
+  .main-content.expanded { margin-left: 70px !important; }
+}
+

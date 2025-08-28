@@ -8,8 +8,8 @@
 <div class="container-fluid">
     <!-- Welcome Section -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 bg-gradient-primary text-white">
+                <div class="col-12">
+            <div class="card border-0 bg-gradient-primary text-white welcome-hero">
                 <div class="card-body py-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
@@ -20,8 +20,8 @@
                         </div>
                         <div class="col-md-4 text-end">
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{% url 'business-software-hub' %}" class="btn btn-light btn-lg">
-                                    <i class="fas fa-rocket me-2"></i>Launch Software
+                        <a href="{% url 'launch-payroll' %}" class="btn btn-light btn-lg">
+                                    <i class="fas fa-rocket me-2"></i>Launch Payroll
                                 </a>
                                 <a href="{% url 'business-support' %}" class="btn btn-outline-light">
                                     <i class="fas fa-life-ring"></i>
@@ -34,147 +34,38 @@
         </div>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-3 col-md-6">
-            {% include 'dashboards/business/components/subscription-card.html' with title="Active Subscriptions" value="3" icon="credit-card" status="success" %}
-        </div>
-        <div class="col-lg-3 col-md-6">
-            {% include 'dashboards/business/components/billing-summary.html' with title="Monthly Cost" value="KES 45,000" icon="money-bill" status="info" %}
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="text-warning mb-3">
-                        <i class="fas fa-users fa-3x"></i>
-                    </div>
-                    <h3 class="mb-1">24</h3>
-                    <p class="text-muted mb-0">Active Users</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="text-info mb-3">
-                        <i class="fas fa-clock fa-3x"></i>
-                    </div>
-                    <h3 class="mb-1">15 days</h3>
-                    <p class="text-muted mb-0">Next Renewal</p>
-                    <small class="text-warning">ERP License</small>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Software Access -->
-    <div class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card">
+    <!-- Quick Launch + Recent Activity side-by-side -->
+    <div class="row g-4 align-items-stretch mb-4">
+        <div class="col-xl-4 col-lg-5 col-md-12">
+            <div class="card h-100">
                 <div class="card-header bg-white border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-rocket text-primary me-2"></i>Quick Launch
-                        </h5>
-                        <a href="{% url 'business-software-hub' %}" class="btn btn-outline-primary btn-sm">
-                            View All <i class="fas fa-arrow-right ms-1"></i>
+                    <h5 class="mb-0"><i class="fas fa-rocket text-primary me-2"></i>Quick Launch</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid">
+                        <a href="{% url 'launch-payroll' %}" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt me-2"></i>Launch Payroll
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-xl-8 col-lg-7 col-md-12">
+            <div class="card h-100">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0"><i class="fas fa-history text-primary me-2"></i>Recent Activity</h5>
+                </div>
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-lg-4 col-md-6">
-                            {% include 'dashboards/business/components/software-tile.html' with name="ERP System" icon="cogs" url="/software/erp/" status="active" users="12" %}
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            {% include 'dashboards/business/components/software-tile.html' with name="SACCO Platform" icon="handshake" url="/software/sacco/" status="active" users="8" %}
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                            {% include 'dashboards/business/components/software-tile.html' with name="Payroll System" icon="money-check" url="/software/payroll/" status="active" users="4" %}
-                        </div>
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox mb-2"></i>
+                        <div>No recent activity yet.</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity & Notifications -->
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-history text-primary me-2"></i>Recent Activity
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-success"></div>
-                            <div class="timeline-content">
-                                <h6 class="mb-1">Payment Successful</h6>
-                                <p class="text-muted mb-1">Monthly subscription renewed for ERP System</p>
-                                <small class="text-muted">2 hours ago</small>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-info"></div>
-                            <div class="timeline-content">
-                                <h6 class="mb-1">New User Added</h6>
-                                <p class="text-muted mb-1">John Doe was granted access to SACCO Platform</p>
-                                <small class="text-muted">1 day ago</small>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-marker bg-warning"></div>
-                            <div class="timeline-content">
-                                <h6 class="mb-1">License Expiring</h6>
-                                <p class="text-muted mb-1">ERP System license expires in 15 days</p>
-                                <small class="text-muted">2 days ago</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-chart-pie text-primary me-2"></i>Usage Overview
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="usageChart" width="300" height="200"></canvas>
-                    
-                    <div class="mt-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                                <small>ERP System</small>
-                            </div>
-                            <small class="fw-bold">50%</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-info rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                                <small>SACCO Platform</small>
-                            </div>
-                            <small class="fw-bold">30%</small>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
-                                <small>Payroll System</small>
-                            </div>
-                            <small class="fw-bold">20%</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -218,38 +109,17 @@
     .timeline-content {
         padding-left: 1rem;
     }
+
+    /* Welcome hero (mobile) */
+    @media (max-width: 991.98px) {
+      .welcome-hero .card-body { padding: 0.75rem 1rem; }
+      .welcome-hero h2 { font-size: 1.1rem; line-height: 1.2; margin-bottom: 0.25rem; }
+      .welcome-hero p { font-size: 0.95rem; margin-bottom: 0; }
+      .welcome-hero .text-end { text-align: left !important; }
+      .welcome-hero .d-flex.justify-content-end { justify-content: flex-start !important; gap: 0.5rem; flex-wrap: wrap; }
+      .welcome-hero .btn.btn-lg { padding: 8px 14px; font-size: 15px; line-height: 1.2; border-radius: 6px; }
+    }
 </style>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Usage Chart
-    const ctx = document.getElementById('usageChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['ERP System', 'SACCO Platform', 'Payroll System'],
-            datasets: [{
-                data: [50, 30, 20],
-                backgroundColor: [
-                    'var(--primary-color)',
-                    '#17a2b8',
-                    '#28a745'
-                ],
-                borderWidth: 0,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-});
-</script>
-{% endblock %}
+{% block extra_js %}{% endblock %}
