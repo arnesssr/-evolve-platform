@@ -54,7 +54,8 @@
 <th>Status</th>
                                     <th>Phone</th>
                                     <th>Plan</th>
-                                    <th>Billing</th>
+<th>Billing</th>
+                                    <th>Invoice</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -76,12 +77,17 @@
                                         </td>
                                         <td>{{ p.phone_number|default:'—' }}</td>
                                         <td>{{ p.plan_name|default:'—' }}</td>
-                                        <td>{{ p.billing|default:'—'|title }}</td>
+<td>{{ p.billing|default:'—'|title }}</td>
+                                        <td>
+                                            <a href="{% url 'business-invoice-download' p.order_id %}" class="btn btn-sm btn-outline-secondary" title="Download invoice">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
+<td colspan="8" class="text-center text-muted py-4">
                                         No invoices available yet.
                                     </td>
                                 </tr>

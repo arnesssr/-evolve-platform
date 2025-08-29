@@ -277,6 +277,22 @@ def list_ipns_view(request):
     res = pesapal_service.get_registered_ipns(token)
     return JsonResponse(res.json(), safe=False)
 
+@login_required
+def register_current_ipn(request):
+    """Register an IPN URL based on current host or override via ?host= param.
+    Useful to quickly register https://<host>/ipn/ with Pesapal.
+    """
+    token = pesapal_service.generate_access_token()
+    host = request.GET.get('host') or request.get_host()
+    # Default to https scheme for production
+    ipn_url = f"https://{host}/ipn/"
+    res = pesapal_service.register_ipn_url(token, ipn_url)
+    try:
+        payload = res.json()
+    except Exception:
+        payload = {'status_code': res.status_code}
+    return JsonResponse({'requested_url': ipn_url, 'status_code': res.status_code, 'response': payload}, status=res.status_code)
+
 def create_order_view(request):
     token = pesapal_service.generate_access_token()
 
@@ -358,6 +374,7 @@ def create_order_view(request):
                 phone_number=payer_phone,
                 plan_name=str(request.session.get('purchase_plan') or ''),
                 billing=str(request.session.get('purchase_billing') or 'monthly'),
+                payment_method='pesapal',
                 status='initiated'
             )
     except Exception as e:
@@ -726,6 +743,70 @@ def business_billing_export(request):
     resp = DjHttpResponse(output.getvalue(), content_type='text/csv')
     resp['Content-Disposition'] = 'attachment; filename="billing_statement.csv"'
     return resp
+
+@login_required
+def business_invoice_download(request, order_id: str):
+    """Generate and download a PDF invoice/receipt for a PaymentRecord.
+    Uses reportlab if available; otherwise returns a simple text fallback as PDF.
+    """
+    from App.models import PaymentRecord
+    pr = get_object_or_404(PaymentRecord, user=request.user, order_id=order_id)
+
+    # Try ReportLab
+    try:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.pdfgen import canvas
+        from io import BytesIO
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+        y = height - 50
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(50, y, "Invoice / Receipt")
+        y -= 30
+        p.setFont("Helvetica", 10)
+        p.drawString(50, y, f"Invoice #: {pr.order_id}")
+        y -= 15
+        p.drawString(50, y, f"Date: {pr.created_at.strftime('%Y-%m-%d %H:%M:%S')}")
+        y -= 15
+        p.drawString(50, y, f"User: {request.user.email}")
+        y -= 15
+        p.drawString(50, y, f"Description: {pr.description or 'Payment'}")
+        y -= 15
+        p.drawString(50, y, f"Amount: {pr.currency} {pr.amount}")
+        y -= 15
+        p.drawString(50, y, f"Status: {pr.status.title()} (provider: {pr.provider_status or 'N/A'})")
+        y -= 15
+        p.drawString(50, y, f"Phone: {pr.phone_number or '—'}")
+        y -= 15
+        p.drawString(50, y, f"Plan: {pr.plan_name or '—'} | Billing: {(pr.billing or '').title()}")
+        y -= 30
+        p.setFont("Helvetica-Oblique", 9)
+        p.drawString(50, y, "Thank you for your payment.")
+
+        p.showPage()
+        p.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename=\"invoice_{pr.order_id}.pdf\"'
+        return response
+    except Exception:
+        # Fallback: simple text with PDF content type (not ideal, but functional)
+        content = (
+            f"Invoice #: {pr.order_id}\n"
+            f"Date: {pr.created_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            f"User: {request.user.email}\n"
+            f"Description: {pr.description or 'Payment'}\n"
+            f"Amount: {pr.currency} {pr.amount}\n"
+            f"Status: {pr.status} (provider: {pr.provider_status or 'N/A'})\n"
+            f"Phone: {pr.phone_number or '—'}\n"
+            f"Plan: {pr.plan_name or '—'} | Billing: {(pr.billing or '').title()}\n"
+        )
+        response = HttpResponse(content, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename=\"invoice_{pr.order_id}.txt\"'
+        return response
 
 @login_required
 def business_users(request):

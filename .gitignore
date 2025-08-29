@@ -17,3 +17,10 @@ build/
 staticfiles/
 # Certificates and secrets
 config/aiven-ca.pem
+# Additional env files
+.env.production.local
+.env.production
+.env.local
+.env.*
+!.env.example
+!.env*.example
