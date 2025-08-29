@@ -39,7 +39,8 @@ urlpatterns = [
     # Business Dashboard URLs
     path('business-dashboard/', views.business_dashboard, name='business-dashboard'),
     path('business-subscriptions/', views.business_subscriptions, name='business-subscriptions'),
-    path('business-billing/', views.business_billing, name='business-billing'),
+path('business-billing/', views.business_billing, name='business-billing'),
+    path('business-billing/export/', views.business_billing_export, name='business-billing-export'),
     path('business-users/', views.business_users, name='business-users'),
     path('business-support/', views.business_support, name='business-support'),
     path('business-settings/', views.business_settings, name='business-settings'),

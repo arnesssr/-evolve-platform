@@ -356,6 +356,8 @@ def create_order_view(request):
                 currency='KES',
                 description=description,
                 phone_number=payer_phone,
+                plan_name=str(request.session.get('purchase_plan') or ''),
+                billing=str(request.session.get('purchase_billing') or 'monthly'),
                 status='initiated'
             )
     except Exception as e:
@@ -409,11 +411,12 @@ def ipn_listener(request):
     try:
         if pr:
             pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
+            pr.provider_status = status or pr.provider_status
             if status == 'COMPLETED':
                 pr.status = 'completed'
             elif status == 'FAILED':
                 pr.status = 'failed'
-            pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
+            pr.save(update_fields=['provider_tracking_id', 'provider_status', 'status', 'updated_at'])
     except Exception as e:
         print(f"IPN PaymentRecord update error: {e}")
 
@@ -448,8 +451,21 @@ def ipn_listener(request):
         except Exception:
             pass
 
-        # Activate subscription
+        # Activate subscription (basic amount check: optional warning on mismatch)
         if user_for_actions and plan:
+            # Basic validation: compare expected vs recorded amount when possible
+            try:
+                expected_amount = None
+                if pr and pr.billing:
+                    if pr.billing == 'yearly' and plan.yearly_price and plan.yearly_price > 0:
+                        expected_amount = float(plan.yearly_price)
+                    else:
+                        expected_amount = float(plan.price)
+                if expected_amount is not None and pr and pr.amount and float(pr.amount) != float(expected_amount):
+                    print(f"[WARN] Payment amount mismatch for {merchant_reference}: recorded={pr.amount} expected={expected_amount}")
+            except Exception:
+                pass
+
             now = timezone.now()
             period = timedelta(days=365) if billing == 'yearly' else timedelta(days=30)
             Subscription.objects.update_or_create(
@@ -528,11 +544,12 @@ def payment_confirm(request):
             pr = PaymentRecord.objects.filter(order_id=merchant_reference).first()
         if pr:
             pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
+            pr.provider_status = status or pr.provider_status
             if status == 'COMPLETED':
                 pr.status = 'completed'
             elif status == 'FAILED':
                 pr.status = 'failed'
-            pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
+            pr.save(update_fields=['provider_tracking_id', 'provider_status', 'status', 'updated_at'])
     except Exception as e:
         print(f"PaymentRecord update error: {e}")
 
@@ -680,6 +697,35 @@ def business_billing(request):
     except Exception:
         payments = []
     return render(request, 'dashboards/business/pages/billing-history.html', { 'payments': payments })
+
+@login_required
+def business_billing_export(request):
+    """Export user's PaymentRecord rows as CSV"""
+    import csv
+    from io import StringIO
+    from django.http import HttpResponse as DjHttpResponse
+    from App.models import PaymentRecord
+
+    rows = PaymentRecord.objects.filter(user=request.user).order_by('-created_at')
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Invoice #', 'Date', 'Description', 'Amount', 'Currency', 'Status', 'Provider Status', 'Phone', 'Plan', 'Billing'])
+    for p in rows:
+        writer.writerow([
+            p.order_id,
+            p.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            p.description or '',
+            str(p.amount),
+            p.currency,
+            p.status,
+            p.provider_status or '',
+            p.phone_number or '',
+            p.plan_name or '',
+            (p.billing or '').title(),
+        ])
+    resp = DjHttpResponse(output.getvalue(), content_type='text/csv')
+    resp['Content-Disposition'] = 'attachment; filename="billing_statement.csv"'
+    return resp
 
 @login_required
 def business_users(request):

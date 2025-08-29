@@ -226,6 +226,11 @@ class PaymentRecord(models.Model):
     currency = models.CharField(max_length=10, default='KES')
     description = models.TextField(blank=True)
     phone_number = models.CharField(max_length=20, blank=True)  # payer MSISDN if available
+    # structured fields for reconciliation and UI
+    plan_name = models.CharField(max_length=100, blank=True, default='')
+    billing = models.CharField(max_length=20, blank=True, default='monthly')  # monthly|yearly
+    payment_method = models.CharField(max_length=50, blank=True, default='')  # mpesa|card|bank (if available)
+    provider_status = models.CharField(max_length=30, blank=True, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='initiated')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -14,7 +14,10 @@
                     <h3 class="mb-2">Billing & Invoices</h3>
                     <p class="text-muted mb-0">View payment history, download invoices, and manage billing settings</p>
                 </div>
-                <div class="d-flex gap-2">
+<div class="d-flex gap-2">
+                    <a href="{% url 'business-billing-export' %}" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Download Statement (CSV)
+                    </a>
                 </div>
             </div>
         </div>
@@ -48,8 +51,10 @@
                                     <th>Date</th>
                                     <th>Description</th>
                                     <th>Amount</th>
-                                    <th>Status</th>
+<th>Status</th>
                                     <th>Phone</th>
+                                    <th>Plan</th>
+                                    <th>Billing</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,7 +65,7 @@
                                         <td>{{ p.created_at|date:'M d, Y H:i' }}</td>
                                         <td>{{ p.description|default:'Payment' }}</td>
                                         <td>KES {{ p.amount }}</td>
-                                        <td>
+<td>
                                             {% if p.status == 'completed' %}
                                                 <span class="badge bg-success">Paid</span>
                                             {% elif p.status == 'failed' %}
@@ -70,6 +75,8 @@
                                             {% endif %}
                                         </td>
                                         <td>{{ p.phone_number|default:'—' }}</td>
+                                        <td>{{ p.plan_name|default:'—' }}</td>
+                                        <td>{{ p.billing|default:'—'|title }}</td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
