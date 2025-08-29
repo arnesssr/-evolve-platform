@@ -532,6 +532,49 @@ def admin_test(request):
 def admin_dashboard(request):
     return render(request, 'dashboards/admin/dashboard.html')
 
+from django.conf import settings
+from django.db.models import F
+from urllib.parse import urlparse
+from App.reseller.marketing.models import MarketingLink
+
+def link_redirect(request, code: str):
+    """Resolve a marketing link code, increment click count, set attribution, and redirect safely.
+    - Increments MarketingLink.clicks atomically.
+    - Stores attribution in session and a cookie (affiliate_code) for 30 days.
+    - Redirects only to same-origin destinations; otherwise falls back to '/'.
+    """
+    try:
+        link = MarketingLink.objects.get(code=code, is_active=True)
+    except MarketingLink.DoesNotExist:
+        # Unknown or inactive code: send to a safe default (landing)
+        return redirect('landing')
+
+    # Increment clicks atomically
+    MarketingLink.objects.filter(pk=link.pk).update(clicks=F('clicks') + 1)
+
+    # Store attribution server-side
+    request.session['affiliate_code'] = link.code
+    request.session['affiliate_reseller_id'] = link.reseller_id
+
+    # Build a safe redirect target (same host or relative URL only)
+    target = link.destination_url or '/'
+    try:
+        parsed = urlparse(target)
+        host = request.get_host()
+        if parsed.netloc and parsed.netloc != host:
+            # Disallow external redirects; fall back to homepage
+            target = '/'
+    except Exception:
+        target = '/'
+
+    # Prepare response and set cookie
+    resp = redirect(target)
+    max_age = 30 * 24 * 60 * 60  # 30 days
+    secure = getattr(settings, 'SESSION_COOKIE_SECURE', False)
+    samesite = getattr(settings, 'SESSION_COOKIE_SAMESITE', 'Lax') or 'Lax'
+    resp.set_cookie('affiliate_code', link.code, max_age=max_age, secure=secure, samesite=samesite)
+    return resp
+
 def edit_plans(request):
     plans = Plan.objects.all().order_by('display_order')
     return render(request, 'dashboards/admin/edit-plans.html', {'plans': plans})

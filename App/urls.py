@@ -52,6 +52,9 @@ urlpatterns = [
     path('payroll/launch/', views.launch_payroll, name='launch-payroll'),
     
     path('reseller-dashboard/', views.reseller_dashboard, name='reseller-dashboard'),
+
+    # Marketing short-link resolver (tracks clicks and redirects)
+    path('r/<str:code>/', views.link_redirect, name='link_redirect'),
     
     # Include reseller app URLs
     path('reseller/', include('App.reseller.urls')),

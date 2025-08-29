@@ -129,7 +129,8 @@
     }
 
     function buildShareUrl(item) {
-        return `${item.destination_url}?ref=${encodeURIComponent(item.code)}`;
+        // Use short link resolver so clicks are tracked server-side
+        return `${window.location.origin}/r/${encodeURIComponent(item.code)}`;
     }
 
     function renderLinksTable(items, totalCount) {
@@ -263,8 +264,8 @@
             }
 
             const data = await resp.json();
-            // Shareable link: use destination with a ref code param so we can attribute later.
-            const shareUrl = `${data.destination_url}?ref=${encodeURIComponent(data.code)}`;
+            // Shareable link: use short-link resolver so clicks are tracked
+            const shareUrl = `${window.location.origin}/r/${encodeURIComponent(data.code)}`;
             const linkInput = document.getElementById('generatedLink');
             if (linkInput) linkInput.value = shareUrl;
 
