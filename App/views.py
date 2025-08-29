@@ -433,8 +433,21 @@ def payment_confirm(request):
 
 
 def business_dashboard(request):
-    # Render the consolidated dashboard page template
-    return render(request, 'dashboards/business/pages/dashboard.html')
+    # Render the consolidated dashboard page template with subscription context
+    payroll = None
+    payroll_active = False
+    try:
+        payroll = Subscription.objects.filter(user=request.user, product='payroll').order_by('-end_date').first()
+        if payroll and payroll.status == 'active' and payroll.end_date:
+            payroll_active = payroll.end_date >= timezone.now()
+    except Exception:
+        payroll = None
+        payroll_active = False
+    context = {
+        'payroll': payroll,
+        'payroll_active': payroll_active,
+    }
+    return render(request, 'dashboards/business/pages/dashboard.html', context)
 
 # Business Dashboard Views
 def business_subscriptions(request):

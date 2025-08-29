@@ -75,6 +75,7 @@
                             <th>Link</th>
                             <th>Clicks</th>
                             <th>Conversions</th>
+                            <th>Earnings</th>
                             <th>Created</th>
                             <th>Actions</th>
                         </tr>
@@ -144,7 +145,7 @@
         if (!Array.isArray(items) || items.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-4">
+                    <td colspan="8" class="text-center py-4">
                         <p class="mb-0">No referral links created yet.</p>
                         <p class="text-muted small">Generate your first link using the form above!</p>
                     </td>
@@ -156,6 +157,8 @@
         const rows = items.map(item => {
             const shareUrl = buildShareUrl(item);
             const created = formatDate(item.created_at);
+            const conversions = (typeof item.conversions === 'number') ? item.conversions : 0;
+            const earnings = item.earnings ? item.earnings : '0.00';
             return `
                 <tr>
                     <td data-label="Campaign">
@@ -174,7 +177,8 @@
                         </div>
                     </td>
                     <td data-label="Clicks">${item.clicks ?? 0}</td>
-                    <td data-label="Conversions"><span class="text-success">0</span></td>
+                    <td data-label="Conversions"><span class="text-success">${conversions}</span></td>
+                    <td data-label="Earnings">KES ${earnings}</td>
                     <td data-label="Created">${created}</td>
                     <td data-label="Actions">
                         <div class="btn-group btn-group-sm">

@@ -20,9 +20,15 @@
                         </div>
                         <div class="col-md-4 text-end">
                             <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'launch-payroll' %}" class="btn btn-light btn-lg">
+                        {% if payroll_active %}
+                                <a href="{% url 'launch-payroll' %}" class="btn btn-light btn-lg">
                                     <i class="fas fa-rocket me-2"></i>Launch Payroll
                                 </a>
+                            {% else %}
+                                <a href="{% url 'subscribe_payroll' %}" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-credit-card me-2"></i>Subscribe & Pay
+                                </a>
+                            {% endif %}
                                 <a href="{% url 'business-support' %}" class="btn btn-outline-light">
                                     <i class="fas fa-life-ring"></i>
                                 </a>
@@ -44,9 +50,15 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid">
+                        {% if payroll_active %}
                         <a href="{% url 'launch-payroll' %}" class="btn btn-primary">
                             <i class="fas fa-external-link-alt me-2"></i>Launch Payroll
                         </a>
+                        {% else %}
+                        <a href="{% url 'subscribe_payroll' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-credit-card me-2"></i>Subscribe & Pay
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -58,8 +70,13 @@
                 </div>
                 <div class="card-body">
                     <div class="text-center text-muted py-4">
-                        <i class="fas fa-inbox mb-2"></i>
-                        <div>No recent activity yet.</div>
+                        {% if payroll_active and payroll %}
+                            <div class="mb-2"><span class="badge bg-success">Payroll Active</span></div>
+                            <div class="small">Subscribed until {{ payroll.end_date|date:'M d, Y' }}</div>
+                        {% else %}
+                            <i class="fas fa-inbox mb-2"></i>
+                            <div>No recent activity yet.</div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
