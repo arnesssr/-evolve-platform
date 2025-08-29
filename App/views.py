@@ -360,14 +360,131 @@ def create_order_view(request):
 
 @csrf_exempt
 def ipn_listener(request):
-    # Pesapal will send a GET request with transaction details
-    tracking_id = request.GET.get('tracking_id')
-    merchant_reference = request.GET.get('merchant_reference')
+    """
+    Authoritative payment notification handler (IPN) for Pesapal.
+    - Normalizes params.
+    - Verifies status via get_transaction_status.
+    - Marks PaymentRecord completed/failed (idempotent).
+    - On COMPLETED, activates subscription and creates commission based on affiliate attribution.
+    """
+    # Normalize params (Pesapal may send different casings)
+    tracking_id = (
+        request.GET.get("order_tracking_id")
+        or request.GET.get("OrderTrackingId")
+        or request.GET.get("tracking_id")
+        or request.GET.get("TrackingId")
+    )
+    merchant_reference = (
+        request.GET.get("order_merchant_reference")
+        or request.GET.get("OrderMerchantReference")
+        or request.GET.get("merchant_reference")
+        or request.GET.get("MerchantReference")
+    )
 
-    # You can log or process the tracking_id and merchant_reference
-    print(f"IPN received - Tracking ID: {tracking_id}, Reference: {merchant_reference}")
+    token = generate_access_token()
+    status = get_transaction_status(token, tracking_id, merchant_reference)
 
-    return HttpResponse("IPN received", status=200)
+    from App.models import PaymentRecord
+    pr = None
+    try:
+        if merchant_reference:
+            pr = PaymentRecord.objects.filter(order_id=merchant_reference).first()
+    except Exception:
+        pr = None
+
+    # Update PaymentRecord status idempotently
+    try:
+        if pr:
+            pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
+            pr.status = 'completed' if status == 'COMPLETED' else 'failed'
+            pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
+    except Exception as e:
+        print(f"IPN PaymentRecord update error: {e}")
+
+    if status == 'COMPLETED':
+        # Resolve user from merchant reference (U<id>-...)
+        user_for_actions = None
+        if merchant_reference and merchant_reference.startswith('U'):
+            try:
+                uid_part = merchant_reference.split('-', 1)[0][1:]
+                uid = int(uid_part)
+                user_for_actions = User.objects.get(id=uid)
+            except Exception:
+                user_for_actions = None
+        if (not user_for_actions) and pr:
+            user_for_actions = pr.user
+
+        # Infer plan/billing from PaymentRecord.description if possible
+        plan = Plan.objects.filter(is_active=True).order_by('display_order').first()
+        billing = 'monthly'
+        try:
+            desc = (pr.description if pr else '') or ''
+            if 'Yearly' in desc:
+                billing = 'yearly'
+            # Optional: extract plan name inside parentheses (... (PlanName))
+            import re
+            m = re.search(r'\(([^)]+)\)', desc)
+            if m:
+                plan_name = m.group(1)
+                p2 = Plan.objects.filter(name=plan_name).first()
+                if p2:
+                    plan = p2
+        except Exception:
+            pass
+
+        # Activate subscription
+        if user_for_actions and plan:
+            now = timezone.now()
+            period = timedelta(days=365) if billing == 'yearly' else timedelta(days=30)
+            Subscription.objects.update_or_create(
+                user=user_for_actions,
+                product='payroll',
+                defaults={
+                    'plan': plan,
+                    'status': 'active',
+                    'start_date': now,
+                    'end_date': now + period,
+                    'auto_renewal': True,
+                }
+            )
+
+        # Create commission using AFF marker and MarketingLink mapping
+        try:
+            # Extract affiliate code from description: "... | AFF=CODE"
+            affiliate_code = None
+            desc = (pr.description if pr else '') or ''
+            if 'AFF=' in desc:
+                affiliate_code = desc.split('AFF=', 1)[1].strip()
+            if affiliate_code:
+                from App.reseller.marketing.models import MarketingLink as ML
+                ml = ML.objects.filter(code=affiliate_code, is_active=True).first()
+                if ml:
+                    from App.reseller.earnings.models.reseller import Reseller as ResellerModel
+                    from App.reseller.earnings.services.commission_service import CommissionService
+                    reseller = ResellerModel.objects.get(id=ml.reseller_id)
+                    sale_amount = float(pr.amount) if pr else (float(plan.yearly_price) if billing=='yearly' and plan and plan.yearly_price else (float(plan.price) if plan else 0))
+                    commission_rate = float(reseller.get_tier_commission_rate())
+                    client_name = (user_for_actions.get_full_name() or user_for_actions.username) if user_for_actions else ''
+                    client_email = (user_for_actions.email if user_for_actions else '')
+                    notes = f"link_code={affiliate_code}; product=payroll; billing={billing}"
+                    CommissionService().create_commission({
+                        'reseller': reseller,
+                        'sale_amount': sale_amount,
+                        'commission_rate': commission_rate,
+                        'transaction_reference': tracking_id or merchant_reference or str(uuid.uuid4()),
+                        'client_name': client_name,
+                        'client_email': client_email,
+                        'product_name': 'Payroll Subscription',
+                        'product_type': 'subscription',
+                        'notes': notes,
+                    })
+        except Exception as e:
+            print(f"IPN Commission creation error: {e}")
+
+        return HttpResponse("OK", status=200)
+
+    # Non-completed or failed status
+    return HttpResponse("IGNORED", status=200)
 
 def payment_confirm(request):
     # Provider may send different param names; normalize them
@@ -494,6 +611,7 @@ def payment_confirm(request):
         return redirect('business-subscriptions')
 
 
+@login_required
 def business_dashboard(request):
     # Render the consolidated dashboard page template with subscription context
     payroll = None
@@ -512,6 +630,7 @@ def business_dashboard(request):
     return render(request, 'dashboards/business/pages/dashboard.html', context)
 
 # Business Dashboard Views
+@login_required
 def business_subscriptions(request):
     payroll = None
     payroll_active = False
@@ -528,6 +647,7 @@ def business_subscriptions(request):
     }
     return render(request, 'dashboards/business/pages/my-plans.html', context)
 
+@login_required
 def business_billing(request):
     # Show user's recent payments/invoices (from PaymentRecord)
     payments = []
@@ -538,16 +658,20 @@ def business_billing(request):
         payments = []
     return render(request, 'dashboards/business/pages/billing-history.html', { 'payments': payments })
 
+@login_required
 def business_users(request):
     return render(request, 'dashboards/business/pages/user-management.html')
 
+@login_required
 def business_support(request):
     return render(request, 'dashboards/business/pages/support-center.html')
 
+@login_required
 def business_settings(request):
     # Redirect to the main dashboard since settings is not implemented for MVP
     return render(request, 'dashboards/business/pages/dashboard.html')
 
+@login_required
 def business_purchase_software(request):
     """
     Handle software purchase requests - redirect to payment system with software context
