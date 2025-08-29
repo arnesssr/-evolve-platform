@@ -16,7 +16,7 @@
             <span>Earnings</span>
         </a>
         
-        <a href="{% url 'reseller:links' %}" class="nav-item {% if 'links' in request.resolver_match.url_name or 'tools' in request.resolver_match.url_name %}active{% endif %}">
+        <a href="{% url 'reseller:links' %}" class="nav-item {% if 'links' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-megaphone"></i>
             <span>Marketing</span>
         </a>
@@ -81,14 +81,6 @@
                     <a href="{% url 'reseller:links' %}" class="menu-item">
                         <i class="bi bi-link-45deg"></i>
                         <span>Links</span>
-                    </a>
-                    <a href="{% url 'reseller:tools' %}" class="menu-item">
-                        <i class="bi bi-tools"></i>
-                        <span>Tools</span>
-                    </a>
-                    <a href="{% url 'reseller:resources' %}" class="menu-item">
-                        <i class="bi bi-book"></i>
-                        <span>Resources</span>
                     </a>
                 </div>
             </div>

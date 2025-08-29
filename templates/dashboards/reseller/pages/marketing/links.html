@@ -31,34 +31,16 @@
                         <label class="form-label">Product</label>
                         <select class="form-select" name="product" required>
                             <option value="">Select Product</option>
-                            <option value="payment_gateway">Payment Gateway</option>
-                            <option value="pos_system">POS System</option>
-                            <option value="ecommerce">E-Commerce Solution</option>
-                            <option value="all">All Products</option>
+                            <option value="payroll">Payroll</option>
                         </select>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label">UTM Source</label>
-                        <input type="text" class="form-control" name="utm_source" placeholder="e.g., facebook, email">
-                    </div>
                 </div>
-                <div class="row g-3 mt-2">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label">Landing Page</label>
-                        <select class="form-select" name="landing_page">
-                            <option value="home">Homepage</option>
-                            <option value="pricing">Pricing Page</option>
-                            <option value="features">Features Page</option>
-                            <option value="signup">Sign Up Page</option>
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label">Custom Parameters (Optional)</label>
-                        <input type="text" class="form-control" name="custom_params" placeholder="key1=value1&key2=value2">
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-primary">Generate Link</button>
+                <div class="mt-3 d-flex align-items-center gap-3">
+                    <button type="submit" class="btn btn-primary" id="generateLinkBtn">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="generateSpinner" role="status" aria-hidden="true"></span>
+                        <span id="generateBtnText">Generate Link</span>
+                    </button>
+                    <div id="linkError" class="alert alert-danger d-none mb-0 py-2 px-3" role="alert" style="font-size: 0.9rem;"></div>
                 </div>
             </form>
 
@@ -72,14 +54,6 @@
                             <i class="bi bi-clipboard"></i> Copy
                         </button>
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-sm btn-outline-primary" onclick="generateQRCode()">
-                            <i class="bi bi-qr-code"></i> Generate QR Code
-                        </button>
-                        <button class="btn btn-sm btn-outline-primary" onclick="shortenLink()">
-                            <i class="bi bi-link-45deg"></i> Shorten Link
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -89,7 +63,7 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">Your Active Links</h5>
-            <span class="badge bg-primary">{{ active_links_count|default:0 }} Active Links</span>
+            <span class="badge bg-primary"><span id="activeLinksCount">0</span> Active Links</span>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -105,54 +79,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for link in referral_links %}
-                        <tr>
-                            <td data-label="Campaign">
-                                <div class="fw-medium">{{ link.campaign_name }}</div>
-                                <div class="text-muted small">{{ link.utm_source|default:"Direct" }}</div>
-                            </td>
-                            <td data-label="Product">
-                                <span class="badge bg-secondary">{{ link.product }}</span>
-                            </td>
-                            <td data-label="Link">
-                                <div class="link-wrapper">
-                                    <code class="small">{{ link.short_url|default:link.url|truncatechars:30 }}</code>
-                                    <button class="btn btn-sm btn-link" onclick="copyLinkToClipboard('{{ link.url }}')">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td data-label="Clicks">{{ link.clicks|default:0 }}</td>
-                            <td data-label="Conversions">
-                                <span class="text-success">{{ link.conversions|default:0 }}</span>
-                                {% if link.clicks > 0 %}
-                                <span class="text-muted small">({{ link.conversion_rate|default:"0" }}%)</span>
-                                {% endif %}
-                            </td>
-                            <td data-label="Created">{{ link.created_date|date:"M d, Y" }}</td>
-                            <td data-label="Actions">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary" onclick="viewLinkStats('{{ link.id }}')">
-                                        <i class="bi bi-graph-up"></i>
-                                    </button>
-                                    <button class="btn btn-outline-secondary" onclick="editLink('{{ link.id }}')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-outline-danger" onclick="deleteLink('{{ link.id }}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <p class="mb-0">No referral links created yet.</p>
-                                <p class="text-muted small">Generate your first link using the form above!</p>
-                            </td>
-                        </tr>
-                        {% endfor %}
+                    <tbody id="linksTbody">
                     </tbody>
                 </table>
             </div>
@@ -160,39 +87,217 @@
     </div>
 </div>
 
-<!-- QR Code Modal -->
-<div class="modal fade" id="qrCodeModal" tabindex="-1">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">QR Code</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center">
-                <div id="qrCodeContainer"></div>
-                <button class="btn btn-primary mt-3" onclick="downloadQRCode()">Download QR Code</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     // Link generation and management functions
-    document.getElementById('linkGeneratorForm').addEventListener('submit', function(e) {
+    const API_BASE = '/platform/api/v1';
+
+    function getCsrfToken() {
+        const name = 'csrftoken=';
+        const decodedCookie = decodeURIComponent(document.cookie || '');
+        const ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(name) === 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return '';
+    }
+
+    function randomString(len) {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let out = '';
+        for (let i = 0; i < len; i++) {
+            out += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return out;
+    }
+
+    function generateCode(prefix) {
+        return `${prefix}-${randomString(8)}`;
+    }
+
+    function formatDate(d) {
+        try {
+            const dt = new Date(d);
+            if (!isNaN(dt.getTime())) return dt.toLocaleDateString();
+        } catch (_) {}
+        return '';
+    }
+
+    function buildShareUrl(item) {
+        return `${item.destination_url}?ref=${encodeURIComponent(item.code)}`;
+    }
+
+    function renderLinksTable(items, totalCount) {
+        const tbody = document.getElementById('linksTbody');
+        const countEl = document.getElementById('activeLinksCount');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const count = typeof totalCount === 'number' ? totalCount : (Array.isArray(items) ? items.length : 0);
+
+        if (!Array.isArray(items) || items.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <p class="mb-0">No referral links created yet.</p>
+                        <p class="text-muted small">Generate your first link using the form above!</p>
+                    </td>
+                </tr>`;
+            if (countEl) countEl.textContent = String(count);
+            return;
+        }
+
+        const rows = items.map(item => {
+            const shareUrl = buildShareUrl(item);
+            const created = formatDate(item.created_at);
+            return `
+                <tr>
+                    <td data-label="Campaign">
+                        <div class="fw-medium">${item.title || ''}</div>
+                        <div class="text-muted small">Direct</div>
+                    </td>
+                    <td data-label="Product">
+                        <span class="badge bg-secondary">Payroll</span>
+                    </td>
+                    <td data-label="Link">
+                        <div class="link-wrapper">
+                            <code class="small">${shareUrl}</code>
+                            <button class="btn btn-sm btn-link" onclick="copyLinkToClipboard('${shareUrl}')">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td data-label="Clicks">${item.clicks ?? 0}</td>
+                    <td data-label="Conversions"><span class="text-success">0</span></td>
+                    <td data-label="Created">${created}</td>
+                    <td data-label="Actions">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="copyLinkToClipboard('${shareUrl}')" title="Copy link">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+        tbody.innerHTML = rows.join('');
+        if (countEl) countEl.textContent = String(count);
+    }
+
+    async function fetchAndRenderLinks() {
+        try {
+            const resp = await fetch(`${API_BASE}/marketing/links/`, { credentials: 'include' });
+            if (!resp.ok) throw new Error(`Failed to fetch links: ${resp.status}`);
+            const data = await resp.json();
+            const items = Array.isArray(data) ? data : (Array.isArray(data.results) ? data.results : []);
+            const total = Array.isArray(data) ? data.length : (typeof data.count === 'number' ? data.count : items.length);
+            renderLinksTable(items, total);
+        } catch (e) {
+            console.error(e);
+            renderLinksTable([], 0);
+        }
+    }
+
+    document.getElementById('linkGeneratorForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        // Generate link logic
-        const generatedLink = 'https://evolve-payments.com/ref/ABC123XYZ'; // Example
-        document.getElementById('generatedLink').value = generatedLink;
-        document.getElementById('generatedLinkSection').style.display = 'block';
+
+        const form = e.currentTarget;
+        const btn = document.getElementById('generateLinkBtn');
+        const spinner = document.getElementById('generateSpinner');
+        const btnText = document.getElementById('generateBtnText');
+        const errBox = document.getElementById('linkError');
+        const controls = form.querySelectorAll('input, select, button');
+
+        // Reset error box
+        if (errBox) {
+            errBox.classList.add('d-none');
+            errBox.textContent = '';
+        }
+
+        const campaignName = (form.elements['campaign_name']?.value || '').trim();
+        const product = form.elements['product']?.value || '';
+        if (product !== 'payroll') {
+            if (errBox) {
+                errBox.textContent = 'Please select Payroll.';
+                errBox.classList.remove('d-none');
+            }
+            return;
+        }
+
+        const title = campaignName || 'Payroll';
+        const code = generateCode('PAY');
+        const destinationUrl = `${window.location.origin}/payroll/subscribe/`;
+
+        const payload = {
+            title: title,
+            code: code,
+            destination_url: destinationUrl,
+            is_active: true
+        };
+
+        // Set loading state
+        controls.forEach(el => el.disabled = true);
+        if (btn) btn.disabled = true;
+        if (spinner) spinner.classList.remove('d-none');
+        if (btnText) btnText.textContent = 'Generating...';
+
+        try {
+            const resp = await fetch(`${API_BASE}/marketing/links/`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!resp.ok) {
+                const text = await resp.text();
+                throw new Error(text || `Request failed with ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            // Shareable link: use destination with a ref code param so we can attribute later.
+            const shareUrl = `${data.destination_url}?ref=${encodeURIComponent(data.code)}`;
+            const linkInput = document.getElementById('generatedLink');
+            if (linkInput) linkInput.value = shareUrl;
+
+            const section = document.getElementById('generatedLinkSection');
+            if (section) section.style.display = 'block';
+
+            // Refresh table so the newly created link appears
+            await fetchAndRenderLinks();
+        } catch (err) {
+            console.error('Failed to create link', err);
+            if (errBox) {
+                // Truncate very long HTML error bodies for safety
+                let msg = String(err && err.message ? err.message : err || 'Unknown error');
+                if (msg.length > 300) msg = msg.slice(0, 300) + '...';
+                errBox.textContent = `Could not create link. ${msg}`;
+                errBox.classList.remove('d-none');
+            }
+        } finally {
+            // Restore controls
+            controls.forEach(el => el.disabled = false);
+            if (btn) btn.disabled = false;
+            if (spinner) spinner.classList.add('d-none');
+            if (btnText) btnText.textContent = 'Generate Link';
+        }
     });
 
     function copyLink() {
         const linkInput = document.getElementById('generatedLink');
-        linkInput.select();
-        document.execCommand('copy');
-        // Show success message
+        const value = linkInput && linkInput.value ? linkInput.value : '';
+        if (!value) { return; }
+        navigator.clipboard.writeText(value).then(() => {
+            // Optionally show a non-intrusive notification
+        });
     }
 
     function copyLinkToClipboard(link) {
@@ -201,15 +306,13 @@
         });
     }
 
-    function generateQRCode() {
-        // Implement QR code generation
-        const modal = new bootstrap.Modal(document.getElementById('qrCodeModal'));
-        modal.show();
-    }
 
     function viewLinkStats(linkId) {
-        // Navigate to link statistics
+        // Navigate to link statistics (optional, not wired for MVP)
         window.location.href = `/reseller/links/${linkId}/stats/`;
     }
+
+    // Load existing links on page load
+    fetchAndRenderLinks();
 </script>
 {% endblock %}

@@ -51,12 +51,6 @@
             <a href="{% url 'reseller:links' %}" class="{% if request.resolver_match.url_name == 'links' %}active{% endif %}" data-tooltip="Links">
                 <i class="fas fa-link"></i> <span>Links</span>
             </a>
-            <a href="{% url 'reseller:tools' %}" class="{% if request.resolver_match.url_name == 'tools' %}active{% endif %}" data-tooltip="Tools">
-                <i class="fas fa-toolbox"></i> <span>Tools</span>
-            </a>
-            <a href="{% url 'reseller:resources' %}" class="{% if request.resolver_match.url_name == 'resources' %}active{% endif %}" data-tooltip="Resources">
-                <i class="fas fa-book"></i> <span>Resources</span>
-            </a>
         </div>
         <a href="{% url 'reseller:settings' %}" class="{% if 'settings' in request.resolver_match.url_name %}active{% endif %}" data-tooltip="Settings">
             <i class="fas fa-cog"></i> <span>Settings</span>

@@ -51,9 +51,9 @@ WHITENOISE_MANIFEST_STRICT = False
 
 ### Testing After Deployment
 
-1. **Main site**: https://evolve-platform.onrender.com/
-2. **Diagnostic page**: https://evolve-platform.onrender.com/static-diagnostic/
-3. **Test page**: https://evolve-platform.onrender.com/static-test/
+1. **Main site**: {{RENDER_SERVICE_URL}}
+2. **Diagnostic page**: {{RENDER_SERVICE_URL}}/static-diagnostic/
+3. **Test page**: {{RENDER_SERVICE_URL}}/static-test/
 
 ### Next Steps If Issues Persist
 

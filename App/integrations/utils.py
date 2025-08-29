@@ -16,6 +16,13 @@ def send_otp(email, phone, code):
     # HTML version
     html_content = render_to_string('emails/otp_email.html', {'code': code})
 
+    # Check if email is properly configured
+    email_host = getattr(settings, 'EMAIL_HOST', None)
+    if not email_host:
+        print(f"⚠️ EMAIL_HOST not configured. OTP for {email}: {code}")
+        print("Please configure EMAIL_HOST, EMAIL_HOST_USER, and EMAIL_HOST_PASSWORD in environment variables.")
+        return
+
     try:
         msg = EmailMultiAlternatives(subject, text_content, from_email, to)
         msg.attach_alternative(html_content, "text/html")
@@ -25,6 +32,8 @@ def send_otp(email, phone, code):
     except Exception as e:
         # Log the error but don't break the flow
         print(f"❌ Failed to send OTP email to {email}: {e}")
+        # Log OTP to console as emergency fallback (for debugging only)
+        print(f"🔐 EMERGENCY OTP for {email}: {code} (Email failed, showing in logs for debugging)")
         # Try sending plain text email as fallback
         try:
             from django.core.mail import send_mail as django_send_mail
