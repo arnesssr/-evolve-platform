@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'App',
     'App.admin.apps.AdminConfig',
     'App.reseller',
+    'App.business',
+    
 ]
 
 # Pesapal Configurations
