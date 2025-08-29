@@ -296,6 +296,11 @@ def create_order_view(request):
     # Build a callback URL to our confirmation endpoint so we can verify and activate subscriptions
     callback_url = request.build_absolute_uri(reverse('payment_confirm'))
 
+    # Attach affiliate markers if present for downstream reconciliation (non-authoritative)
+    affiliate_code = request.session.get('affiliate_code')
+    if affiliate_code:
+        description = f"{description} | AFF={affiliate_code}"
+
     payload = {
         "id": str(uuid.uuid4()),
         "currency": "KES",
@@ -383,12 +388,45 @@ def payment_confirm(request):
                         'auto_renewal': True,
                     }
                 )
-        # Clear purchase context
+
+            # Create reseller commission if attributed via short link
+            try:
+                affiliate_reseller_id = request.session.get('affiliate_reseller_id')
+                affiliate_code = request.session.get('affiliate_code')
+                if affiliate_reseller_id and affiliate_code:
+                    from App.reseller.earnings.models.reseller import Reseller as ResellerModel
+                    from App.reseller.earnings.services.commission_service import CommissionService
+                    reseller = ResellerModel.objects.get(id=affiliate_reseller_id)
+                    # Determine sale amount (from session or plan)
+                    sale_amount = request.session.get('purchase_amount')
+                    if not sale_amount and plan:
+                        sale_amount = float(plan.yearly_price) if billing == 'yearly' and plan.yearly_price else float(plan.price)
+                    sale_amount = sale_amount or 0
+                    commission_rate = float(reseller.get_tier_commission_rate())
+                    client_name = request.user.get_full_name() or request.user.username
+                    client_email = request.user.email
+                    notes = f"link_code={affiliate_code}; product=payroll; billing={billing}"
+                    CommissionService().create_commission({
+                        'reseller': reseller,
+                        'sale_amount': sale_amount,
+                        'commission_rate': commission_rate,
+                        'transaction_reference': tracking_id or merchant_reference or str(uuid.uuid4()),
+                        'client_name': client_name,
+                        'client_email': client_email,
+                        'product_name': 'Payroll Subscription',
+                        'product_type': 'subscription',
+                        'notes': notes,
+                    })
+            except Exception as e:
+                # Do not fail user flow if commission creation fails
+                print(f"Commission creation error: {e}")
+
+        # Clear purchase context (keep affiliate cookie; session keys not needed anymore)
         for k in ['purchase_software','purchase_plan','purchase_billing','purchase_users','purchase_amount','purchase_description']:
             request.session.pop(k, None)
-        # Friendly UX: take user straight to the app
+        # Friendly UX: send user to business dashboard (validated by active subscription)
         messages.success(request, 'Payment successful. Your Payroll subscription is now active.')
-        return redirect('launch-payroll')
+        return redirect('business-dashboard')
     else:
         messages.error(request, 'Payment could not be verified. Please contact support if you were charged.')
         return redirect('business-subscriptions')

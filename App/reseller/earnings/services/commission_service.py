@@ -38,7 +38,8 @@ class CommissionService(BaseService):
             amount=commission_amount,
             commission_rate=commission_rate,
             status='pending',
-            calculation_date=timezone.now()
+            calculation_date=timezone.now(),
+            notes=transaction_data.get('notes', '')
         )
 
         # Update reseller's pending commission

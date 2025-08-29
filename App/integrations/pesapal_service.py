@@ -49,6 +49,8 @@ def submit_order_request(access_token, payload):
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
+    # Note: Pesapal payload supports fields documented by the provider.
+    # We pass through our description (which may include affiliate markers) as-is.
     return requests.post(url, json=payload, headers=headers)
 
 def get_transaction_status(access_token, tracking_id, merchant_reference):
