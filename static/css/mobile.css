@@ -1,0 +1,319 @@
+/* Mobile-Only CSS - Complete Override for Hero Section */
+/* This file specifically targets mobile devices and overrides all desktop styles */
+
+/* Mobile Media Query - Apply only to screens 768px and below */
+@media (max-width: 768px) {
+    
+    /* Reset and Override Hero Section */
+    #hero {
+        min-height: auto !important;
+        height: auto !important;
+        padding: 80px 16px 40px 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    /* Hero Wrapper - Single Column Layout */
+    .hero-wrapper {
+        display: block !important;
+        grid-template-columns: none !important;
+        gap: 0 !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+    }
+    
+    /* Hero Content - Centered */
+    .hero-content {
+        text-align: center !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+    
+    /* Hero Badge - Smaller */
+    .hero-badge {
+        display: inline-flex !important;
+        justify-content: center !important;
+        padding: 4px 8px !important;
+        margin-bottom: 12px !important;
+        font-size: 11px !important;
+    }
+    
+    .hero-badge .badge-text {
+        font-size: 11px !important;
+    }
+    
+    /* Hero Title - Much Smaller */
+    .hero-title {
+        font-size: 24px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 12px !important;
+        text-align: center !important;
+        font-weight: 700 !important;
+    }
+    
+    .hero-title .title-line-1,
+    .hero-title .title-line-2,
+    .hero-title .title-line-3 {
+        font-size: 24px !important;
+        margin-bottom: 2px !important;
+        line-height: 1.2 !important;
+        display: block !important;
+    }
+    
+    /* Hero Subtitle - Smaller */
+    .hero-subtitle {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 20px !important;
+        text-align: center !important;
+        padding: 0 12px !important;
+        max-width: 100% !important;
+    }
+    
+    /* Hero CTA Container - Stack Vertically */
+    .hero-cta-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 auto 20px auto !important;
+        padding: 0 16px !important;
+        max-width: 280px !important;
+        width: 100% !important;
+    }
+    
+    /* Hero Buttons - Full Width, Smaller */
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+        min-height: 40px !important;
+        text-decoration: none !important;
+        gap: 6px !important;
+        box-sizing: border-box !important;
+    }
+    
+    .btn-hero-primary {
+        background: #1877f2 !important;
+        color: white !important;
+        border: none !important;
+        order: 1 !important;
+    }
+    
+    .btn-hero-secondary {
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #333 !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        order: 2 !important;
+        backdrop-filter: none !important;
+    }
+    
+    /* Hero Trust - Centered, Smaller */
+    .hero-trust {
+        display: flex !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        margin-top: 24px !important;
+        padding: 0 16px !important;
+    }
+    
+    .trust-item {
+        font-size: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+    
+    .trust-item i {
+        font-size: 14px !important;
+    }
+    
+    /* Hide Hero Visual on Mobile */
+    .hero-visual {
+        display: none !important;
+    }
+    
+    /* Hide Scroll Indicator on Mobile */
+    .hero-scroll-indicator {
+        display: none !important;
+    }
+    
+    /* Adjust Background Orbs for Mobile */
+    .hero-gradient-orb {
+        opacity: 0.3 !important;
+    }
+    
+    .hero-gradient-orb.orb-1 {
+        width: 300px !important;
+        height: 300px !important;
+        top: -100px !important;
+        right: -100px !important;
+    }
+    
+    .hero-gradient-orb.orb-2 {
+        width: 250px !important;
+        height: 250px !important;
+        bottom: -75px !important;
+        left: -75px !important;
+    }
+    
+    .hero-gradient-orb.orb-3 {
+        display: none !important;
+    }
+    
+    /* Header Adjustments for Mobile */
+    .navbar {
+        padding: 12px 16px !important;
+    }
+    
+    .logo {
+        font-size: 20px !important;
+    }
+    
+    /* Body and Container Adjustments */
+    body {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .container {
+        padding: 0 16px !important;
+        max-width: 100% !important;
+    }
+    
+    /* Force Text Colors on Mobile */
+    .hero-title,
+    .hero-title .title-line-1,
+    .hero-title .title-line-2,
+    .hero-title .title-line-3 {
+        color: white !important;
+    }
+    
+    .hero-subtitle {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .hero-badge .badge-text {
+        color: white !important;
+    }
+    
+    /* Additional Mobile Optimizations */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    
+    button, a {
+        -webkit-appearance: none !important;
+        border-radius: 6px !important;
+    }
+    
+    /* Ensure No Overflow */
+    html, body {
+        overflow-x: hidden !important;
+    }
+    
+    #hero {
+        overflow-x: hidden !important;
+    }
+}
+
+/* Extra Small Mobile Devices (iPhone SE, smaller phones) */
+@media (max-width: 480px) {
+    
+    #hero {
+        padding: 70px 12px 30px 12px !important;
+    }
+    
+    .hero-title {
+        font-size: 20px !important;
+    }
+    
+    .hero-title .title-line-1,
+    .hero-title .title-line-2,
+    .hero-title .title-line-3 {
+        font-size: 20px !important;
+    }
+    
+    .hero-subtitle {
+        font-size: 13px !important;
+        padding: 0 8px !important;
+    }
+    
+    .hero-cta-container {
+        max-width: 260px !important;
+        padding: 0 12px !important;
+    }
+    
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+        min-height: 36px !important;
+    }
+    
+    .hero-badge {
+        padding: 3px 6px !important;
+        font-size: 10px !important;
+    }
+    
+    .hero-badge .badge-text {
+        font-size: 10px !important;
+    }
+    
+    .trust-item {
+        font-size: 11px !important;
+    }
+    
+    .trust-item i {
+        font-size: 12px !important;
+    }
+    
+    .logo {
+        font-size: 18px !important;
+    }
+    
+    .navbar {
+        padding: 10px 12px !important;
+    }
+}
+
+/* Landscape Mobile Orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+    
+    #hero {
+        padding: 60px 16px 30px 16px !important;
+        min-height: auto !important;
+    }
+    
+    .hero-title {
+        font-size: 22px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .hero-title .title-line-1,
+    .hero-title .title-line-2,
+    .hero-title .title-line-3 {
+        font-size: 22px !important;
+        margin-bottom: 1px !important;
+    }
+    
+    .hero-subtitle {
+        margin-bottom: 16px !important;
+    }
+    
+    .hero-cta-container {
+        margin-bottom: 16px !important;
+    }
+}
