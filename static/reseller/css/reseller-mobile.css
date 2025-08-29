@@ -38,17 +38,20 @@ body {
     }
 }
 
-/* Container fluid for mobile */
+/* Container fluid */
 .dashboard-wrapper {
     width: 100%;
     overflow-x: hidden;
 }
 
-.main-content {
-    margin-left: 0 !important;
-    padding: 10px;
-    width: 100%;
-    min-height: calc(100vh - 60px);
+/* On mobile/tablet, main content should span full width */
+@media (max-width: 991.98px) {
+  .main-content {
+      margin-left: 0 !important;
+      padding: 10px;
+      width: 100%;
+      min-height: calc(100vh - 60px);
+  }
 }
 
 /* ==========================================
