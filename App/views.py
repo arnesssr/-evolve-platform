@@ -301,8 +301,15 @@ def create_order_view(request):
     if affiliate_code:
         description = f"{description} | AFF={affiliate_code}"
 
+    # Build a merchant reference that embeds the user id for reliable postback handling
+    if request.user.is_authenticated:
+        merchant_ref = f"U{request.user.id}-{uuid.uuid4()}"
+        request.session['last_order_user_id'] = request.user.id
+    else:
+        merchant_ref = str(uuid.uuid4())
+
     payload = {
-        "id": str(uuid.uuid4()),
+        "id": merchant_ref,
         "currency": "KES",
         "amount": amount,
         "description": description,
@@ -325,6 +332,22 @@ def create_order_view(request):
             "zip_code": ""
         }
     }
+
+    # Persist payment initiation for billing history
+    try:
+        from App.models import PaymentRecord
+        if request.user.is_authenticated:
+            PaymentRecord.objects.create(
+                user=request.user,
+                order_id=merchant_ref,
+                amount=amount,
+                currency='KES',
+                description=description,
+                status='initiated'
+            )
+    except Exception as e:
+        print(f"PaymentRecord create error: {e}")
+
     res = submit_order_request(token, payload)
     res_json = res.json()
 
@@ -364,12 +387,42 @@ def payment_confirm(request):
     token = generate_access_token()
     status = get_transaction_status(token, tracking_id, merchant_reference)
 
+    # Try to update stored PaymentRecord
+    try:
+        from App.models import PaymentRecord
+        pr = None
+        if merchant_reference:
+            pr = PaymentRecord.objects.filter(order_id=merchant_reference).first()
+        if pr:
+            pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
+            pr.status = 'completed' if status == 'COMPLETED' else 'failed'
+            pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
+    except Exception as e:
+        print(f"PaymentRecord update error: {e}")
+
+    # Determine acting user (in case session/login was lost on redirect)
+    user_for_actions = request.user if request.user.is_authenticated else None
+    if not user_for_actions and merchant_reference and merchant_reference.startswith('U'):
+        try:
+            uid_part = merchant_reference.split('-', 1)[0][1:]
+            uid = int(uid_part)
+            user_for_actions = User.objects.get(id=uid)
+        except Exception:
+            pass
+    if not user_for_actions:
+        last_uid = request.session.get('last_order_user_id')
+        if last_uid:
+            try:
+                user_for_actions = User.objects.get(id=last_uid)
+            except Exception:
+                user_for_actions = None
+
     if status == "COMPLETED":
         # On successful payment, activate subscription if applicable
-        software = request.session.get('purchase_software')
+        software = request.session.get('purchase_software', 'payroll')
         plan_name = request.session.get('purchase_plan')
         billing = request.session.get('purchase_billing', 'monthly')
-        if software == 'payroll' and request.user.is_authenticated:
+        if software == 'payroll' and user_for_actions:
             try:
                 plan = Plan.objects.get(name=plan_name)
             except Plan.DoesNotExist:
@@ -378,7 +431,7 @@ def payment_confirm(request):
             period = timedelta(days=365) if billing == 'yearly' else timedelta(days=30)
             if plan:
                 Subscription.objects.update_or_create(
-                    user=request.user,
+                    user=user_for_actions,
                     product='payroll',
                     defaults={
                         'plan': plan,
@@ -391,20 +444,29 @@ def payment_confirm(request):
 
             # Create reseller commission if attributed via short link
             try:
+                affiliate_code = request.session.get('affiliate_code') or request.COOKIES.get('affiliate_code')
                 affiliate_reseller_id = request.session.get('affiliate_reseller_id')
-                affiliate_code = request.session.get('affiliate_code')
+                from App.reseller.earnings.models.reseller import Reseller as ResellerModel
+                from App.reseller.earnings.services.commission_service import CommissionService
+                if affiliate_code and not affiliate_reseller_id:
+                    # Resolve reseller from MarketingLink
+                    try:
+                        from App.reseller.marketing.models import MarketingLink as ML
+                        ml = ML.objects.filter(code=affiliate_code, is_active=True).first()
+                        if ml:
+                            affiliate_reseller_id = ml.reseller_id
+                    except Exception:
+                        affiliate_reseller_id = None
                 if affiliate_reseller_id and affiliate_code:
-                    from App.reseller.earnings.models.reseller import Reseller as ResellerModel
-                    from App.reseller.earnings.services.commission_service import CommissionService
                     reseller = ResellerModel.objects.get(id=affiliate_reseller_id)
                     # Determine sale amount (from session or plan)
                     sale_amount = request.session.get('purchase_amount')
-                    if not sale_amount and plan:
+                    if (not sale_amount) and plan:
                         sale_amount = float(plan.yearly_price) if billing == 'yearly' and plan.yearly_price else float(plan.price)
-                    sale_amount = sale_amount or 0
+                    sale_amount = sale_amount or (pr.amount if pr else 0)
                     commission_rate = float(reseller.get_tier_commission_rate())
-                    client_name = request.user.get_full_name() or request.user.username
-                    client_email = request.user.email
+                    client_name = (user_for_actions.get_full_name() or user_for_actions.username)
+                    client_email = user_for_actions.email
                     notes = f"link_code={affiliate_code}; product=payroll; billing={billing}"
                     CommissionService().create_commission({
                         'reseller': reseller,
@@ -422,7 +484,7 @@ def payment_confirm(request):
                 print(f"Commission creation error: {e}")
 
         # Clear purchase context (keep affiliate cookie; session keys not needed anymore)
-        for k in ['purchase_software','purchase_plan','purchase_billing','purchase_users','purchase_amount','purchase_description']:
+        for k in ['purchase_software','purchase_plan','purchase_billing','purchase_users','purchase_amount','purchase_description','last_order_user_id']:
             request.session.pop(k, None)
         # Friendly UX: send user to business dashboard (validated by active subscription)
         messages.success(request, 'Payment successful. Your Payroll subscription is now active.')
@@ -467,7 +529,14 @@ def business_subscriptions(request):
     return render(request, 'dashboards/business/pages/my-plans.html', context)
 
 def business_billing(request):
-    return render(request, 'dashboards/business/pages/billing-history.html')
+    # Show user's recent payments/invoices (from PaymentRecord)
+    payments = []
+    try:
+        from App.models import PaymentRecord
+        payments = PaymentRecord.objects.filter(user=request.user).order_by('-created_at')[:50]
+    except Exception:
+        payments = []
+    return render(request, 'dashboards/business/pages/billing-history.html', { 'payments': payments })
 
 def business_users(request):
     return render(request, 'dashboards/business/pages/user-management.html')

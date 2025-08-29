@@ -59,11 +59,36 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% if payments %}
+                                    {% for p in payments %}
+                                    <tr>
+                                        <td>{{ p.order_id }}</td>
+                                        <td>{{ p.created_at|date:'M d, Y H:i' }}</td>
+                                        <td>{{ p.description|default:'Payment' }}</td>
+                                        <td>KES {{ p.amount }}</td>
+                                        <td>
+                                            {% if p.status == 'completed' %}
+                                                <span class="badge bg-success">Paid</span>
+                                            {% elif p.status == 'failed' %}
+                                                <span class="badge bg-danger">Failed</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
                                 <tr>
                                     <td colspan="6" class="text-center text-muted py-4">
                                         No invoices available yet.
                                     </td>
                                 </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
