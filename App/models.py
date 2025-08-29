@@ -225,6 +225,7 @@ class PaymentRecord(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=10, default='KES')
     description = models.TextField(blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)  # payer MSISDN if available
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='initiated')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

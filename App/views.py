@@ -10,7 +10,7 @@ from App.models import Business, Plan, Feature, Subscription
 from App.integrations.utils import send_otp, send_mail
 from django.views.generic import TemplateView
 from django.http import JsonResponse, Http404
-from App.integrations.pesapal_service import generate_access_token, register_ipn_url, get_registered_ipns, submit_order_request, get_transaction_status
+from App.integrations import pesapal_service
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
@@ -199,7 +199,7 @@ def verify_login_otp(request):
                 if profile.role == 'business_owner':
                      return redirect('business-dashboard')
                 elif profile.role == 'admin':
-                    return redirect('admin-dashboard-test')  
+                    return redirect('admin-dashboard')  
                 else:
                     return redirect('reseller-dashboard')
 
@@ -263,22 +263,22 @@ def payment(request):
 
 
 def get_token_view(request):
-    token = generate_access_token()
+    token = pesapal_service.generate_access_token()
     return JsonResponse({"token": token})
 
 def register_ipn_view(request):
-    token = generate_access_token()
+    token = pesapal_service.generate_access_token()
     ipn_url = request.GET.get("url")
-    res = register_ipn_url(token, ipn_url)
+    res = pesapal_service.register_ipn_url(token, ipn_url)
     return JsonResponse(res.json(), status=res.status_code)
 
 def list_ipns_view(request):
-    token = generate_access_token()
-    res = get_registered_ipns(token)
+    token = pesapal_service.generate_access_token()
+    res = pesapal_service.get_registered_ipns(token)
     return JsonResponse(res.json(), safe=False)
 
 def create_order_view(request):
-    token = generate_access_token()
+    token = pesapal_service.generate_access_token()
 
     if request.content_type == 'application/json':
         data = json.loads(request.body)
@@ -297,7 +297,7 @@ def create_order_view(request):
     callback_url = request.build_absolute_uri(reverse('payment_confirm'))
 
     # Attach affiliate markers if present for downstream reconciliation (non-authoritative)
-    affiliate_code = request.session.get('affiliate_code')
+    affiliate_code = request.session.get('affiliate_code') or request.COOKIES.get('affiliate_code')
     if affiliate_code:
         description = f"{description} | AFF={affiliate_code}"
 
@@ -308,6 +308,18 @@ def create_order_view(request):
     else:
         merchant_ref = str(uuid.uuid4())
 
+    # Derive payer info
+    payer_email = getattr(request.user, 'email', '') if request.user.is_authenticated else ''
+    payer_phone = ''
+    try:
+        from App.models import UserProfile as UP
+        if request.user.is_authenticated:
+            prof = UP.objects.filter(user=request.user).first()
+            if prof and prof.phone:
+                payer_phone = prof.phone
+    except Exception:
+        payer_phone = ''
+
     payload = {
         "id": merchant_ref,
         "currency": "KES",
@@ -315,16 +327,16 @@ def create_order_view(request):
         "description": description,
         "callback_url": callback_url,
         "redirect_mode": "",
-        "notification_id": "005bccfc-10ec-4cb7-a491-db9dd0db9213",
-        "branch": "Store Name - Lixnet",
+        "notification_id": getattr(settings, 'PESAPAL_NOTIFICATION_ID', ''),
+        "branch": getattr(settings, 'PESAPAL_BRANCH', ''),
         "billing_address": {
-            "email_address": "kanini@example.com",
-            "phone_number": "0723xxxxxx",
+            "email_address": payer_email,
+            "phone_number": payer_phone,
             "country_code": "KE",
-            "first_name": "John",
+            "first_name": "",
             "middle_name": "",
-            "last_name": "Doe",
-            "line_1": "Pesapal Limited",
+            "last_name": "",
+            "line_1": "",
             "line_2": "",
             "city": "",
             "state": "",
@@ -343,12 +355,13 @@ def create_order_view(request):
                 amount=amount,
                 currency='KES',
                 description=description,
+                phone_number=payer_phone,
                 status='initiated'
             )
     except Exception as e:
         print(f"PaymentRecord create error: {e}")
 
-    res = submit_order_request(token, payload)
+    res = pesapal_service.submit_order_request(token, payload)
     res_json = res.json()
 
     if res.status_code == 200 and "redirect_url" in res_json:
@@ -381,8 +394,8 @@ def ipn_listener(request):
         or request.GET.get("MerchantReference")
     )
 
-    token = generate_access_token()
-    status = get_transaction_status(token, tracking_id, merchant_reference)
+    token = pesapal_service.generate_access_token()
+    status = pesapal_service.get_transaction_status(token, tracking_id, merchant_reference)
 
     from App.models import PaymentRecord
     pr = None
@@ -396,7 +409,10 @@ def ipn_listener(request):
     try:
         if pr:
             pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
-            pr.status = 'completed' if status == 'COMPLETED' else 'failed'
+            if status == 'COMPLETED':
+                pr.status = 'completed'
+            elif status == 'FAILED':
+                pr.status = 'failed'
             pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
     except Exception as e:
         print(f"IPN PaymentRecord update error: {e}")
@@ -501,8 +517,8 @@ def payment_confirm(request):
         or request.GET.get("MerchantReference")
     )
 
-    token = generate_access_token()
-    status = get_transaction_status(token, tracking_id, merchant_reference)
+    token = pesapal_service.generate_access_token()
+    status = pesapal_service.get_transaction_status(token, tracking_id, merchant_reference)
 
     # Try to update stored PaymentRecord
     try:
@@ -512,7 +528,10 @@ def payment_confirm(request):
             pr = PaymentRecord.objects.filter(order_id=merchant_reference).first()
         if pr:
             pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
-            pr.status = 'completed' if status == 'COMPLETED' else 'failed'
+            if status == 'COMPLETED':
+                pr.status = 'completed'
+            elif status == 'FAILED':
+                pr.status = 'failed'
             pr.save(update_fields=['provider_tracking_id', 'status', 'updated_at'])
     except Exception as e:
         print(f"PaymentRecord update error: {e}")
@@ -565,6 +584,7 @@ def payment_confirm(request):
                 affiliate_reseller_id = request.session.get('affiliate_reseller_id')
                 from App.reseller.earnings.models.reseller import Reseller as ResellerModel
                 from App.reseller.earnings.services.commission_service import CommissionService
+                from App.reseller.earnings.models import Commission as CommissionModel
                 if affiliate_code and not affiliate_reseller_id:
                     # Resolve reseller from MarketingLink
                     try:
@@ -575,27 +595,30 @@ def payment_confirm(request):
                     except Exception:
                         affiliate_reseller_id = None
                 if affiliate_reseller_id and affiliate_code:
-                    reseller = ResellerModel.objects.get(id=affiliate_reseller_id)
-                    # Determine sale amount (from session or plan)
-                    sale_amount = request.session.get('purchase_amount')
-                    if (not sale_amount) and plan:
-                        sale_amount = float(plan.yearly_price) if billing == 'yearly' and plan.yearly_price else float(plan.price)
-                    sale_amount = sale_amount or (pr.amount if pr else 0)
-                    commission_rate = float(reseller.get_tier_commission_rate())
-                    client_name = (user_for_actions.get_full_name() or user_for_actions.username)
-                    client_email = user_for_actions.email
-                    notes = f"link_code={affiliate_code}; product=payroll; billing={billing}"
-                    CommissionService().create_commission({
-                        'reseller': reseller,
-                        'sale_amount': sale_amount,
-                        'commission_rate': commission_rate,
-                        'transaction_reference': tracking_id or merchant_reference or str(uuid.uuid4()),
-                        'client_name': client_name,
-                        'client_email': client_email,
-                        'product_name': 'Payroll Subscription',
-                        'product_type': 'subscription',
-                        'notes': notes,
-                    })
+                    # Ensure idempotency: skip if a commission already exists for this transaction reference
+                    tx_ref = tracking_id or merchant_reference or str(uuid.uuid4())
+                    if not CommissionModel.objects.filter(transaction_reference=tx_ref).exists():
+                        reseller = ResellerModel.objects.get(id=affiliate_reseller_id)
+                        # Determine sale amount (from session or plan)
+                        sale_amount = request.session.get('purchase_amount')
+                        if (not sale_amount) and plan:
+                            sale_amount = float(plan.yearly_price) if billing == 'yearly' and plan.yearly_price else float(plan.price)
+                        sale_amount = sale_amount or (pr.amount if pr else 0)
+                        commission_rate = float(reseller.get_tier_commission_rate())
+                        client_name = (user_for_actions.get_full_name() or user_for_actions.username)
+                        client_email = user_for_actions.email
+                        notes = f"link_code={affiliate_code}; product=payroll; billing={billing}"
+                        CommissionService().create_commission({
+                            'reseller': reseller,
+                            'sale_amount': sale_amount,
+                            'commission_rate': commission_rate,
+                            'transaction_reference': tx_ref,
+                            'client_name': client_name,
+                            'client_email': client_email,
+                            'product_name': 'Payroll Subscription',
+                            'product_type': 'subscription',
+                            'notes': notes,
+                        })
             except Exception as e:
                 # Do not fail user flow if commission creation fails
                 print(f"Commission creation error: {e}")
@@ -674,13 +697,15 @@ def business_settings(request):
 @login_required
 def business_purchase_software(request):
     """
-    Handle software purchase requests - redirect to payment system with software context
+    Handle software purchase requests - restrict to payroll only.
+    This removes non-payroll product placeholders and simplifies logic per platform scope.
     """
     if request.method == "POST":
-        software = request.POST.get('software', 'unknown')
+        # Force product to payroll regardless of incoming value
+        software = 'payroll'
         plan = request.POST.get('plan', 'standard')
         billing = request.POST.get('billing', 'monthly')
-        users = request.POST.get('users', '5')
+        users = request.POST.get('users', '1')
         
         # Store purchase details in session for payment processing
         request.session['purchase_software'] = software
@@ -688,24 +713,16 @@ def business_purchase_software(request):
         request.session['purchase_billing'] = billing
         request.session['purchase_users'] = users
         
-        # Calculate pricing based on software and plan
+        # Calculate pricing for payroll only
         pricing = {
-            'erp': {'standard': 15000, 'professional': 25000},
-            'sacco': {'standard': 12000, 'professional': 18000},
-            'payroll': {'standard': 5000, 'professional': 8000},
-            'crm': {'standard': 12000, 'professional': 20000},
-            'inventory': {'standard': 15000, 'professional': 25000}
+            'payroll': {'standard': 5000, 'professional': 8000}
         }
         
         software_name_map = {
-            'erp': 'ERP System',
-            'sacco': 'SACCO Platform', 
-            'payroll': 'Payroll System',
-            'crm': 'CRM System',
-            'inventory': 'Inventory Management'
+            'payroll': 'Payroll System'
         }
         
-        base_cost = pricing.get(software, {}).get(plan, 15000)
+        base_cost = pricing['payroll'].get(plan, pricing['payroll']['standard'])
         setup_fee = 5000
         total_cost = base_cost + setup_fee
         
@@ -716,7 +733,7 @@ def business_purchase_software(request):
         
         # Store pricing for payment
         request.session['purchase_amount'] = total_cost
-        request.session['purchase_description'] = f"{software_name_map.get(software, 'Software')} - {plan.title()} Plan ({billing})"
+        request.session['purchase_description'] = f"{software_name_map['payroll']} - {plan.title()} Plan ({billing})"
         
         # Redirect to existing payment flow
         return redirect('payment')
@@ -769,9 +786,6 @@ def reseller_dashboard(request):
 
 def payment_failed(request):
     return render(request, 'payments/payment-failed.html')
-
-def admin_test(request):
-    return render(request, 'dashboards/admin/admin-dashboard-test.html')
 
 def admin_dashboard(request):
     return render(request, 'dashboards/admin/dashboard.html')
@@ -1337,9 +1351,3 @@ def mask_contact(contact, method):
     return contact
 
 
-def static_test_view(request):
-    """Test view to verify static files are being served correctly"""
-    return render(request, 'static_test.html', {
-        'debug': settings.DEBUG,
-        'STATIC_URL': settings.STATIC_URL,
-    })

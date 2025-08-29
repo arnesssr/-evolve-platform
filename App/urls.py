@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from App import views
-from App.diagnostic import static_diagnostic_view
 
 urlpatterns = [
     path('', views.landing_page, name = 'landing'),
@@ -34,7 +33,6 @@ urlpatterns = [
     path('order/submit/', views.create_order_view, name='create_order'),
     path('ipn/', views.ipn_listener, name='ipn_listener'),
     path('payment/confirm', views.payment_confirm, name='payment_confirm'),
-    path('payment-failed/', views.payment_failed, name='payment_failed'),
 
     path('logout/', views.logout, name='logout'),
     
@@ -66,7 +64,6 @@ urlpatterns = [
     path('platform/api/v1/', include('App.business.api.v1.urls')),
     path('platform/api/v1/', include('App.reseller.api.v1.urls')),
 
-    path('admin-test/', views.admin_test, name='admin-dashboard-test'),
     path('admin/dashboard/', views.admin_dashboard, name='admin-dashboard'),
     path('edit-plans/', views.edit_plans, name='edit-plans'),
     path('api/plans/<int:plan_id>/', views.get_plan_data, name='get_plan_data'),
@@ -74,9 +71,5 @@ urlpatterns = [
     path("api/plans/<int:pk>/", views.get_plan, name="get_plan"),
     path("api/plans/create/", views.create_plan, name="create_plan"),
     path("api/plans/active/", views.get_active_plans, name="get_active_plans"),
-    
-    # Diagnostic URL for static files (remove in production)
-    path('static-diagnostic/', static_diagnostic_view, name='static_diagnostic'),
-    path('static-test/', views.static_test_view, name='static_test'),
 
 ]

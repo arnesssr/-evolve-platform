@@ -76,6 +76,8 @@ PESAPAL_BASE_URL = config('PESAPAL_BASE_URL', default='https://cybqa.pesapal.com
 PESAPAL_CONSUMER_KEY = config('PESAPAL_CONSUMER_KEY', default='')
 PESAPAL_CONSUMER_SECRET = config('PESAPAL_CONSUMER_SECRET', default='')
 PESAPAL_SANDBOX = config('PESAPAL_SANDBOX', cast=bool, default=True)  # Set to False in production
+PESAPAL_NOTIFICATION_ID = config('PESAPAL_NOTIFICATION_ID', default='')
+PESAPAL_BRANCH = config('PESAPAL_BRANCH', default='')
 
 
 MIDDLEWARE = [

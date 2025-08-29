@@ -15,9 +15,6 @@
                     <p class="text-muted mb-0">View payment history, download invoices, and manage billing settings</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-primary">
-                        <i class="fas fa-download me-2"></i>Download Statement
-                    </a>
                 </div>
             </div>
         </div>
@@ -39,9 +36,6 @@
                                 <option>Last year</option>
                                 <option>All time</option>
                             </select>
-                            <button class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-download"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -55,7 +49,7 @@
                                     <th>Description</th>
                                     <th>Amount</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>Phone</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,11 +69,7 @@
                                                 <span class="badge bg-secondary">Pending</span>
                                             {% endif %}
                                         </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-secondary" disabled>
-                                                <i class="fas fa-download"></i>
-                                            </button>
-                                        </td>
+                                        <td>{{ p.phone_number|default:'—' }}</td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
@@ -97,42 +87,7 @@
         </div>
     </div>
 
-    <!-- Payment Methods -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-credit-card text-primary me-2"></i>Payment Method
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-muted">No payment method on file.</div>
-                    <hr>
-                    <a href="{% url 'business-support' %}" class="btn btn-outline-primary btn-sm w-100">
-                        <i class="fas fa-edit me-2"></i>Add / Update Payment Method
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0">
-                        <i class="fas fa-building text-primary me-2"></i>Billing Information
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-muted">Billing details not set.</div>
-                    <hr>
-                    <a href="{% url 'business-support' %}" class="btn btn-outline-primary btn-sm w-100">
-                        <i class="fas fa-edit me-2"></i>Update Billing Info
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Removed Payment Method and Billing Info cards for MVP to avoid dead links -->
 </div>
 
 {% endblock %}

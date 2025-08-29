@@ -121,3 +121,4 @@ class PaymentsIPNTests(TestCase):
 
         # Ensure no duplicate commission created
         self.assertEqual(Commission.objects.count(), initial_commissions)
+
