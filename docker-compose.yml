@@ -8,9 +8,11 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
+    env_file:
+      - .env
     environment:
-      - DEBUG=1
-      - DATABASE_URL=sqlite:///db.sqlite3
+      - DEBUG=${DEBUG:-1}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///db.sqlite3}
     depends_on:
       - db
     command: >

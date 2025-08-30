@@ -25,7 +25,36 @@ class MarketingLinkViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = request.user
         if not hasattr(user, 'reseller_profile'):
-            return Response({'detail': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+            # Auto-create reseller profile if missing
+            from App.reseller.earnings.models import Reseller
+            from App.models import UserProfile
+            from django.db import transaction
+            
+            with transaction.atomic():
+                # Ensure user has UserProfile with reseller role
+                user_profile, created = UserProfile.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': '',
+                        'role': 'reseller'
+                    }
+                )
+                
+                # Update role if profile existed but wasn't reseller
+                if not created and user_profile.role != 'reseller':
+                    user_profile.role = 'reseller'
+                    user_profile.save()
+                
+                # Create reseller profile
+                referral_code = Reseller.generate_unique_referral_code(user.id)
+                reseller_profile = Reseller.objects.create(
+                    user=user,
+                    referral_code=referral_code,
+                    phone_number=user_profile.phone or '',
+                    reseller_type='individual'  # Default type
+                )
+                user.reseller_profile = reseller_profile  # Update cached relation
+        
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         link = MarketingLinkService().create_link(user.reseller_profile, serializer.validated_data)
