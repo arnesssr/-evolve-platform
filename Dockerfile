@@ -39,7 +39,7 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Make startup script executable
-RUN chmod +x start.sh render-start.sh
+RUN chmod +x render-start.sh
 
 # Expose port
 EXPOSE 8000
