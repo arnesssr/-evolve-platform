@@ -39,7 +39,7 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # Make startup script executable
-RUN chmod +x start.sh
+RUN chmod +x start.sh render-start.sh
 
 # Expose port
 EXPOSE 8000
@@ -49,4 +49,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 # Default command - use startup script
-CMD ["./start.sh"]
+CMD ["bash","render-start.sh"]

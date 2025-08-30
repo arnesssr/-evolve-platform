@@ -54,6 +54,13 @@ TIMEOUT=${GUNICORN_TIMEOUT:-120}
 echo "[render-start] Running database migrations..."
 python manage.py migrate --noinput
 
+# Collect static files (optional; set COLLECTSTATIC=0 to skip)
+COLLECT=${COLLECTSTATIC:-1}
+if [ "$COLLECT" != "0" ] && [ "$COLLECT" != "false" ] && [ "$COLLECT" != "False" ] && [ "$COLLECT" != "FALSE" ]; then
+  echo "[render-start] Collecting static files..."
+  python manage.py collectstatic --noinput --verbosity=1
+fi
+
 echo "[render-start] Starting Gunicorn (workers=${WORKERS}, threads=${THREADS}, timeout=${TIMEOUT})..."
 exec gunicorn config.wsgi:application \
   --bind 0.0.0.0:${PORT:-8000} \
