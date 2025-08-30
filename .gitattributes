@@ -1,0 +1,6 @@
+# Normalize line endings and ensure shell scripts are LF on all platforms
+* text=auto
+
+# Force LF for shell scripts so they run correctly on Linux (Render)
+*.sh text eol=lf
+

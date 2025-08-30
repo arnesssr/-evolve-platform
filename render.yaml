@@ -6,7 +6,7 @@ services:
       pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --threads 2 --timeout 120
+    startCommand: bash render-start.sh
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings
@@ -18,6 +18,13 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.11.13
+      # Optional Gunicorn tuning via env
+      - key: GUNICORN_WORKERS
+        value: ""
+      - key: GUNICORN_THREADS
+        value: "2"
+      - key: GUNICORN_TIMEOUT
+        value: "120"
       # Email (set these in Render dashboard; values omitted here on purpose)
       - key: EMAIL_BACKEND
         value: django.core.mail.backends.smtp.EmailBackend
@@ -40,5 +47,5 @@ services:
         value: 
       - key: SMSLEOPARD_ACCESS_TOKEN
         value: 
-    # This is the key part - run migrations after deployment
+    # Ensure DB migrations run during deployment
     preDeployCommand: python manage.py migrate --noinput
