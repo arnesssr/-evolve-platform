@@ -682,20 +682,40 @@ def payment_confirm(request):
     token = pesapal_service.generate_access_token()
     status = pesapal_service.get_transaction_status(token, tracking_id, merchant_reference)
 
-    # Try to update stored PaymentRecord
+    # Try to update stored PaymentRecord and enrich with details
     try:
         from App.models import PaymentRecord
         pr = None
         if merchant_reference:
             pr = PaymentRecord.objects.filter(order_id=merchant_reference).first()
+        # Attempt to fetch details (best-effort)
+        details = None
+        try:
+            details = pesapal_service.get_transaction_status_details(token, tracking_id, merchant_reference)
+        except Exception as e:
+            details = None
+            print(f"[PESAPAL] status details fetch failed: {e}")
         if pr:
+            # Enrich with details when available
+            if details:
+                d_phone = (details.get('phone_number') or '').strip()
+                d_method = (details.get('payment_method') or '').strip()
+                d_track = (details.get('tracking_id') or '').strip()
+                if d_track and not tracking_id:
+                    tracking_id = d_track
+                if d_track and not pr.provider_tracking_id:
+                    pr.provider_tracking_id = d_track
+                if d_phone:
+                    pr.phone_number = d_phone[:20]
+                if d_method:
+                    pr.payment_method = d_method[:50]
             pr.provider_tracking_id = tracking_id or pr.provider_tracking_id
             pr.provider_status = status or pr.provider_status
             if status == 'COMPLETED':
                 pr.status = 'completed'
             elif status == 'FAILED':
                 pr.status = 'failed'
-            pr.save(update_fields=['provider_tracking_id', 'provider_status', 'status', 'updated_at'])
+            pr.save(update_fields=['provider_tracking_id', 'provider_status', 'status', 'phone_number', 'payment_method', 'updated_at'])
     except Exception as e:
         print(f"PaymentRecord update error: {e}")
 

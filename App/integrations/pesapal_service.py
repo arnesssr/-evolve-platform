@@ -101,6 +101,29 @@ def submit_order_request(access_token, payload):
         logger.error(f"[PESAPAL] Unexpected error during order submission: {e}")
         raise
 
+def _parse_payment_status(payload: dict) -> str | None:
+    try:
+        # Common variants from providers
+        candidates = [
+            'payment_status', 'PaymentStatus', 'paymentStatus', 'status', 'Status'
+        ]
+        val = None
+        for k in candidates:
+            if isinstance(payload.get(k), str) and payload.get(k).strip():
+                val = payload.get(k).strip()
+                break
+        if not val and isinstance(payload.get('result'), dict):
+            # Sometimes nested under 'result'
+            res = payload['result']
+            for k in candidates:
+                if isinstance(res.get(k), str) and res.get(k).strip():
+                    val = res.get(k).strip()
+                    break
+        return val.upper() if isinstance(val, str) else None
+    except Exception:
+        return None
+
+
 def get_transaction_status(access_token, tracking_id, merchant_reference):
     url = f"{BASE_URL}/api/Transactions/GetTransactionStatus"
     headers = {
@@ -111,11 +134,73 @@ def get_transaction_status(access_token, tracking_id, merchant_reference):
         "order_tracking_id": tracking_id,
         "order_merchant_reference": merchant_reference
     }
-    response = requests.get(url, headers=headers, params=params)
-
+    response = requests.get(url, headers=headers, params=params, timeout=30)
+    try:
+        js = response.json()
+    except Exception:
+        js = {}
     if response.status_code == 200:
-        return response.json().get("payment_status")  # "COMPLETED", "FAILED", etc.
+        return _parse_payment_status(js)
     else:
         return None
+
+
+def get_transaction_status_details(access_token, tracking_id=None, merchant_reference=None):
+    """Return a dict with normalized details about a transaction status.
+    Keys: status, phone_number, payment_method, tracking_id, raw
+    """
+    url = f"{BASE_URL}/api/Transactions/GetTransactionStatus"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json"
+    }
+    params = {}
+    if tracking_id:
+        params["order_tracking_id"] = tracking_id
+    if merchant_reference:
+        params["order_merchant_reference"] = merchant_reference
+    resp = requests.get(url, headers=headers, params=params, timeout=30)
+    try:
+        js = resp.json()
+    except Exception:
+        js = {}
+
+    status = _parse_payment_status(js)
+
+    # Normalize potential phone keys
+    phone = None
+    phone_keys = [
+        'phone_number', 'PhoneNumber', 'consumer_phone_number', 'msisdn', 'MSISDN', 'account_number', 'AccountNumber'
+    ]
+    for k in phone_keys:
+        val = js.get(k)
+        if isinstance(val, str) and val.strip():
+            phone = val.strip()
+            break
+    # Normalize method keys
+    method = None
+    method_keys = ['payment_method', 'PaymentMethod', 'paymentMethod', 'channel', 'Channel']
+    for k in method_keys:
+        val = js.get(k)
+        if isinstance(val, str) and val.strip():
+            method = val.strip()
+            break
+    # Tracking id in payload if present
+    track = None
+    track_keys = ['order_tracking_id', 'OrderTrackingId', 'tracking_id', 'TrackingId']
+    for k in track_keys:
+        val = js.get(k)
+        if isinstance(val, str) and val.strip():
+            track = val.strip()
+            break
+
+    return {
+        'status': status,
+        'phone_number': phone,
+        'payment_method': method,
+        'tracking_id': track or tracking_id,
+        'raw': js,
+        'http_status': resp.status_code,
+    }
 
 
