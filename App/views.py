@@ -353,7 +353,9 @@ def create_order_view(request):
         "amount": amount,
         "description": description,
         "callback_url": callback_url,
+        "redirect_mode": "REDIRECT",
         "notification_id": getattr(settings, 'PESAPAL_NOTIFICATION_ID', ''),
+        "branch": getattr(settings, 'PESAPAL_BRANCH', ''),
         "billing_address": {
             "email_address": email_address,
             "phone_number": phone,
@@ -401,13 +403,23 @@ def create_order_view(request):
         print(f"[PESAPAL] Response text: {res.text[:500]}...")  # First 500 chars
         return JsonResponse({"error": "Invalid response from payment provider"}, status=500)
     
-    if res.status_code == 200 and "redirect_url" in res_json:
+    # Accept any 2xx as success and support nested data.redirect_url
+    redirect_url = None
+    if isinstance(res_json, dict):
+        redirect_url = res_json.get("redirect_url")
+        if not redirect_url and isinstance(res_json.get("data"), dict):
+            redirect_url = res_json["data"].get("redirect_url")
+
+    if 200 <= res.status_code < 300 and redirect_url:
         return JsonResponse({
-            "redirect_url": res_json["redirect_url"]
+            "redirect_url": redirect_url
         })
     else:
         # Log the actual error from Pesapal
-        error_msg = res_json.get('message', res_json.get('error', 'Unknown error'))
+        error_msg = None
+        if isinstance(res_json, dict):
+            error_msg = res_json.get('message') or res_json.get('error') or res_json.get('status')
+        error_msg = error_msg or f"HTTP {res.status_code}"
         print(f"[PESAPAL] Order submission failed: {error_msg}")
         print(f"[PESAPAL] Full response: {res_json}")
         return JsonResponse({"error": f"Payment provider error: {error_msg}"}, status=400)

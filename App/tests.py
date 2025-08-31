@@ -121,3 +121,49 @@ class PaymentsIPNTests(TestCase):
 
         # Ensure no duplicate commission created
         self.assertEqual(Commission.objects.count(), initial_commissions)
+
+
+class FakeResponse:
+    def __init__(self, status_code=200, data=None, text=""):
+        self.status_code = status_code
+        self._data = data or {}
+        self.text = text or ("" if data is None else str(data))
+
+    def json(self):
+        return self._data
+
+
+class CreateOrderViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='buyer@example.com', email='buyer@example.com', password='Passw0rd!'
+        )
+        self.client.force_login(self.user)
+
+    @patch('App.integrations.pesapal_service.submit_order_request')
+    @patch('App.integrations.pesapal_service.generate_access_token')
+    def test_returns_redirect_url_on_success(self, mock_token, mock_submit):
+        mock_token.return_value = 'TEST_TOKEN'
+        mock_submit.return_value = FakeResponse(200, {'redirect_url': 'https://pay.example/redirect/abc'})
+
+        r = self.client.post(reverse('create_order'), {
+            'amount': '1000'
+        })
+        self.assertEqual(r.status_code, 200)
+        data = r.json()
+        self.assertIn('redirect_url', data)
+        self.assertTrue(data['redirect_url'].startswith('https://'))
+
+    @patch('App.integrations.pesapal_service.submit_order_request')
+    @patch('App.integrations.pesapal_service.generate_access_token')
+    def test_returns_400_on_provider_error(self, mock_token, mock_submit):
+        mock_token.return_value = 'TEST_TOKEN'
+        mock_submit.return_value = FakeResponse(400, {'error': 'Invalid notification id'})
+
+        r = self.client.post(reverse('create_order'), {
+            'amount': '1000'
+        })
+        self.assertEqual(r.status_code, 400)
+        data = r.json()
+        self.assertIn('error', data)
