@@ -1,5 +1,9 @@
 import requests
+import logging
 from django.conf import settings
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 BASE_URL = settings.PESAPAL_BASE_URL
 
@@ -14,8 +18,31 @@ def generate_access_token():
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    response = requests.post(url, json=payload, headers=headers)
-    return response.json().get("token") if response.status_code == 200 else None
+    
+    logger.info(f"[PESAPAL] Requesting token from: {url}")
+    logger.debug(f"[PESAPAL] Consumer key: {settings.PESAPAL_CONSUMER_KEY[:10]}..." if settings.PESAPAL_CONSUMER_KEY else "[PESAPAL] Consumer key is empty!")
+    
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        logger.info(f"[PESAPAL] Token response status: {response.status_code}")
+        
+        if response.status_code == 200:
+            token = response.json().get("token")
+            if token:
+                logger.info("[PESAPAL] Token generated successfully")
+                return token
+            else:
+                logger.error("[PESAPAL] Token not found in response")
+                logger.error(f"[PESAPAL] Response: {response.json()}")
+        else:
+            logger.error(f"[PESAPAL] Failed to generate token. Status: {response.status_code}")
+            logger.error(f"[PESAPAL] Response: {response.text}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"[PESAPAL] Request error during token generation: {e}")
+    except Exception as e:
+        logger.error(f"[PESAPAL] Unexpected error during token generation: {e}")
+    
+    return None
 
 # Register IPN URL
 def register_ipn_url(access_token, ipn_url):
@@ -49,9 +76,30 @@ def submit_order_request(access_token, payload):
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    # Note: Pesapal payload supports fields documented by the provider.
-    # We pass through our description (which may include affiliate markers) as-is.
-    return requests.post(url, json=payload, headers=headers)
+    
+    logger.info(f"[PESAPAL] Submitting order to: {url}")
+    logger.debug(f"[PESAPAL] Order payload: {payload}")
+    
+    try:
+        # Note: Pesapal payload supports fields documented by the provider.
+        # We pass through our description (which may include affiliate markers) as-is.
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        logger.info(f"[PESAPAL] Order submission response status: {response.status_code}")
+        
+        if response.status_code == 200:
+            logger.info("[PESAPAL] Order submitted successfully")
+            logger.debug(f"[PESAPAL] Response: {response.json()}")
+        else:
+            logger.error(f"[PESAPAL] Order submission failed. Status: {response.status_code}")
+            logger.error(f"[PESAPAL] Response: {response.text}")
+        
+        return response
+    except requests.exceptions.RequestException as e:
+        logger.error(f"[PESAPAL] Request error during order submission: {e}")
+        raise
+    except Exception as e:
+        logger.error(f"[PESAPAL] Unexpected error during order submission: {e}")
+        raise
 
 def get_transaction_status(access_token, tracking_id, merchant_reference):
     url = f"{BASE_URL}/api/Transactions/GetTransactionStatus"

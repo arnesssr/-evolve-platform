@@ -20,6 +20,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Create your views here.
@@ -295,7 +296,12 @@ def register_current_ipn(request):
 
 def create_order_view(request):
     token = pesapal_service.generate_access_token()
-
+    
+    # Log token status for debugging
+    if not token:
+        print("[PESAPAL] Failed to generate access token")
+        return JsonResponse({"error": "Failed to authenticate with payment provider"}, status=500)
+    
     if request.content_type == 'application/json':
         data = json.loads(request.body)
         amount = float(data.get('amount', 0))
@@ -336,18 +342,21 @@ def create_order_view(request):
     except Exception:
         payer_phone = ''
 
+    # Use merchant_reference as merchant_ref was renamed
+    merchant_reference = merchant_ref
+    email_address = payer_email
+    phone = payer_phone
+
     payload = {
-        "id": merchant_ref,
+        "id": merchant_reference,
         "currency": "KES",
         "amount": amount,
         "description": description,
         "callback_url": callback_url,
-        "redirect_mode": "",
         "notification_id": getattr(settings, 'PESAPAL_NOTIFICATION_ID', ''),
-        "branch": getattr(settings, 'PESAPAL_BRANCH', ''),
         "billing_address": {
-            "email_address": payer_email,
-            "phone_number": payer_phone,
+            "email_address": email_address,
+            "phone_number": phone,
             "country_code": "KE",
             "first_name": "",
             "middle_name": "",
@@ -381,14 +390,27 @@ def create_order_view(request):
         print(f"PaymentRecord create error: {e}")
 
     res = pesapal_service.submit_order_request(token, payload)
-    res_json = res.json()
-
+    
+    # Log response for debugging
+    print(f"[PESAPAL] Order submission response code: {res.status_code}")
+    
+    try:
+        res_json = res.json()
+    except Exception as e:
+        print(f"[PESAPAL] Failed to parse response JSON: {e}")
+        print(f"[PESAPAL] Response text: {res.text[:500]}...")  # First 500 chars
+        return JsonResponse({"error": "Invalid response from payment provider"}, status=500)
+    
     if res.status_code == 200 and "redirect_url" in res_json:
         return JsonResponse({
             "redirect_url": res_json["redirect_url"]
         })
     else:
-        return JsonResponse({"error": "Failed to create order"}, status=400)
+        # Log the actual error from Pesapal
+        error_msg = res_json.get('message', res_json.get('error', 'Unknown error'))
+        print(f"[PESAPAL] Order submission failed: {error_msg}")
+        print(f"[PESAPAL] Full response: {res_json}")
+        return JsonResponse({"error": f"Payment provider error: {error_msg}"}, status=400)
 
 @csrf_exempt
 def ipn_listener(request):
@@ -913,6 +935,67 @@ def reseller_dashboard(request):
 
 def payment_failed(request):
     return render(request, 'payments/payment-failed.html')
+
+@staff_member_required
+def pesapal_health(request):
+    """Check Pesapal configuration and connectivity.
+    Returns JSON with:
+    - token_ok: whether we obtained an access token
+    - base_url: Pesapal base URL in use
+    - notification_id_set: whether PESAPAL_NOTIFICATION_ID is configured
+    - branch_set: whether PESAPAL_BRANCH is configured
+    - ipn_list_ok: whether the IPN list endpoint responded OK
+    - ipn_registered_for_host: whether an IPN exists matching https://<host>/ipn/
+    """
+    from django.http import JsonResponse
+    from django.utils.timezone import now
+    from App.integrations import pesapal_service
+    import traceback
+
+    result = {
+        'checked_at': now().isoformat(),
+        'base_url': getattr(settings, 'PESAPAL_BASE_URL', ''),
+        'notification_id_set': bool(getattr(settings, 'PESAPAL_NOTIFICATION_ID', '')),
+        'branch_set': bool(getattr(settings, 'PESAPAL_BRANCH', '')),
+        'token_ok': False,
+        'ipn_list_ok': False,
+        'ipn_registered_for_host': False,
+        'details': {},
+    }
+
+    try:
+        token = pesapal_service.generate_access_token()
+        result['token_ok'] = bool(token)
+        if token:
+            # Try listing IPNs
+            resp = pesapal_service.get_registered_ipns(token)
+            result['ipn_list_ok'] = (getattr(resp, 'status_code', 0) == 200)
+            try:
+                data = resp.json() if hasattr(resp, 'json') else []
+            except Exception:
+                data = []
+            # Match expected URL for this host
+            host = request.get_host()
+            expected = f"https://{host}/ipn/"
+            # Pesapal may return list of dicts; try to match by url field case-insensitively
+            found = False
+            if isinstance(data, list):
+                for item in data:
+                    url = (item.get('url') or item.get('Url') or '').strip()
+                    if url.lower() == expected.lower():
+                        found = True
+                        break
+            result['ipn_registered_for_host'] = found
+            # Keep minimal diagnostics (no secrets)
+            result['details']['ipn_count'] = len(data) if isinstance(data, list) else None
+            result['details']['expected_ipn'] = expected
+        else:
+            result['details']['error'] = 'Failed to obtain access token; check PESAPAL_CONSUMER_KEY/SECRET and BASE_URL'
+    except Exception as e:
+        result['details']['exception'] = str(e)
+        result['details']['trace'] = traceback.format_exc().splitlines()[-3:]
+
+    return JsonResponse(result, status=200 if result['token_ok'] else 500)
 
 def admin_dashboard(request):
     return render(request, 'dashboards/admin/dashboard.html')

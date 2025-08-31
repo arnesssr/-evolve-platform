@@ -34,6 +34,9 @@ urlpatterns = [
     path('order/submit/', views.create_order_view, name='create_order'),
     path('ipn/', views.ipn_listener, name='ipn_listener'),
     path('payment/confirm', views.payment_confirm, name='payment_confirm'),
+    
+    # Diagnostics
+    path('pesapal/health/', views.pesapal_health, name='pesapal_health'),
 
     path('logout/', views.logout, name='logout'),
     

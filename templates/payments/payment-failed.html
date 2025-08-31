@@ -189,7 +189,13 @@
 
         <div class="error-details">
             <h3>What went wrong?</h3>
+            {% if error %}
+            <p>{{ error }}</p>
+            {% elif reason %}
+            <p>{{ reason }}</p>
+            {% else %}
             <p>Your payment was declined. This could be due to insufficient funds, incorrect card details, or your bank blocking the transaction.</p>
+            {% endif %}
         </div>
 
         <div class="actions">
