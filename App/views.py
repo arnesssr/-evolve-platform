@@ -441,11 +441,82 @@ def create_order_view(request):
     else:
         # Log the actual error from Pesapal
         error_msg = None
+        err_code = None
+        err_obj = None
         if isinstance(res_json, dict):
-            error_msg = res_json.get('message') or res_json.get('error') or res_json.get('status')
+            err_obj = res_json.get('error') if isinstance(res_json.get('error'), dict) else None
+            error_msg = (err_obj or {}).get('message') or res_json.get('message') or res_json.get('error') or res_json.get('status')
+            err_code = (err_obj or {}).get('code') or res_json.get('code') or res_json.get('error_code')
         error_msg = error_msg or f"HTTP {res.status_code}"
         print(f"[PESAPAL] Order submission failed: {error_msg}")
         print(f"[PESAPAL] Full response: {res_json}")
+
+        # Self-heal: if InvalidIpnId, try to discover or register the correct IPN for this host, then retry once
+        healable = False
+        if isinstance(error_msg, str) and ('InvalidIpnId' in error_msg or 'IPN ID is invalid' in error_msg):
+            healable = True
+        if isinstance(err_code, str) and err_code == 'InvalidIpnId':
+            healable = True
+
+        if healable:
+            try:
+                # Build expected IPN URL for current host (always https)
+                host = request.get_host()
+                expected_ipn = f"https://{host}/ipn/"
+                # 1) Try get_registered_ipns
+                ipn_resp = pesapal_service.get_registered_ipns(token)
+                ipn_json = []
+                try:
+                    ipn_json = ipn_resp.json() if hasattr(ipn_resp, 'json') else []
+                except Exception:
+                    ipn_json = []
+                found_id = None
+                if isinstance(ipn_json, list):
+                    for item in ipn_json:
+                        url = (item.get('url') or item.get('Url') or '').strip()
+                        if url.lower() == expected_ipn.lower():
+                            found_id = item.get('id') or item.get('Id') or item.get('ipn_id') or item.get('IpnId')
+                            if found_id:
+                                break
+                # 2) If not found, register
+                if not found_id:
+                    reg_resp = pesapal_service.register_ipn_url(token, expected_ipn)
+                    try:
+                        reg_json = reg_resp.json() if hasattr(reg_resp, 'json') else {}
+                    except Exception:
+                        reg_json = {}
+                    found_id = reg_json.get('ipn_id') or reg_json.get('IpnId') or reg_json.get('id') or reg_json.get('Id')
+                if found_id:
+                    print(f"[PESAPAL] Discovered/registered IPN for {expected_ipn} -> id={found_id}; retrying order...")
+                    payload["notification_id"] = found_id
+                    res2 = pesapal_service.submit_order_request(token, payload)
+                    try:
+                        res2_json = res2.json()
+                    except Exception:
+                        res2_json = {}
+                    # Extract redirect url again
+                    redirect_url2 = None
+                    if isinstance(res2_json, dict):
+                        candidates = ["redirect_url", "redirectUrl", "redirectURL"]
+                        for k in candidates:
+                            if k in res2_json and res2_json[k]:
+                                redirect_url2 = res2_json[k]
+                                break
+                        if not redirect_url2 and isinstance(res2_json.get("data"), dict):
+                            data_obj2 = res2_json["data"]
+                            for k in candidates:
+                                if k in data_obj2 and data_obj2[k]:
+                                    redirect_url2 = data_obj2[k]
+                                    break
+                    if 200 <= res2.status_code < 300 and redirect_url2:
+                        return JsonResponse({"redirect_url": redirect_url2})
+                    else:
+                        print(f"[PESAPAL] Retry after IPN fix failed. Status={res2.status_code} Body={res2_json}")
+                else:
+                    print(f"[PESAPAL] Could not discover or register IPN for host {host}; leaving error as-is")
+            except Exception as heal_e:
+                print(f"[PESAPAL] Self-heal attempt for InvalidIpnId failed: {heal_e}")
+
         return JsonResponse({"error": f"Payment provider error: {error_msg}"}, status=400)
 
 @csrf_exempt
