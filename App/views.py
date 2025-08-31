@@ -316,7 +316,18 @@ def create_order_view(request):
         amount = request.session.get('purchase_amount', 0)
 
     # Build a callback URL to our confirmation endpoint so we can verify and activate subscriptions
-    callback_url = request.build_absolute_uri(reverse('payment_confirm'))
+    # Prefer an explicit external base URL if configured (ensures correct host/scheme in proxies)
+    callback_path = reverse('payment_confirm')
+    base_override = (getattr(settings, 'PESAPAL_CALLBACK_BASE_URL', '') or '').strip()
+    if base_override:
+        base_override = base_override.rstrip('/')
+        callback_url = f"{base_override}{callback_path if callback_path.startswith('/') else '/' + callback_path}"
+    else:
+        # Fallback to request host; force https if it came as http (Pesapal prefers https)
+        callback_url = request.build_absolute_uri(callback_path)
+        if callback_url.startswith('http://'):
+            callback_url = 'https://' + callback_url[len('http://'):]
+    print(f"[PESAPAL] Using callback_url: {callback_url}")
 
     # Attach affiliate markers if present for downstream reconciliation (non-authoritative)
     affiliate_code = request.session.get('affiliate_code') or request.COOKIES.get('affiliate_code')
@@ -355,7 +366,6 @@ def create_order_view(request):
         "callback_url": callback_url,
         "redirect_mode": "REDIRECT",
         "notification_id": getattr(settings, 'PESAPAL_NOTIFICATION_ID', ''),
-        "branch": getattr(settings, 'PESAPAL_BRANCH', ''),
         "billing_address": {
             "email_address": email_address,
             "phone_number": phone,
@@ -371,6 +381,10 @@ def create_order_view(request):
             "zip_code": ""
         }
     }
+    # Only include branch if configured (avoid sending empty string)
+    branch_val = (getattr(settings, 'PESAPAL_BRANCH', '') or '').strip()
+    if branch_val:
+        payload["branch"] = branch_val
 
     # Persist payment initiation for billing history
     try:
@@ -403,12 +417,22 @@ def create_order_view(request):
         print(f"[PESAPAL] Response text: {res.text[:500]}...")  # First 500 chars
         return JsonResponse({"error": "Invalid response from payment provider"}, status=500)
     
-    # Accept any 2xx as success and support nested data.redirect_url
+    # Accept any 2xx as success and support nested data.redirect_url and casing variants
     redirect_url = None
     if isinstance(res_json, dict):
-        redirect_url = res_json.get("redirect_url")
+        candidates = ["redirect_url", "redirectUrl", "redirectURL"]
+        # Check top-level
+        for k in candidates:
+            if k in res_json and res_json[k]:
+                redirect_url = res_json[k]
+                break
+        # Check nested under data
         if not redirect_url and isinstance(res_json.get("data"), dict):
-            redirect_url = res_json["data"].get("redirect_url")
+            data_obj = res_json["data"]
+            for k in candidates:
+                if k in data_obj and data_obj[k]:
+                    redirect_url = data_obj[k]
+                    break
 
     if 200 <= res.status_code < 300 and redirect_url:
         return JsonResponse({

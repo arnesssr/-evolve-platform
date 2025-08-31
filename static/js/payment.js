@@ -85,13 +85,16 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: formData,
         })
-          .then(res => res.json())
-          .then(data => {
+          .then(async res => {
+            let data;
+            try { data = await res.json(); } catch (_) { data = {}; }
             if (data.redirect_url) {
               // Redirect user directly to Pesapal URL
               window.location.href = data.redirect_url;
             } else {
-              alert("Payment failed or redirect URL missing.");
+              const msg = data.error || data.message || `Payment failed (HTTP ${res.status}). Redirect URL missing.`;
+              alert(msg);
+              console.error("Payment provider error:", data);
             }
           })
           .catch(err => {
